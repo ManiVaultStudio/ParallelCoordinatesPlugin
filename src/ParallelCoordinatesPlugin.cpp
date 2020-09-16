@@ -14,6 +14,7 @@ using namespace hdps;
 // View
 // =============================================================================
 
+
 ParallelCoordinatesPlugin::~ParallelCoordinatesPlugin(void)
 {
     
@@ -21,9 +22,40 @@ ParallelCoordinatesPlugin::~ParallelCoordinatesPlugin(void)
 
 void ParallelCoordinatesPlugin::init()
 {
-    // Widgets can be freely added to the view plugin via the addWidget() function.
-	ParallelCoordinatesWidget* parallelCoordinatesWidget = new ParallelCoordinatesWidget();
-    addWidget(parallelCoordinatesWidget);
+	//
+	_dataSlot = new DataSlot(supportedDataTypes());
+
+	//
+	_parallelCoordinatesWidget = new ParallelCoordinatesWidget();
+	_dataSlot->addWidget(_parallelCoordinatesWidget);
+    addWidget(_parallelCoordinatesWidget);
+
+	//
+	connect(_dataSlot, &DataSlot::onDataInput, this, &ParallelCoordinatesPlugin::onDataInput);
+}
+
+void ParallelCoordinatesPlugin::onDataInput(QString dataSetName)
+{
+	_currentDataSet = dataSetName;
+	
+	setWindowTitle(_currentDataSet);
+
+	const Points& points = _core->requestData<Points>(_currentDataSet);
+
+	//_dimNames = QStringList(points.getDimensionNames().begin(), points.getDimensionNames().end());
+	//_numPoints = points.getNumPoints();
+
+	// TODO: pass points and names to the d3 widget
+	//if (_dimNames.size() == points.getNumDimensions())
+	//{
+	//	//settings->initDimOptions(points.getDimensionNames());
+	//	//settings->initScalarDimOptions(DataSet::getSourceData(points).getDimensionNames());
+	//}
+	//else
+	//{
+	//	//settings->initDimOptions(points.getNumDimensions());
+	//	//settings->initScalarDimOptions(DataSet::getSourceData(points).getNumDimensions());
+	//}
 }
 
 /**
@@ -34,7 +66,7 @@ void ParallelCoordinatesPlugin::init()
  */
 void ParallelCoordinatesPlugin::dataAdded(const QString name)
 {
-    const Points& addedSet = _core->requestData<Points>(name);
+ 
 }
 
 /**
@@ -45,7 +77,7 @@ void ParallelCoordinatesPlugin::dataAdded(const QString name)
  */
 void ParallelCoordinatesPlugin::dataChanged(const QString name)
 {
-    const Points& changedSet = _core->requestData<Points>(name);
+
 }
 
 /**
@@ -54,7 +86,7 @@ void ParallelCoordinatesPlugin::dataChanged(const QString name)
  */
 void ParallelCoordinatesPlugin::dataRemoved(const QString name)
 {
-    const Points& removedSet = dynamic_cast<const Points&>(_core->requestData(name));
+    
 }
 
 /**
@@ -64,7 +96,7 @@ void ParallelCoordinatesPlugin::dataRemoved(const QString name)
  */
 void ParallelCoordinatesPlugin::selectionChanged(const QString dataName)
 {
-    const hdps::DataSet& selectionSet = _core->requestSelection(dataName);
+
 }
 
 DataTypes ParallelCoordinatesPlugin::supportedDataTypes() const

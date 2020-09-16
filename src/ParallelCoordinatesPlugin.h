@@ -1,9 +1,19 @@
 #pragma once
 
 #include <ViewPlugin.h>
+#include <widgets/DataSlot.h>
+
+#include <QStringList>
 
 using namespace hdps::plugin;
+using namespace hdps::gui;
 
+// =============================================================================
+// View
+// =============================================================================
+
+//class ParallelCoordinatesSettings;
+class ParallelCoordinatesWidget;
 
 class ParallelCoordinatesPlugin : public ViewPlugin
 {
@@ -20,6 +30,20 @@ public:
     void dataRemoved(const QString name) Q_DECL_OVERRIDE;
     void selectionChanged(const QString dataName) Q_DECL_OVERRIDE;
     hdps::DataTypes supportedDataTypes() const Q_DECL_OVERRIDE;
+
+	ParallelCoordinatesWidget* _parallelCoordinatesWidget;
+
+public slots:
+	void onDataInput(QString dataSetName);
+
+private:
+	QString _currentDataSet;
+	DataSlot* _dataSlot;
+//	ParallelCoordinatesSettings* settings;
+
+	unsigned int _numPoints;
+	QStringList	_dimNames;
+
 };
 
 
