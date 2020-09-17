@@ -11,7 +11,7 @@ using namespace hdps::plugin;
 // =============================================================================
 
 class ParallelCoordinatesSettings;
-class ParallelCoordinatesWidget;
+class ParlCoorWidget;
 
 class ParallelCoordinatesPlugin : public ViewPlugin
 {
@@ -35,7 +35,7 @@ public slots:
 private:
 	QString _currentDataSet;
 
-	ParallelCoordinatesWidget* _parallelCoordinatesWidget;
+	ParlCoorWidget* _parCoordWidget;
 	ParallelCoordinatesSettings* _settingsWidget;
 
 };

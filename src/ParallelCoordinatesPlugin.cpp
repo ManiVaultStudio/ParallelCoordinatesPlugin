@@ -31,8 +31,9 @@ void ParallelCoordinatesPlugin::init()
 
 
 	//
-	_parallelCoordinatesWidget = new ParallelCoordinatesWidget();
-    addWidget(_parallelCoordinatesWidget);
+	_parCoordWidget = new ParlCoorWidget();
+	_parCoordWidget->setPage("D:/Documents/hdps/ParallelCoordinatesPlugin/src/web/brushing.html", "D:/Documents/hdps/ParallelCoordinatesPlugin/src/web/");
+    addWidget(_parCoordWidget);
 
 	//
 	_settingsWidget = new ParallelCoordinatesSettings();
