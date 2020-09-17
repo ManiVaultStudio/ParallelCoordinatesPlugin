@@ -32,7 +32,7 @@ void ParallelCoordinatesPlugin::init()
 
 	//
 	_parCoordWidget = new ParlCoorWidget();
-	_parCoordWidget->setPage("D:/Documents/hdps/ParallelCoordinatesPlugin/src/web/brushing.html", "D:/Documents/hdps/ParallelCoordinatesPlugin/src/web/");
+	_parCoordWidget->setPage(":parcoords/parcoords.html", "qrc:/parcoords/");
     addWidget(_parCoordWidget);
 
 	//

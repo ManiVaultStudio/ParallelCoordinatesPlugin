@@ -17,6 +17,8 @@ endif(MSVC)
 
 find_package(Qt5 COMPONENTS Widgets WebEngineWidgets REQUIRED)
 
+qt5_add_resources(RESOURCE_FILES res/parcoords_resources.qrc)
+
 set(SOURCES
     src/ParallelCoordinatesPlugin.h
     src/ParallelCoordinatesPlugin.cpp
@@ -27,11 +29,19 @@ set(SOURCES
     src/ParallelCoordinatesSettings.cpp
 )
 
+set (RESOURCES
+    res/parcoords_resources.qrc
+)
+
 source_group( Plugin FILES ${SOURCES})
+source_group( Resources FILES ${RESOURCES})
+source_group( Resources\\generated FILES ${CMAKE_CURRENT_BINARY_DIR}/qrc_parcoords_resources.cpp)
 
 include_directories("$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/include/")
 
-add_library(${PROJECT} SHARED ${SOURCES})
+add_library(${PROJECT} SHARED ${SOURCES} ${RESOURCES} ${RESOURCE_FILES})
+
+qt5_use_modules(${PROJECT} Widgets WebEngineWidgets)
 
 target_link_libraries(${PROJECT} Qt5::Widgets)
 target_link_libraries(${PROJECT} Qt5::WebEngineWidgets)

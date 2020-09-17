@@ -31,6 +31,7 @@ void ParlCoorCommunicationObject::js_highlightUpdated(int highlightId)
 ParlCoorWidget::ParlCoorWidget():
 	loaded(false)
 {
+	Q_INIT_RESOURCE(parcoords_resources);
 	_communicationObject = new ParlCoorCommunicationObject(this);
 	init(_communicationObject);
 

@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="">
+        <file>parcoords/parcoords.html</file>
+        <file>parcoords/parcoords.tools.js</file>
+    </qresource>
+    <qresource prefix="">
+        <file>jslibs/d3.v3.min.js</file>
+        <file>jslibs/d3.parcoords.js</file>
+        <file>jslibs/d3.parcoords.css</file>
+        <file>jslibs/d3.svg.multibrush.js</file>
+        <file>jslibs/styles.css</file>
+        <file>jslibs/qwebchannel.js</file>
+    </qresource>
+		<qresource prefix="">
+		<file>cars.csv</file>
+	</qresource>
+</RCC>
