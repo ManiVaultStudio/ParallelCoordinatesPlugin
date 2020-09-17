@@ -2,6 +2,7 @@
 
 #include "PointData.h"
 #include "ParallelCoordinatesWidget.h"
+#include "ParallelCoordinatesSettings.h"
 
 #include <QtCore>
 #include <QtDebug>
@@ -17,45 +18,52 @@ using namespace hdps;
 
 ParallelCoordinatesPlugin::~ParallelCoordinatesPlugin(void)
 {
-    
+ 
 }
 
 void ParallelCoordinatesPlugin::init()
 {
 	//
-	_dataSlot = new DataSlot(supportedDataTypes());
+	QVBoxLayout* layout = new QVBoxLayout();
+	layout->setMargin(0);
+	layout->setSpacing(0);
+	setMainLayout(layout);
+
 
 	//
 	_parallelCoordinatesWidget = new ParallelCoordinatesWidget();
-	_dataSlot->addWidget(_parallelCoordinatesWidget);
     addWidget(_parallelCoordinatesWidget);
 
 	//
-	connect(_dataSlot, &DataSlot::onDataInput, this, &ParallelCoordinatesPlugin::onDataInput);
+	_settingsWidget = new ParallelCoordinatesSettings();
+	addWidget(_settingsWidget);
+
+	//
+	connect(_settingsWidget, &ParallelCoordinatesSettings::onDataInput, this, &ParallelCoordinatesPlugin::onDataInput);
 }
 
 void ParallelCoordinatesPlugin::onDataInput(QString dataSetName)
 {
 	_currentDataSet = dataSetName;
-	
+
 	setWindowTitle(_currentDataSet);
-
-	const Points& points = _core->requestData<Points>(_currentDataSet);
-
-	//_dimNames = QStringList(points.getDimensionNames().begin(), points.getDimensionNames().end());
-	//_numPoints = points.getNumPoints();
-
-	// TODO: pass points and names to the d3 widget
-	//if (_dimNames.size() == points.getNumDimensions())
-	//{
-	//	//settings->initDimOptions(points.getDimensionNames());
-	//	//settings->initScalarDimOptions(DataSet::getSourceData(points).getDimensionNames());
-	//}
-	//else
-	//{
-	//	//settings->initDimOptions(points.getNumDimensions());
-	//	//settings->initScalarDimOptions(DataSet::getSourceData(points).getNumDimensions());
-	//}
+//
+//	const Points& points = _core->requestData<Points>(_currentDataSet);
+//
+//	//_dimNames = QStringList(points.getDimensionNames().begin(), points.getDimensionNames().end());
+//	//_numPoints = points.getNumPoints();
+//
+//	// TODO: pass points and names to the d3 widget
+//	//if (_dimNames.size() == points.getNumDimensions())
+//	//{
+//	//	//settings->initDimOptions(points.getDimensionNames());
+//	//	//settings->initScalarDimOptions(DataSet::getSourceData(points).getDimensionNames());
+//	//}
+//	//else
+//	//{
+//	//	//settings->initDimOptions(points.getNumDimensions());
+//	//	//settings->initScalarDimOptions(DataSet::getSourceData(points).getNumDimensions());
+//	//}
 }
 
 /**

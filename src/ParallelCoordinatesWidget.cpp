@@ -1,12 +1,10 @@
 #include "ParallelCoordinatesWidget.h"
 
 #include <QUrl>
-#include <QDir>
 #include <QDebug>
 #include <QResizeEvent>
 #include <QWebEngineView>
 #include <QWebEnginePage>
-#include <QSizeF>
 
 #include <sstream>
 
