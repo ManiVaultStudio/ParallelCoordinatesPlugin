@@ -46,7 +46,7 @@ void ParlCoorWidget::resizeEvent(QResizeEvent * e) {
 void ParlCoorWidget::initWebPage()
 {
 	loaded = true;
-
+	qDebug() << "ParlCoorWidget: WebChannel bridge is available.";
 }
 
 void ParlCoorWidget::js_selectData(QString name)

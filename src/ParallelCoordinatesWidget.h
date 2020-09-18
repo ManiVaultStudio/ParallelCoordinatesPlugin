@@ -49,6 +49,7 @@ protected:
 signals:
 
 private slots:
+	/** Is invoked when the js side calls js_available of the WebCommunicationObject (ParlCoorCommunicationObject) */
 	void initWebPage() override;
 
 private:
