@@ -2,6 +2,9 @@
 
 #include <ViewPlugin.h>
 
+#include <vector>
+
+#include <QString>
 #include <QStringList>
 
 using namespace hdps::plugin;
@@ -10,7 +13,7 @@ using namespace hdps::plugin;
 // View
 // =============================================================================
 
-class ParallelCoordinatesSettings;
+class ParlCoorSettings;
 class ParlCoorWidget;
 
 class ParallelCoordinatesPlugin : public ViewPlugin
@@ -30,13 +33,16 @@ public:
     hdps::DataTypes supportedDataTypes() const Q_DECL_OVERRIDE;
 
 public slots:
-	void onDataInput(QString dataSetName);
+	void onDataInput(const QString dataSetName);
 
 private:
 	QString _currentDataSet;
+	QStringList _dimNames;
+	unsigned int _numDims;
+	unsigned int _numPoints;
 
 	ParlCoorWidget* _parCoordWidget;
-	ParallelCoordinatesSettings* _settingsWidget;
+	ParlCoorSettings* _settingsWidget;
 
 };
 

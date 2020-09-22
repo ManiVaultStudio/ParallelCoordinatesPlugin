@@ -5,14 +5,14 @@
 #include <QMimeData>
 
 
-ParallelCoordinatesSettings::ParallelCoordinatesSettings() {
+ParlCoorSettings::ParlCoorSettings() {
 	// enable drag and drop of data elements, see https://doc.qt.io/qt-5/dnd.html#dropping
 	setAcceptDrops(true);
 
 	setFixedHeight(100);
 }
 
-void ParallelCoordinatesSettings::dragEnterEvent(QDragEnterEvent* dragEnterEvent)
+void ParlCoorSettings::dragEnterEvent(QDragEnterEvent* dragEnterEvent)
 {
 	const auto items = dragEnterEvent->mimeData()->text().split("\n");
 	const auto datasetType = items.at(1);
@@ -24,7 +24,7 @@ void ParallelCoordinatesSettings::dragEnterEvent(QDragEnterEvent* dragEnterEvent
 
 }
 
-void ParallelCoordinatesSettings::dropEvent(QDropEvent* dropEvent)
+void ParlCoorSettings::dropEvent(QDropEvent* dropEvent)
 {
 	const auto items = dropEvent->mimeData()->text().split("\n");
 	const auto datasetName = items.at(0);

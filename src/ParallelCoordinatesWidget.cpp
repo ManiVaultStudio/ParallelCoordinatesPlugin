@@ -1,5 +1,7 @@
 #include "ParallelCoordinatesWidget.h"
 
+#include <string>
+
 #include <QVariant>
 #include <QString>
 #include <QResizeEvent>
@@ -49,10 +51,14 @@ void ParlCoorWidget::initWebPage()
 	qDebug() << "ParlCoorWidget: WebChannel bridge is available.";
 }
 
+void ParlCoorWidget::passDataToJS(std::string _jsonObject)
+{
+	emit _communicationObject->qt_setData(QString(_jsonObject.c_str()));
+}
+
 void ParlCoorWidget::js_selectData(QString name)
 {
 }
-
 
 void ParlCoorWidget::js_selectionUpdated(QVariant selectedClusters)
 {

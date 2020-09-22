@@ -3,12 +3,12 @@
 #include <QWidget>
 
 
-class ParallelCoordinatesSettings : public QWidget
+class ParlCoorSettings : public QWidget
 {
 	Q_OBJECT
 
 public:
-	ParallelCoordinatesSettings();
+	ParlCoorSettings();
 
 private:
 	// Drag and drop

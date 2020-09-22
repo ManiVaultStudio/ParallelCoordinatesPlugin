@@ -8,6 +8,8 @@ try {
 
         QtBridge = channel.objects.QtBridge;
 
+        QtBridge.qt_setData.connect(function () { setData(arguments[0]); });
+
         notifyBridgeAvailable();
     });
 } catch (error) {
@@ -36,6 +38,8 @@ function notifyBridgeAvailable() {
     if (isQtAvailable) {
         QtBridge.js_available();
     }
+
+    log("test");
 }
 
 function setViewBusy() {

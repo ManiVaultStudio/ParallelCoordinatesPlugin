@@ -39,6 +39,8 @@ class ParlCoorWidget : public hdps::gui::WebWidget
 public:
 	ParlCoorWidget();
 
+	void passDataToJS(std::string _jsonObject);
+
 	void js_selectData(QString text);
 	void js_selectionUpdated(QVariant selectedClusters);
 	void js_highlightUpdated(int highlightId);
@@ -49,13 +51,12 @@ protected:
 signals:
 
 private slots:
-	/** Is invoked when the js side calls js_available of the WebCommunicationObject (ParlCoorCommunicationObject) */
+	/** Is invoked when the js side calls js_available of the WebCommunicationObject (ParlCoorCommunicationObject) 
+		js_available emits notifyJsBridgeIsAvailable, which is conencted to initWebPage in WebWidget.cpp*/
 	void initWebPage() override;
 
 private:
 	ParlCoorCommunicationObject*  _communicationObject;
-
-	QString _currentData;
 
 	/** Whether the web view has loaded and web-functions are ready to be called. */
 	bool loaded;

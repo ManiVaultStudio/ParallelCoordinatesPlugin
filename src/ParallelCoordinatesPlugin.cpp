@@ -36,24 +36,54 @@ void ParallelCoordinatesPlugin::init()
     addWidget(_parCoordWidget);
 
 	//
-	_settingsWidget = new ParallelCoordinatesSettings();
+	_settingsWidget = new ParlCoorSettings();
 	addWidget(_settingsWidget);
 
 	//
-	connect(_settingsWidget, &ParallelCoordinatesSettings::onDataInput, this, &ParallelCoordinatesPlugin::onDataInput);
+	connect(_settingsWidget, &ParlCoorSettings::onDataInput, this, &ParallelCoordinatesPlugin::onDataInput);
 }
 
-void ParallelCoordinatesPlugin::onDataInput(QString dataSetName)
+void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 {
 	_currentDataSet = dataSetName;
+	setWindowTitle(dataSetName);
 
-	setWindowTitle(_currentDataSet);
-//
-//	const Points& points = _core->requestData<Points>(_currentDataSet);
-//
-//	//_dimNames = QStringList(points.getDimensionNames().begin(), points.getDimensionNames().end());
-//	//_numPoints = points.getNumPoints();
-//
+	//// get data set from core
+	//const Points& points = _core->requestData<Points>(dataSetName);
+	//_dimNames = QStringList(points.getDimensionNames().begin(), points.getDimensionNames().end());
+	//_numDims = points.getNumDimensions();
+	//_numPoints = points.getNumPoints();
+
+	//// write data to json string
+	//std::string jsonObject = "";
+	//qDebug() << "ParallelCoordinatesPlugin: Prepare JSON string for data exchange";
+
+	//unsigned int numDims = points.getNumDimensions();
+	//points.visitFromBeginToEnd([&points, &numDims](auto beginOfData, auto endOfData)
+	//{
+	//	for (unsigned int dimensionId = 0; dimensionId < numDims; dimensionId++)
+	//	{
+	//		// add dimension to JSON
+
+	//		for (const auto& pointId : points.indices)
+	//		{
+	//			const auto index = pointId * numDims + dimensionId;
+	//			// add values of all points of one dimension to JSON
+
+	//		}
+	//	}
+	//});
+
+	std::string jsonObject = "{ \n "
+		"\"0\" : [0, -0, 0, 0, 0, 3], \n"
+		"\"1\" : [1, -1, 1, 2, 1, 6], \n"
+		"\"2\" : [2, -2, 4, 4, 0.5, 2], \n"
+		"\"3\" : [3, -3, 9, 6, 0.33, 4], \n"
+		"\"4\" : [4, -4, 16, 8, 0.25, 9] \n"
+		"}";
+
+	_parCoordWidget->passDataToJS(jsonObject);
+
 //	// TODO: pass points and names to the d3 widget
 //	//if (_dimNames.size() == points.getNumDimensions())
 //	//{
