@@ -7,6 +7,9 @@
 #include <QtCore>
 #include <QtDebug>
 
+#include <string>
+#include <numeric>
+
 Q_PLUGIN_METADATA(IID "nl.tudelft.ParallelCoordinatesPlugin")
 
 using namespace hdps;
@@ -48,53 +51,61 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 	_currentDataSet = dataSetName;
 	setWindowTitle(dataSetName);
 
-	//// get data set from core
-	//const Points& points = _core->requestData<Points>(dataSetName);
-	//_dimNames = QStringList(points.getDimensionNames().begin(), points.getDimensionNames().end());
-	//_numDims = points.getNumDimensions();
-	//_numPoints = points.getNumPoints();
+	// get data set from core
+	const Points& points = _core->requestData<Points>(dataSetName);
+	// Get indices of selected points
+	std::vector<unsigned int> pointIDsGlobal = points.indices;
+	// If points represent all data set, select them all
+	if (points.isFull()) {
+		std::vector<unsigned int> all(points.getNumPoints());
+		std::iota(std::begin(all), std::end(all), 0);
 
-	//// write data to json string
-	//std::string jsonObject = "";
-	//qDebug() << "ParallelCoordinatesPlugin: Prepare JSON string for data exchange";
+		pointIDsGlobal = all;
+	}
 
-	//unsigned int numDims = points.getNumDimensions();
-	//points.visitFromBeginToEnd([&points, &numDims](auto beginOfData, auto endOfData)
-	//{
-	//	for (unsigned int dimensionId = 0; dimensionId < numDims; dimensionId++)
-	//	{
-	//		// add dimension to JSON
+	_dimNames = QStringList(points.getDimensionNames().begin(), points.getDimensionNames().end());
+	_numDims = points.getNumDimensions();
+	_numPoints = points.getNumPoints();
 
-	//		for (const auto& pointId : points.indices)
-	//		{
-	//			const auto index = pointId * numDims + dimensionId;
-	//			// add values of all points of one dimension to JSON
+	// write data to json string
+	std::string jsonObject = "";
+	std::string stringPoints;
 
-	//		}
-	//	}
-	//});
+	qDebug() << "ParallelCoordinatesPlugin: Prepare JSON string for data exchange";
 
-	std::string jsonObject = "{ \n "
-		"\"0\" : [0, -0, 0, 0, 0, 3], \n"
-		"\"1\" : [1, -1, 1, 2, 1, 6], \n"
-		"\"2\" : [2, -2, 4, 4, 0.5, 2], \n"
-		"\"3\" : [3, -3, 9, 6, 0.33, 4], \n"
-		"\"4\" : [4, -4, 16, 8, 0.25, 9] \n"
-		"}";
+	points.visitFromBeginToEnd([&jsonObject, &pointIDsGlobal, this](auto beginOfData, auto endOfData)
+	{
+		std::string currentPoint = "";
+		// parse values of each point to JSON
+		// for each point "{ "dimName0" : Val, "dimName1" : Vals, ...}
+		for (const auto& pointId : pointIDsGlobal)
+		{
+			currentPoint = "{";
+			for (unsigned int dimId = 0; dimId < _numDims; dimId++)
+			{
+				const auto index = pointId * _numDims + dimId;
+				float attr = beginOfData[index];
+				currentPoint.append("\"" + _dimNames[dimId].toStdString() + "\" : " + std::to_string(attr) + ",");
+			}
+			currentPoint.back() = '}';	// replace the last , with a closing brace
+
+			jsonObject.append(currentPoint + ",");
+		}
+	});
+	jsonObject.pop_back();	// remove last ,
+
+	jsonObject = "[" + jsonObject + "]";
+
+	//std::string jsonObject = "["
+	//	"{\"A\" : 0, \"B\" : -0, \"C\" : 0, \"D\" : 0, \"E\" : 0, \"F\" : 3}, "
+	//	"{\"A\" : 1, \"B\" : -1, \"C\" : 1, \"D\" : 2, \"E\" : 1, \"F\" : 6}, "
+	//	"{\"A\" : 2, \"B\" : -2, \"C\" : 4, \"D\" : 4, \"E\" : 0.5, \"F\" : 2}, "
+	//	"{\"A\" : 3, \"B\" : -3, \"C\" : 9, \"D\" : 6, \"E\" : 0.33, \"F\" : 4}, "
+	//	"{\"A\" : 4, \"B\" : -4, \"C\" : 16, \"D\" : 8, \"E\" : 0.25, \"F\" : 9}"
+	//	"]";
 
 	_parCoordWidget->passDataToJS(jsonObject);
 
-//	// TODO: pass points and names to the d3 widget
-//	//if (_dimNames.size() == points.getNumDimensions())
-//	//{
-//	//	//settings->initDimOptions(points.getDimensionNames());
-//	//	//settings->initScalarDimOptions(DataSet::getSourceData(points).getDimensionNames());
-//	//}
-//	//else
-//	//{
-//	//	//settings->initDimOptions(points.getNumDimensions());
-//	//	//settings->initScalarDimOptions(DataSet::getSourceData(points).getNumDimensions());
-//	//}
 }
 
 /**

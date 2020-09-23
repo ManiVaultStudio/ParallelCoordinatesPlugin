@@ -1,3 +1,5 @@
+var dat;
+
 var parcoords = d3.parcoords()("#example")
     .alpha(0.4);
 
@@ -5,25 +7,18 @@ var parcoords = d3.parcoords()("#example")
 function setData(d) {    
 
   log("parcoords.tools: setting data");
+  dat = JSON.parse(d);
 
-  //console.log(d);
-
-  console.log(d["1"]);
+  parcoords
+  .data(dat)
+  .composite("darker")
+  .render()
+  .shadows()
+  .reorderable()
+  .brushMode("1D-axes");  // enable brushing
 
 }
   
-
-// load csv file and create the chart
-d3.csv('../cars.csv', function(data) {
-  parcoords
-    .data(data)
-    .hideAxis(["name"])
-    .composite("darker")
-    .render()
-    .shadows()
-    .reorderable()
-    .brushMode("1D-axes");  // enable brushing
-});
 
 var sltBrushMode = d3.select('#sltBrushMode')
 
