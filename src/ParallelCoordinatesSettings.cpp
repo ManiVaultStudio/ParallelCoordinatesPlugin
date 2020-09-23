@@ -3,13 +3,25 @@
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QMimeData>
-
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QLabel>
 
 ParlCoorSettings::ParlCoorSettings() {
 	// enable drag and drop of data elements, see https://doc.qt.io/qt-5/dnd.html#dropping
 	setAcceptDrops(true);
 
 	setFixedHeight(100);
+
+	QGroupBox* settingsBox = new QGroupBox("Basic settings");
+	auto* const settingsLayout = new QGridLayout();
+
+	settingsLayout->addWidget(&QLabel("Data Set"), 0, 0);
+	settingsLayout->addWidget(&coreDataSets, 1, 0);
+
+	settingsBox->setLayout(settingsLayout);
+
+	//addWidget(settingsBox);	// TODO: add the widget, maybe refactor some code
 }
 
 void ParlCoorSettings::dragEnterEvent(QDragEnterEvent* dragEnterEvent)

@@ -1,20 +1,22 @@
 var dat;
 
-var parcoords = d3.parcoords()("#example")
+var parcoords = d3.parcoords({nullValueSeparator: "bottom"})("#example")
     .alpha(0.4);
 
 
 function setData(d) {    
 
-  log("parcoords.tools: setting data");
+  log("parcoords.tools: parsing data to JSON");
   dat = JSON.parse(d);
 
+  log("parcoords.tools: plotting parallel coordinates");
   parcoords
   .data(dat)
   .composite("darker")
   .render()
   .shadows()
   .reorderable()
+  .mode("queue")          // enables progressive rendering when brushing
   .brushMode("1D-axes");  // enable brushing
 
 }

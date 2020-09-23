@@ -68,33 +68,44 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 	_numPoints = points.getNumPoints();
 
 	// write data to json string
-	std::string jsonObject = "";
-	std::string stringPoints;
+	std::string jsonObject = "[";
+	std::vector<std::string> jsonPoints(_numPoints, "");
 
 	qDebug() << "ParallelCoordinatesPlugin: Prepare JSON string for data exchange";
 
-	points.visitFromBeginToEnd([&jsonObject, &pointIDsGlobal, this](auto beginOfData, auto endOfData)
+	// TODO: call this in a backgroud function
+	points.visitFromBeginToEnd([&jsonPoints, &pointIDsGlobal, this](auto beginOfData, auto endOfData)
 	{
 		std::string currentPoint = "";
+		unsigned int index = 0;
+		float attr = 0;
 		// parse values of each point to JSON
 		// for each point "{ "dimName0" : Val, "dimName1" : Vals, ...}
+		// TODO: parallelize this
 		for (const auto& pointId : pointIDsGlobal)
 		{
 			currentPoint = "{";
 			for (unsigned int dimId = 0; dimId < _numDims; dimId++)
 			{
-				const auto index = pointId * _numDims + dimId;
-				float attr = beginOfData[index];
+				index = pointId * _numDims + dimId;
+				attr = beginOfData[index];
 				currentPoint.append("\"" + _dimNames[dimId].toStdString() + "\" : " + std::to_string(attr) + ",");
 			}
 			currentPoint.back() = '}';	// replace the last , with a closing brace
 
-			jsonObject.append(currentPoint + ",");
+			jsonPoints[pointId] = currentPoint;
 		}
 	});
-	jsonObject.pop_back();	// remove last ,
 
-	jsonObject = "[" + jsonObject + "]";
+	// Join all points with a delimiter ","
+	jsonObject.append(
+		std::accumulate(std::begin(jsonPoints), std::end(jsonPoints), std::string(),
+		[](std::string &ss, std::string &s)
+	{
+		return ss.empty() ? s : ss + "," + s;
+	}));
+
+	jsonObject.append("]");	// end JSON
 
 	//std::string jsonObject = "["
 	//	"{\"A\" : 0, \"B\" : -0, \"C\" : 0, \"D\" : 0, \"E\" : 0, \"F\" : 3}, "
@@ -104,8 +115,8 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 	//	"{\"A\" : 4, \"B\" : -4, \"C\" : 16, \"D\" : 8, \"E\" : 0.25, \"F\" : 9}"
 	//	"]";
 
+	qDebug() << "ParallelCoordinatesPlugin: Passing JSON to .js side";
 	_parCoordWidget->passDataToJS(jsonObject);
-
 }
 
 /**
@@ -116,7 +127,7 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
  */
 void ParallelCoordinatesPlugin::dataAdded(const QString name)
 {
- 
+	_settingsWidget->coreDataSets.addItem(name);
 }
 
 /**

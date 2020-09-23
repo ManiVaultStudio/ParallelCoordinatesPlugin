@@ -1,9 +1,13 @@
 #pragma once
 
-#include <QWidget>
+#include <widgets/SettingsWidget.h>
 
+//#include <QWidget>
+#include <QComboBox>
 
-class ParlCoorSettings : public QWidget
+using namespace hdps::gui;
+
+class ParlCoorSettings : public SettingsWidget
 {
 	Q_OBJECT
 
@@ -29,5 +33,8 @@ private:
 
 signals:
 	void onDataInput(QString dataName);
+
+public: 
+	QComboBox	coreDataSets;
 
 };
