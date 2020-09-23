@@ -6,6 +6,7 @@
 
 #include <QString>
 #include <QStringList>
+#include <QThread>
 
 using namespace hdps::plugin;
 
@@ -32,7 +33,12 @@ public:
     void selectionChanged(const QString dataName) Q_DECL_OVERRIDE;
     hdps::DataTypes supportedDataTypes() const Q_DECL_OVERRIDE;
 
+private:
+	// Parses data to JSON and passes it to the web widget
+	void passDataToJS(const QString dataSetName);
+
 public slots:
+	// sets window title and calls passDataToJS in another thread
 	void onDataInput(const QString dataSetName);
 
 private:
@@ -43,6 +49,8 @@ private:
 
 	ParlCoorWidget* _parCoordWidget;
 	ParlCoorSettings* _settingsWidget;
+
+	QThread thread;
 
 };
 

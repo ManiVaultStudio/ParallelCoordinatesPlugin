@@ -5,6 +5,7 @@
 #include "ParallelCoordinatesSettings.h"
 
 #include <QtCore>
+#include <QtConcurrent> 
 #include <QtDebug>
 
 #include <string>
@@ -51,6 +52,15 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 	_currentDataSet = dataSetName;
 	setWindowTitle(dataSetName);
 
+	// parse data to JS in a different thread as to not block the UI
+	QtConcurrent::run(this, &ParallelCoordinatesPlugin::passDataToJS, dataSetName);
+
+}
+
+
+void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName)
+{
+
 	// get data set from core
 	const Points& points = _core->requestData<Points>(dataSetName);
 	// Get indices of selected points
@@ -77,8 +87,6 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 	points.visitFromBeginToEnd([&jsonPoints, &pointIDsGlobal, this](auto beginOfData, auto endOfData)
 	{
 		std::string currentPoint = "";
-		unsigned int index = 0;
-		float attr = 0;
 		// parse values of each point to JSON
 		// for each point "{ "dimName0" : Val, "dimName1" : Vals, ...}
 		// TODO: parallelize this
@@ -87,9 +95,7 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 			currentPoint = "{";
 			for (unsigned int dimId = 0; dimId < _numDims; dimId++)
 			{
-				index = pointId * _numDims + dimId;
-				attr = beginOfData[index];
-				currentPoint.append("\"" + _dimNames[dimId].toStdString() + "\" : " + std::to_string(attr) + ",");
+				currentPoint.append("\"" + _dimNames[dimId].toStdString() + "\" : " + std::to_string(beginOfData[pointId * _numDims + dimId]) + ",");
 			}
 			currentPoint.back() = '}';	// replace the last , with a closing brace
 
@@ -100,24 +106,18 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 	// Join all points with a delimiter ","
 	jsonObject.append(
 		std::accumulate(std::begin(jsonPoints), std::end(jsonPoints), std::string(),
-		[](std::string &ss, std::string &s)
+			[](std::string &ss, std::string &s)
 	{
 		return ss.empty() ? s : ss + "," + s;
 	}));
 
 	jsonObject.append("]");	// end JSON
 
-	//std::string jsonObject = "["
-	//	"{\"A\" : 0, \"B\" : -0, \"C\" : 0, \"D\" : 0, \"E\" : 0, \"F\" : 3}, "
-	//	"{\"A\" : 1, \"B\" : -1, \"C\" : 1, \"D\" : 2, \"E\" : 1, \"F\" : 6}, "
-	//	"{\"A\" : 2, \"B\" : -2, \"C\" : 4, \"D\" : 4, \"E\" : 0.5, \"F\" : 2}, "
-	//	"{\"A\" : 3, \"B\" : -3, \"C\" : 9, \"D\" : 6, \"E\" : 0.33, \"F\" : 4}, "
-	//	"{\"A\" : 4, \"B\" : -4, \"C\" : 16, \"D\" : 8, \"E\" : 0.25, \"F\" : 9}"
-	//	"]";
 
 	qDebug() << "ParallelCoordinatesPlugin: Passing JSON to .js side";
 	_parCoordWidget->passDataToJS(jsonObject);
 }
+
 
 /**
  * Callback which gets triggered when a dataset is added.

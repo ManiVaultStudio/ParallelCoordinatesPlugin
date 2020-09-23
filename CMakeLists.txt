@@ -41,7 +41,7 @@ include_directories("$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/include/")
 
 add_library(${PROJECT} SHARED ${SOURCES} ${RESOURCES} ${RESOURCE_FILES})
 
-qt5_use_modules(${PROJECT} Widgets WebEngineWidgets)
+qt5_use_modules(${PROJECT} Widgets WebEngineWidgets Concurrent)
 
 target_link_libraries(${PROJECT} Qt5::Widgets)
 target_link_libraries(${PROJECT} Qt5::WebEngineWidgets)
