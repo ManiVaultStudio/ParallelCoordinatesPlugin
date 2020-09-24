@@ -19,10 +19,29 @@ using namespace hdps;
 // View
 // =============================================================================
 
+namespace hdps
+{
+	/**
+	 * Creates a container of the specified type, and copies the elements from the
+	 * specified `std::vector` into the created container.
+	 */
+	template <typename ContainerType, typename ValueType>
+	auto fromStdVector(const std::vector<ValueType>& stdVector)
+	{
+		ContainerType result;
+		result.reserve(static_cast<int>(stdVector.size()));
+		std::copy(stdVector.cbegin(), stdVector.cend(), std::back_inserter(result));
+		return result;
+	}
+}
+
+ParallelCoordinatesPlugin::ParallelCoordinatesPlugin() : 
+	ViewPlugin("Parallel Coordinates"), _currentDataSet(nullptr), _parCoordWidget(nullptr), _settingsWidget(nullptr)
+{ 
+}
 
 ParallelCoordinatesPlugin::~ParallelCoordinatesPlugin(void)
 {
- 
 }
 
 void ParallelCoordinatesPlugin::init()
@@ -35,7 +54,7 @@ void ParallelCoordinatesPlugin::init()
 
 
 	//
-	_parCoordWidget = new ParlCoorWidget();
+	_parCoordWidget = new ParlCoorWidget(this);
 	_parCoordWidget->setPage(":parcoords/parcoords.html", "qrc:/parcoords/");
     addWidget(_parCoordWidget);
 
@@ -45,11 +64,13 @@ void ParallelCoordinatesPlugin::init()
 
 	//
 	connect(_settingsWidget, &ParlCoorSettings::onDataInput, this, &ParallelCoordinatesPlugin::onDataInput);
+	connect(_parCoordWidget, &ParlCoorWidget::newSelection, this, &ParallelCoordinatesPlugin::publishSelection);
+
 }
 
 void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 {
-	_currentDataSet = dataSetName;
+	_currentDataSetName = dataSetName;
 	setWindowTitle(dataSetName);
 
 	// parse data to JS in a different thread as to not block the UI
@@ -62,20 +83,20 @@ void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName)
 {
 
 	// get data set from core
-	const Points& points = _core->requestData<Points>(dataSetName);
+	_currentDataSet = &_core->requestData<Points>(dataSetName);
 	// Get indices of selected points
-	std::vector<unsigned int> pointIDsGlobal = points.indices;
+	std::vector<unsigned int> pointIDsGlobal = _currentDataSet->indices;
 	// If points represent all data set, select them all
-	if (points.isFull()) {
-		std::vector<unsigned int> all(points.getNumPoints());
+	if (_currentDataSet->isFull()) {
+		std::vector<unsigned int> all(_currentDataSet->getNumPoints());
 		std::iota(std::begin(all), std::end(all), 0);
 
 		pointIDsGlobal = all;
 	}
 
-	_dimNames = QStringList(points.getDimensionNames().begin(), points.getDimensionNames().end());
-	_numDims = points.getNumDimensions();
-	_numPoints = points.getNumPoints();
+	_dimNames = QStringList(_currentDataSet->getDimensionNames().begin(), _currentDataSet->getDimensionNames().end());
+	_numDims = _currentDataSet->getNumDimensions();
+	_numPoints = _currentDataSet->getNumPoints();
 
 	// write data to json string
 	std::string jsonObject = "[";
@@ -84,15 +105,20 @@ void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName)
 	qDebug() << "ParallelCoordinatesPlugin: Prepare JSON string for data exchange";
 
 	// TODO: call this in a backgroud function
-	points.visitFromBeginToEnd([&jsonPoints, &pointIDsGlobal, this](auto beginOfData, auto endOfData)
+	_currentDataSet->visitFromBeginToEnd([&jsonPoints, &pointIDsGlobal, this](auto beginOfData, auto endOfData)
 	{
 		std::string currentPoint = "";
 		// parse values of each point to JSON
-		// for each point "{ "dimName0" : Val, "dimName1" : Vals, ...}
+		// for each point "{ "__pointID" : ID, "dimName0" : Val, "dimName1" : Vals, ...}
 		// TODO: parallelize this
 		for (const auto& pointId : pointIDsGlobal)
 		{
 			currentPoint = "{";
+
+			// add point ID
+			currentPoint.append("\"__pointID\" : " + std::to_string(pointId) + ",");
+
+			// add channel names and values
 			for (unsigned int dimId = 0; dimId < _numDims; dimId++)
 			{
 				currentPoint.append("\"" + _dimNames[dimId].toStdString() + "\" : " + std::to_string(beginOfData[pointId * _numDims + dimId]) + ",");
@@ -119,35 +145,19 @@ void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName)
 }
 
 
-/**
- * Callback which gets triggered when a dataset is added.
- * The name of the dataset which was added is given.
- * The added dataset can be retrieved through _core->requestSet(name);
- * and casting it to the appropriate high-level set.
- */
 void ParallelCoordinatesPlugin::dataAdded(const QString name)
 {
-	_settingsWidget->coreDataSets.addItem(name);
+	// Current, this plugin does not care whether data was added
 }
 
-/**
- * Callback which gets triggered when a dataset changes.
- * The name of the dataset which was changed is given.
- * The changed dataset can be retrieved through _core->requestSet(name);
- * and casting it to the appropriate high-level set.
- */
 void ParallelCoordinatesPlugin::dataChanged(const QString name)
 {
-
+	// Current, this plugin does not care whether data was changed
 }
 
-/**
- * Callback which gets triggered when a dataset gets removed.
- * The name of the dataset which was removed is given.
- */
 void ParallelCoordinatesPlugin::dataRemoved(const QString name)
 {
-    
+	// Current, this plugin does not care whether data was removed
 }
 
 /**
@@ -157,7 +167,11 @@ void ParallelCoordinatesPlugin::dataRemoved(const QString name)
  */
 void ParallelCoordinatesPlugin::selectionChanged(const QString dataName)
 {
+	// get indices from core
+	auto selectedPoints = dynamic_cast<Points&>(_core->requestSelection(dataName));
+	const auto selectedIndices = hdps::fromStdVector<QVector<uint>>(selectedPoints.indices);
 
+	// send them to js side
 }
 
 DataTypes ParallelCoordinatesPlugin::supportedDataTypes() const
@@ -165,6 +179,26 @@ DataTypes ParallelCoordinatesPlugin::supportedDataTypes() const
     DataTypes supportedTypes;
     supportedTypes.append(PointType);
     return supportedTypes;
+}
+
+void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selectedIDs)
+{
+
+	auto& selectionIndices = dynamic_cast<Points&>(_core->requestSelection(_currentDataSet->getDataName())).indices;
+	auto& sourceIndices = _currentDataSet->getSourceData<Points>(*_currentDataSet).indices;
+
+	selectionIndices.clear();
+	selectionIndices.reserve(_numPoints);
+
+	for (auto id : selectedIDs) {
+		selectionIndices.push_back(id);
+	}
+
+	if (_currentDataSet->isDerivedData())
+		_core->notifySelectionChanged(_currentDataSet->getSourceData<Points>(*_currentDataSet).getDataName());
+	else
+		_core->notifySelectionChanged(_currentDataSet->getDataName());
+
 }
 
 // =============================================================================

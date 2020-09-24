@@ -43,6 +43,9 @@ add_library(${PROJECT} SHARED ${SOURCES} ${RESOURCES} ${RESOURCE_FILES})
 
 qt5_use_modules(${PROJECT} Widgets WebEngineWidgets Concurrent)
 
+# Request C++17
+set_property(TARGET ${PROJECT} PROPERTY CXX_STANDARD 17)
+
 target_link_libraries(${PROJECT} Qt5::Widgets)
 target_link_libraries(${PROJECT} Qt5::WebEngineWidgets)
 target_link_libraries(${PROJECT} "$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/lib/HDPS_Public.lib")

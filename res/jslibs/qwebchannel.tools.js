@@ -39,7 +39,12 @@ function notifyBridgeAvailable() {
         QtBridge.js_available();
     }
 
-    log("test");
+}
+
+function passSelectionToQt(dat) {
+    if (isQtAvailable) {
+		QtBridge.js_passSelectionToQt(dat.toString());
+	}
 }
 
 function setViewBusy() {

@@ -16,13 +16,14 @@ using namespace hdps::plugin;
 
 class ParlCoorSettings;
 class ParlCoorWidget;
+class Points;
 
 class ParallelCoordinatesPlugin : public ViewPlugin
 {
     Q_OBJECT
     
 public:
-	ParallelCoordinatesPlugin() : ViewPlugin("Parallel Coordinates") { }
+	ParallelCoordinatesPlugin();
     ~ParallelCoordinatesPlugin(void) override;
     
     void init() override;
@@ -33,16 +34,22 @@ public:
     void selectionChanged(const QString dataName) Q_DECL_OVERRIDE;
     hdps::DataTypes supportedDataTypes() const Q_DECL_OVERRIDE;
 
+
 private:
 	// Parses data to JSON and passes it to the web widget
 	void passDataToJS(const QString dataSetName);
+
+	// informs the core about a selection 
+	void publishSelection(std::vector<unsigned int> selectedIDs);
 
 public slots:
 	// sets window title and calls passDataToJS in another thread
 	void onDataInput(const QString dataSetName);
 
 private:
-	QString _currentDataSet;
+	QString _currentDataSetName;
+	Points* _currentDataSet;
+
 	QStringList _dimNames;
 	unsigned int _numDims;
 	unsigned int _numPoints;

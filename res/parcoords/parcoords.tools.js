@@ -5,22 +5,37 @@ var parcoords = d3.parcoords({nullValueSeparator: "bottom"})("#example")
 
 
 function setData(d) {    
-
+  //console.log(d)
   log("parcoords.tools: parsing data to JSON");
   dat = JSON.parse(d);
+
+  //console.log(data)
 
   log("parcoords.tools: plotting parallel coordinates");
   parcoords
   .data(dat)
   .composite("darker")
+  .hideAxis(["__pointID"])  // don't show the point ID channel
   .render()
-  .shadows()
-  .reorderable()
+ // .reorderable()        // deactivate by default since for high dim nums it is unhandy with brushing enabled
   .mode("queue")          // enables progressive rendering when brushing
-  .brushMode("1D-axes");  // enable brushing
-
+  .brushMode("1D-axes")  // enable brushing
+  ;
 }
   
+
+// print selected values
+parcoords.on("brush", function(d) {
+  let selectionIDs = [];
+
+  for(let i=0; i<d.length; i++) {
+    selectionIDs.push(d[i]["__pointID"]);
+  }
+
+  passSelectionToQt(selectionIDs);
+
+});
+
 
 var sltBrushMode = d3.select('#sltBrushMode')
 

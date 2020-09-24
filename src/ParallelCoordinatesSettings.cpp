@@ -4,8 +4,8 @@
 #include <QDropEvent>
 #include <QMimeData>
 #include <QGridLayout>
-#include <QGroupBox>
 #include <QLabel>
+#include <QPalette>
 
 ParlCoorSettings::ParlCoorSettings() {
 	// enable drag and drop of data elements, see https://doc.qt.io/qt-5/dnd.html#dropping
@@ -13,15 +13,22 @@ ParlCoorSettings::ParlCoorSettings() {
 
 	setFixedHeight(100);
 
-	QGroupBox* settingsBox = new QGroupBox("Basic settings");
-	auto* const settingsLayout = new QGridLayout();
+	auto* settingsLayout = new QGridLayout();
+	settingsLayout->setColumnStretch(0, 5);
+	settingsLayout->setColumnStretch(1, 200);
 
-	settingsLayout->addWidget(&QLabel("Data Set"), 0, 0);
-	settingsLayout->addWidget(&coreDataSets, 1, 0);
+	QLabel* dataSetLabel = new QLabel("Data Set");
 
-	settingsBox->setLayout(settingsLayout);
+	currentDataSetName.setReadOnly(true);
+	QPalette *palette = new QPalette();
+	palette->setColor(QPalette::Base, Qt::lightGray);
+	palette->setColor(QPalette::Text, Qt::black);
+	currentDataSetName.setPalette(*palette);
 
-	//addWidget(settingsBox);	// TODO: add the widget, maybe refactor some code
+	settingsLayout->addWidget(dataSetLabel, 0, 0, Qt::AlignLeft);
+	settingsLayout->addWidget(&currentDataSetName, 0, 1, Qt::AlignLeft);
+
+	setLayout(settingsLayout);
 }
 
 void ParlCoorSettings::dragEnterEvent(QDragEnterEvent* dragEnterEvent)
@@ -40,6 +47,8 @@ void ParlCoorSettings::dropEvent(QDropEvent* dropEvent)
 {
 	const auto items = dropEvent->mimeData()->text().split("\n");
 	const auto datasetName = items.at(0);
+
+	currentDataSetName.setText(datasetName);
 
 	// let the ParallelCoordinatesPlugin know about the data set name
 	emit onDataInput(datasetName);

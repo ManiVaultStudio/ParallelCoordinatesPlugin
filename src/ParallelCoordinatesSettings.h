@@ -2,12 +2,12 @@
 
 #include <widgets/SettingsWidget.h>
 
-//#include <QWidget>
-#include <QComboBox>
+#include <QWidget>
+#include <QLineEdit>
 
 using namespace hdps::gui;
 
-class ParlCoorSettings : public SettingsWidget
+class ParlCoorSettings : public QWidget
 {
 	Q_OBJECT
 
@@ -35,6 +35,5 @@ signals:
 	void onDataInput(QString dataName);
 
 public: 
-	QComboBox	coreDataSets;
-
+	QLineEdit	currentDataSetName;
 };
