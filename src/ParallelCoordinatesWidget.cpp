@@ -49,8 +49,7 @@ void ParlCoorCommunicationObject::js_passSelectionToQt(QString data) {
 		*IdIter++ = std::stoul(IDstring);
 	}
 
-	if (selectedIDs.size() > 0)
-		emit newSelection(selectedIDs);
+	emit newSelection(selectedIDs);
 }
 
 
