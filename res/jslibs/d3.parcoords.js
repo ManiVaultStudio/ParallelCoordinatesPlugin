@@ -423,6 +423,20 @@ pc.renderBrushed = function() {
   return this;
 };
 
+pc.isBrushed = function() {
+  if (__.brushed && __.brushed.length !== __.data.length)
+    return true;
+
+  var object = brush.currentMode().brushState();
+
+  for (var key in object) {
+    if (object.hasOwnProperty(key)) {
+      return true;
+    }
+  }
+  return false;
+};
+
 function isBrushed() {
   if (__.brushed && __.brushed.length !== __.data.length)
     return true;

@@ -81,7 +81,7 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 
 void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName)
 {
-
+	// TODO: might be faster to not use JSON but rather hand over an array with the first entry for each point as the ID and then go .hideAxis([0])
 	// get data set from core
 	_currentDataSet = &_core->requestData<Points>(dataSetName);
 	// Get indices of selected points
@@ -104,7 +104,6 @@ void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName)
 
 	qDebug() << "ParallelCoordinatesPlugin: Prepare JSON string for data exchange";
 
-	// TODO: call this in a backgroud function
 	_currentDataSet->visitFromBeginToEnd([&jsonPoints, &pointIDsGlobal, this](auto beginOfData, auto endOfData)
 	{
 		std::string currentPoint = "";
@@ -174,32 +173,38 @@ void ParallelCoordinatesPlugin::selectionChanged(const QString dataName)
 	// send them to js side
 }
 
-DataTypes ParallelCoordinatesPlugin::supportedDataTypes() const
-{
-    DataTypes supportedTypes;
-    supportedTypes.append(PointType);
-    return supportedTypes;
-}
-
 void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selectedIDs)
 {
-
+	// ask core for the selection set for the current data set
 	auto& selectionIndices = dynamic_cast<Points&>(_core->requestSelection(_currentDataSet->getDataName())).indices;
 	auto& sourceIndices = _currentDataSet->getSourceData<Points>(*_currentDataSet).indices;
 
+	// no need to update the selection when nothing is updated
+	if (selectedIDs.size() == 0 & selectionIndices.size() == 0)
+		return;
+
+	// clear the selection and add the new points
 	selectionIndices.clear();
 	selectionIndices.reserve(_numPoints);
-
 	for (auto id : selectedIDs) {
 		selectionIndices.push_back(id);
 	}
 
+	// notify core about the selection change
 	if (_currentDataSet->isDerivedData())
 		_core->notifySelectionChanged(_currentDataSet->getSourceData<Points>(*_currentDataSet).getDataName());
 	else
 		_core->notifySelectionChanged(_currentDataSet->getDataName());
 
 }
+
+DataTypes ParallelCoordinatesPlugin::supportedDataTypes() const
+{
+	DataTypes supportedTypes;
+	supportedTypes.append(PointType);
+	return supportedTypes;
+}
+
 
 // =============================================================================
 // Factory DOES NOT NEED TO BE ALTERED

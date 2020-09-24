@@ -24,12 +24,16 @@ function setData(d) {
 }
   
 
-// print selected values
+// Notify qt about a selection 
 parcoords.on("brush", function(d) {
+
   let selectionIDs = [];
 
-  for(let i=0; i<d.length; i++) {
-    selectionIDs.push(d[i]["__pointID"]);
+  if(parcoords.isBrushed() == true)     // parcoords.isBrushed was manually exposed in d3.parcoords.js. Thus, this won't work with the default version
+  {
+    for(let i=0; i<d.length; i++) {
+      selectionIDs.push(d[i]["__pointID"]);
+    }
   }
 
   passSelectionToQt(selectionIDs);
