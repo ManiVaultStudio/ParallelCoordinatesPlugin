@@ -64,7 +64,7 @@ void ParallelCoordinatesPlugin::init()
 
 	//
 	connect(_settingsWidget, &ParlCoorSettings::onDataInput, this, &ParallelCoordinatesPlugin::onDataInput);
-	connect(_parCoordWidget, &ParlCoorWidget::newSelection, this, &ParallelCoordinatesPlugin::publishSelection);
+	connect(_parCoordWidget, &ParlCoorWidget::newSelectionInPC, this, &ParallelCoordinatesPlugin::publishSelection);
 
 }
 
@@ -180,7 +180,7 @@ void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selec
 	auto& sourceIndices = _currentDataSet->getSourceData<Points>(*_currentDataSet).indices;
 
 	// no need to update the selection when nothing is updated
-	if (selectedIDs.size() == 0 & selectionIndices.size() == 0)
+	if ((selectedIDs.size() == 0) & (selectionIndices.size() == 0))
 		return;
 
 	// clear the selection and add the new points

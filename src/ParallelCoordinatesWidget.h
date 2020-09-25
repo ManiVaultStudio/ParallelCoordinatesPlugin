@@ -21,18 +21,9 @@ public:
 
 signals:
 	void qt_setData(QString data);
-	void qt_addAvailableData(QString name);
-	void qt_setSelection(QList<int> selection);
-	void qt_setHighlight(int highlightId);
-	void qt_setMarkerSelection(QList<int> selection);
-
-	void newSelection(std::vector<unsigned int> selectionIDs);
+	void newSelectionInPC(std::vector<unsigned int> selectionIDs);
 
 public slots:
-	void js_selectData(QString text);
-	void js_selectionUpdated(QVariant selectedClusters);
-	void js_highlightUpdated(int highlightId);
-
 	void js_passSelectionToQt(QString data);
 
 private:
@@ -52,15 +43,11 @@ public:
 
 	void passDataToJS(std::string _jsonObject);
 
-	void js_selectData(QString text);
-	void js_selectionUpdated(QVariant selectedClusters);
-	void js_highlightUpdated(int highlightId);
-
 protected:
 	void resizeEvent(QResizeEvent * e) override;
 
 signals:
-	void newSelection(std::vector<unsigned int> selectionIDs);
+	void newSelectionInPC(std::vector<unsigned int> selectionIDs);
 
 private slots:
 	/** Is invoked when the js side calls js_available of the WebCommunicationObject (ParlCoorCommunicationObject) 
