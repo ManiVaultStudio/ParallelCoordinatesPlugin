@@ -12,7 +12,4 @@
         <file>jslibs/qwebchannel.js</file>
         <file>jslibs/qwebchannel.tools.js</file>
    </qresource>
-		<qresource prefix="">
-		<file>cars.csv</file>
-	</qresource>
 </RCC>
