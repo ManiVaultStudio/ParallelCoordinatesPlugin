@@ -20,11 +20,21 @@ public:
 	ParlCoorCommunicationObject(ParlCoorWidget* parent);
 
 signals:
-	void qt_setData(QString data);
-	void newSelectionInPC(std::vector<unsigned int> selectionIDs);
+	// Signals to JS side
+	void qt_setDataInJS(QString data);
+	void qt_setSelectionInJS(QString selection);
+
+	// Signal to Qt side
+	void newSelectionToQt(std::vector<unsigned int>& selectionIDs);
 
 public slots:
+	// Invoked from JS side
 	void js_passSelectionToQt(QString data);
+
+	// invoked from Qt side
+
+	// converts vector to array string and emits qt_setSelectionInJS
+	void newSelectionToJS(std::vector<unsigned int>& selectionIDs);
 
 private:
 	ParlCoorWidget* _parent;
@@ -42,12 +52,13 @@ public:
 	ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin);
 
 	void passDataToJS(std::string _jsonObject);
+	void passSelectionToJS(std::vector<unsigned int>& selectionIDs);
 
 protected:
 	void resizeEvent(QResizeEvent * e) override;
 
 signals:
-	void newSelectionInPC(std::vector<unsigned int> selectionIDs);
+	void newSelectionToQt(std::vector<unsigned int> selectionIDs);
 
 private slots:
 	/** Is invoked when the js side calls js_available of the WebCommunicationObject (ParlCoorCommunicationObject) 

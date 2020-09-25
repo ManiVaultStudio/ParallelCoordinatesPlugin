@@ -5,11 +5,14 @@
 var isQtAvailable = true;
 try {
     new QWebChannel(qt.webChannelTransport, function (channel) {
-
+        // Establish connection
         QtBridge = channel.objects.QtBridge;
 
-        QtBridge.qt_setData.connect(function () { setData(arguments[0]); });
+        // register signals 
+        QtBridge.qt_setDataInJS.connect(function () { setParcoordsData(arguments[0]); });
+        QtBridge.qt_setSelectionInJS.connect(function () { setSelectionIDs(arguments[0]); });
 
+        // confirm successfull connection
         notifyBridgeAvailable();
     });
 } catch (error) {

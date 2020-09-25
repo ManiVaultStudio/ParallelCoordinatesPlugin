@@ -35,7 +35,26 @@ void ParlCoorCommunicationObject::js_passSelectionToQt(QString data) {
 		*IdIter++ = std::stoul(IDstring);
 	}
 
-	emit newSelectionInPC(selectedIDs);
+	emit newSelectionToQt(selectedIDs);
+}
+
+void ParlCoorCommunicationObject::newSelectionToJS(std::vector<unsigned int>& selectionIDs) {
+	// if nothing is selected, tell the parcoords to show all data
+	if (selectionIDs.size() == 0)
+	{
+		emit this->qt_setSelectionInJS("-");
+		return;
+	}
+
+	// parse all IDs into a string
+	QString selection = "";
+	for (const auto& ID : selectionIDs) {
+		selection.append(QString::fromStdString(std::to_string(ID) + ","));
+	}
+	selection.chop(1);	// remove last ","
+
+	// send string array to JS
+	emit this->qt_setSelectionInJS(selection);
 }
 
 
@@ -54,7 +73,7 @@ ParlCoorWidget::ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin):
 	getView()->resize(size());
 
 	// re-emit the signal from the communication objection to the main plugin class where the selection is made public to the core
-	connect(_communicationObject, &ParlCoorCommunicationObject::newSelectionInPC, [&](std::vector<unsigned int> selectedIDs) {emit newSelectionInPC(selectedIDs); });
+	connect(_communicationObject, &ParlCoorCommunicationObject::newSelectionToQt, [&](std::vector<unsigned int> selectedIDs) {emit newSelectionToQt(selectedIDs); });
 }
 
 void ParlCoorWidget::resizeEvent(QResizeEvent * e) {
@@ -69,6 +88,10 @@ void ParlCoorWidget::initWebPage()
 
 void ParlCoorWidget::passDataToJS(std::string _jsonObject)
 {
-	emit _communicationObject->qt_setData(QString(_jsonObject.c_str()));
+	emit _communicationObject->qt_setDataInJS(QString(_jsonObject.c_str()));
 }
 
+void ParlCoorWidget::passSelectionToJS(std::vector<unsigned int>& selectionIDs)
+{
+	_communicationObject->newSelectionToJS(selectionIDs);
+}

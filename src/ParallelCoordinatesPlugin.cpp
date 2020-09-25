@@ -64,7 +64,7 @@ void ParallelCoordinatesPlugin::init()
 
 	//
 	connect(_settingsWidget, &ParlCoorSettings::onDataInput, this, &ParallelCoordinatesPlugin::onDataInput);
-	connect(_parCoordWidget, &ParlCoorWidget::newSelectionInPC, this, &ParallelCoordinatesPlugin::publishSelection);
+	connect(_parCoordWidget, &ParlCoorWidget::newSelectionToQt, this, &ParallelCoordinatesPlugin::publishSelection);
 
 }
 
@@ -168,9 +168,9 @@ void ParallelCoordinatesPlugin::selectionChanged(const QString dataName)
 {
 	// get indices from core
 	auto selectedPoints = dynamic_cast<Points&>(_core->requestSelection(dataName));
-	const auto selectedIndices = hdps::fromStdVector<QVector<uint>>(selectedPoints.indices);
 
 	// send them to js side
+	_parCoordWidget->passSelectionToJS(selectedPoints.indices);
 }
 
 void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selectedIDs)

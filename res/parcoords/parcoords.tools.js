@@ -1,36 +1,52 @@
-var dat;
+var dat;  // JSON data
 
 var parcoords = d3.parcoords({nullValueSeparator: "bottom"})("#example")
     .alpha(0.4);
 
-
-function setData(d) {    
-  //console.log(d)
+// parses JSON string data and renders par coords plot
+function setParcoordsData(d) {    
   log("parcoords.tools: parsing data to JSON");
   dat = JSON.parse(d);
 
-  //console.log(data)
-
   log("parcoords.tools: plotting parallel coordinates");
   parcoords
-  .data(dat)
-  .composite("darker")
-  .hideAxis(["__pointID"])  // don't show the point ID channel
-  .render()
- // .reorderable()        // deactivate by default since for high dim nums it is unhandy with brushing enabled
-  .mode("queue")          // enables progressive rendering when brushing
-  .brushMode("1D-axes")  // enable brushing
+    .data(dat)
+    .composite("darker")
+    .hideAxis(["__pointID"])  // don't show the point ID channel
+    .alphaOnBrushed(0.15)
+    .render()
+  // .reorderable()        // deactivate by default since for high dim nums it is unhandy with brushing enabled
+    .mode("queue")          // enables progressive rendering when brushing
+    .rate(300)
+    .brushMode("1D-axes")  // enable brushing
   ;
 }
-  
+ 
+// parses arrays string and highlights selection
+function setSelectionIDs(IDs) {
+  // if nothing is selected, show all data
+  if (IDs == "-")
+  {
+    parcoords.unhighlight();
+    return;
+  }
+
+  // parse string of IDs to array
+  selectionIDs = IDs.split(',').map(Number);
+  // only highlight the selected IDs
+  parcoords.highlight(dat.filter(function(element){ return selectionIDs.includes(element.__pointID); }));
+}
 
 // Notify qt about a selection 
 parcoords.on("brush", function(d) {
 
   let selectionIDs = [];
 
-  if(parcoords.isBrushed() == true)     // parcoords.isBrushed was manually exposed in d3.parcoords.js. Thus, this won't work with the default version
+  // check if isBrushed since this listener is triggered at the end of brushing and would report all data set brushed/highlighted as that is the default state
+  // parcoords.isBrushed was manually exposed in d3.parcoords.js. Thus, this won't work with the default version
+  if(parcoords.isBrushed() == true)     
   {
+    parcoords.clear("highlight");
     for(let i=0; i<d.length; i++) {
       selectionIDs.push(d[i]["__pointID"]);
     }
