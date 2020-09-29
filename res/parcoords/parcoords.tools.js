@@ -1,4 +1,13 @@
-var dat;  // JSON data
+var dat = [];                 // JSON data
+var brushHighlight = false;   // guards brushing indicators
+
+function enableBrushHighlight(){
+  brushHighlight = true;
+}
+
+function disableBrushHighlight(){
+  brushHighlight = false;
+}
 
 var parcoords = d3.parcoords({nullValueSeparator: "bottom"})("#example")
     .alpha(0.4);
@@ -15,7 +24,7 @@ function setParcoordsData(d) {
     .hideAxis(["__pointID"])  // don't show the point ID channel
     .alphaOnBrushed(0.15)
     .render()
-  // .reorderable()        // deactivate by default since for high dim nums it is unhandy with brushing enabled
+  // .reorderable()         // deactivate by default since for high dim nums it is unhandy with brushing enabled
     .mode("queue")          // enables progressive rendering when brushing
     .rate(300)
     .brushMode("1D-axes")  // enable brushing
@@ -29,6 +38,14 @@ function setSelectionIDs(IDs) {
   {
     parcoords.unhighlight();
     return;
+  }
+
+  // don't show the selection windows from previous selections
+  // this would be the case if you first make a selection in the parcoords and
+  // then in e.g. the image viewer without de-selecting in the parcoords
+  if (brushHighlight == false)
+  {
+    parcoords.brushReset();
   }
 
   // parse string of IDs to array

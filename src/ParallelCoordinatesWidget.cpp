@@ -91,6 +91,17 @@ void ParlCoorWidget::passDataToJS(std::string _jsonObject)
 	emit _communicationObject->qt_setDataInJS(QString(_jsonObject.c_str()));
 }
 
+void ParlCoorWidget::enableBrushHighlight()
+{
+	emit _communicationObject->qt_enableBrushHighlight();
+}
+
+void ParlCoorWidget::disableBrushHighlight()
+{
+	emit _communicationObject->qt_disableBrushHighlight();
+}
+
+
 void ParlCoorWidget::passSelectionToJS(std::vector<unsigned int>& selectionIDs)
 {
 	_communicationObject->newSelectionToJS(selectionIDs);

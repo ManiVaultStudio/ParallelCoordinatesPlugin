@@ -171,10 +171,14 @@ void ParallelCoordinatesPlugin::selectionChanged(const QString dataName)
 
 	// send them to js side
 	_parCoordWidget->passSelectionToJS(selectedPoints.indices);
+
+	_parCoordWidget->disableBrushHighlight();
 }
 
 void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selectedIDs)
 {
+	_parCoordWidget->enableBrushHighlight();
+
 	// ask core for the selection set for the current data set
 	auto& selectionIndices = dynamic_cast<Points&>(_core->requestSelection(_currentDataSet->getDataName())).indices;
 	auto& sourceIndices = _currentDataSet->getSourceData<Points>(*_currentDataSet).indices;

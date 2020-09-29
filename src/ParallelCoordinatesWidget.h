@@ -23,6 +23,8 @@ signals:
 	// Signals to JS side
 	void qt_setDataInJS(QString data);
 	void qt_setSelectionInJS(QString selection);
+	void qt_enableBrushHighlight();
+	void qt_disableBrushHighlight();
 
 	// Signal to Qt side
 	void newSelectionToQt(std::vector<unsigned int>& selectionIDs);
@@ -53,6 +55,9 @@ public:
 
 	void passDataToJS(std::string _jsonObject);
 	void passSelectionToJS(std::vector<unsigned int>& selectionIDs);
+
+	void enableBrushHighlight();
+	void disableBrushHighlight();
 
 protected:
 	void resizeEvent(QResizeEvent * e) override;
