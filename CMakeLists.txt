@@ -7,6 +7,8 @@ PROJECT(${PROJECT})
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DWIN32 /EHsc /MP")
@@ -19,27 +21,26 @@ find_package(Qt5 COMPONENTS Widgets WebEngineWidgets REQUIRED)
 
 qt5_add_resources(RESOURCE_FILES res/parcoords_resources.qrc)
 
-set(SOURCES
-    src/ParallelCoordinatesPlugin.h
-    src/ParallelCoordinatesPlugin.cpp
-    src/ParallelCoordinatesPlugin.json
-	src/ParallelCoordinatesWidget.h
-    src/ParallelCoordinatesWidget.cpp
-    src/ParallelCoordinatesSettings.h
-    src/ParallelCoordinatesSettings.cpp
-)
+file(GLOB H src/*.h)
+file(GLOB CPP src/*.cpp)
+file(GLOB UIS src/*.ui)
+file(GLOB WEB res/jslibs/*.js res/jslibs/*.css res/parcoords/*.js res/parcoords/*.html)
+file(GLOB QRC src/*.qrc)
 
-set (RESOURCES
-    res/parcoords_resources.qrc
-)
+set(SOURCES ${H} ${CPP})
+set(WEB ${WEB})
+set(AUX ${QRC})
 
-source_group( Plugin FILES ${SOURCES})
-source_group( Resources FILES ${RESOURCES})
-source_group( Resources\\generated FILES ${CMAKE_CURRENT_BINARY_DIR}/qrc_parcoords_resources.cpp)
+source_group(Plugin FILES ${SOURCES})
+source_group(UI FILES ${UIS})
+source_group(Web FILES ${WEB})
+source_group(Aux FILES ${AUX})
+
+QT5_WRAP_UI(UI_HEADERS ${UIS})
 
 include_directories("$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/include/")
 
-add_library(${PROJECT} SHARED ${SOURCES} ${RESOURCES} ${RESOURCE_FILES})
+add_library(${PROJECT} SHARED ${SOURCES} ${UIS} ${WEB} ${AUX} ${WEB} ${RESOURCE_FILES})
 
 qt5_use_modules(${PROJECT} Widgets WebEngineWidgets Concurrent)
 

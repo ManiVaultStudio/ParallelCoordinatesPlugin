@@ -15,10 +15,9 @@ var parcoords = d3.parcoords({nullValueSeparator: "bottom"})("#example")
 // parses JSON string data and renders par coords plot
 function setParcoordsData(d) {    
   log("parcoords.tools: parsing data to JSON");
-  dat = JSON.parse(d);
+  dat = d;
 
-  log("parcoords.tools: plotting parallel coordinates");
-  parcoords
+    parcoords
     .data(dat)
     .composite("darker")
     .hideAxis(["__pointID"])  // don't show the point ID channel
@@ -56,7 +55,6 @@ function setSelectionIDs(IDs) {
 
 // Notify qt about a selection 
 parcoords.on("brush", function(d) {
-
   let selectionIDs = [];
 
   // check if isBrushed since this listener is triggered at the end of brushing and would report all data set brushed/highlighted as that is the default state
@@ -69,8 +67,7 @@ parcoords.on("brush", function(d) {
     }
   }
 
-  passSelectionToQt(selectionIDs);
-
+   passSelectionToQt(selectionIDs);
 });
 
 

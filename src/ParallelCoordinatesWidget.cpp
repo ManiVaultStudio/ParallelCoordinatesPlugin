@@ -34,7 +34,6 @@ void ParlCoorCommunicationObject::js_passSelectionToQt(QString data) {
 	while (std::getline(iss, IDstring, del)) {
 		*IdIter++ = std::stoul(IDstring);
 	}
-
 	emit newSelectionToQt(selectedIDs);
 }
 
@@ -86,9 +85,9 @@ void ParlCoorWidget::initWebPage()
 	qDebug() << "ParlCoorWidget: WebChannel bridge is available.";
 }
 
-void ParlCoorWidget::passDataToJS(std::string _jsonObject)
+void ParlCoorWidget::passDataToJS(QVariantList data)
 {
-	emit _communicationObject->qt_setDataInJS(QString(_jsonObject.c_str()));
+	emit _communicationObject->qt_setDataInJS(data);
 }
 
 void ParlCoorWidget::enableBrushHighlight()

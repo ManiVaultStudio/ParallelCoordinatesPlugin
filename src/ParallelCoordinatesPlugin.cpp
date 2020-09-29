@@ -6,6 +6,7 @@
 
 #include <QtCore>
 #include <QtConcurrent> 
+#include <QVariantList> 
 #include <QtDebug>
 
 #include <string>
@@ -81,7 +82,7 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 
 void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName)
 {
-	// TODO: might be faster to not use JSON but rather hand over an array with the first entry for each point as the ID and then go .hideAxis([0])
+
 	// get data set from core
 	_currentDataSet = &_core->requestData<Points>(dataSetName);
 	// Get indices of selected points
@@ -98,49 +99,26 @@ void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName)
 	_numDims = _currentDataSet->getNumDimensions();
 	_numPoints = _currentDataSet->getNumPoints();
 
-	// write data to json string
-	std::string jsonObject = "[";
-	std::vector<std::string> jsonPoints(_numPoints, "");
 
-	qDebug() << "ParallelCoordinatesPlugin: Prepare JSON string for data exchange";
+	QVariantList payload;
+	QVariantMap dimension;
 
-	_currentDataSet->visitFromBeginToEnd([&jsonPoints, &pointIDsGlobal, this](auto beginOfData, auto endOfData)
+	_currentDataSet->visitFromBeginToEnd([&pointIDsGlobal, &dimension, &payload, this](auto beginOfData, auto endOfData)
 	{
-		std::string currentPoint = "";
-		// parse values of each point to JSON
-		// for each point "{ "__pointID" : ID, "dimName0" : Val, "dimName1" : Vals, ...}
-		// TODO: parallelize this
+		qDebug() << "ParallelCoordinatesPlugin: Prepare payload";
 		for (const auto& pointId : pointIDsGlobal)
 		{
-			currentPoint = "{";
-
-			// add point ID
-			currentPoint.append("\"__pointID\" : " + std::to_string(pointId) + ",");
-
-			// add channel names and values
+			dimension.clear();
+			dimension["__pointID"] = pointId;
 			for (unsigned int dimId = 0; dimId < _numDims; dimId++)
 			{
-				currentPoint.append("\"" + _dimNames[dimId].toStdString() + "\" : " + std::to_string(beginOfData[pointId * _numDims + dimId]) + ",");
+				dimension[_dimNames[dimId]] = (float)beginOfData[pointId * _numDims + dimId];
 			}
-			currentPoint.back() = '}';	// replace the last , with a closing brace
-
-			jsonPoints[pointId] = currentPoint;
+			payload.append(dimension);
 		}
 	});
 
-	// Join all points with a delimiter ","
-	jsonObject.append(
-		std::accumulate(std::begin(jsonPoints), std::end(jsonPoints), std::string(),
-			[](std::string &ss, std::string &s)
-	{
-		return ss.empty() ? s : ss + "," + s;
-	}));
-
-	jsonObject.append("]");	// end JSON
-
-
-	qDebug() << "ParallelCoordinatesPlugin: Passing JSON to .js side";
-	_parCoordWidget->passDataToJS(jsonObject);
+	_parCoordWidget->passDataToJS(payload);
 }
 
 

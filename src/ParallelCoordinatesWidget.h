@@ -21,7 +21,7 @@ public:
 
 signals:
 	// Signals to JS side
-	void qt_setDataInJS(QString data);
+	void qt_setDataInJS(QVariantList);
 	void qt_setSelectionInJS(QString selection);
 	void qt_enableBrushHighlight();
 	void qt_disableBrushHighlight();
@@ -53,7 +53,7 @@ class ParlCoorWidget : public hdps::gui::WebWidget
 public:
 	ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin);
 
-	void passDataToJS(std::string _jsonObject);
+	void passDataToJS(QVariantList);
 	void passSelectionToJS(std::vector<unsigned int>& selectionIDs);
 
 	void enableBrushHighlight();
