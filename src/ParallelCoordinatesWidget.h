@@ -3,7 +3,7 @@
 #include "widgets/WebWidget.h"
 
 #include <QWidget>
-#include <QString>
+#include <QVariantList>
 
 class QResizeEvent;
 class ParlCoorWidget;
@@ -21,8 +21,8 @@ public:
 
 signals:
 	// Signals to JS side
-	void qt_setDataInJS(QVariantList);
-	void qt_setSelectionInJS(QString selection);
+	void qt_setDataInJS(QVariantList data);
+	void qt_setSelectionInJS(QVariantList selection);
 	void qt_enableBrushHighlight();
 	void qt_disableBrushHighlight();
 
@@ -31,7 +31,7 @@ signals:
 
 public slots:
 	// Invoked from JS side
-	void js_passSelectionToQt(QString data);
+	void js_passSelectionToQt(QVariantList data);
 
 	// invoked from Qt side
 

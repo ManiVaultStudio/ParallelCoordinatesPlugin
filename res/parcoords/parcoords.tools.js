@@ -14,7 +14,7 @@ var parcoords = d3.parcoords({nullValueSeparator: "bottom"})("#example")
 
 // parses JSON string data and renders par coords plot
 function setParcoordsData(d) {    
-  log("parcoords.tools: parsing data to JSON");
+  log("parcoords.tools: setting data");
   dat = d;
 
     parcoords
@@ -48,7 +48,7 @@ function setSelectionIDs(IDs) {
   }
 
   // parse string of IDs to array
-  selectionIDs = IDs.split(',').map(Number);
+  selectionIDs = IDs;
   // only highlight the selected IDs
   parcoords.highlight(dat.filter(function(element){ return selectionIDs.includes(element.__pointID); }));
 }

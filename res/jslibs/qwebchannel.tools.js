@@ -48,7 +48,7 @@ function notifyBridgeAvailable() {
 
 function passSelectionToQt(dat) {
     if (isQtAvailable) {
-        QtBridge.js_passSelectionToQt(dat.toString());
+        QtBridge.js_passSelectionToQt(dat);
 	}
 }
 

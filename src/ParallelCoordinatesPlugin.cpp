@@ -7,9 +7,9 @@
 #include <QtCore>
 #include <QtConcurrent> 
 #include <QVariantList> 
+#include <QVariantMap> 
 #include <QtDebug>
 
-#include <string>
 #include <numeric>
 
 Q_PLUGIN_METADATA(IID "nl.tudelft.ParallelCoordinatesPlugin")
@@ -76,13 +76,11 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 
 	// parse data to JS in a different thread as to not block the UI
 	QtConcurrent::run(this, &ParallelCoordinatesPlugin::passDataToJS, dataSetName);
-
 }
 
 
 void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName)
 {
-
 	// get data set from core
 	_currentDataSet = &_core->requestData<Points>(dataSetName);
 	// Get indices of selected points
