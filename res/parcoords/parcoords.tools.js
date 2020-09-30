@@ -9,7 +9,7 @@ function disableBrushHighlight(){
   brushHighlight = false;
 }
 
-var parcoords = d3.parcoords({nullValueSeparator: "bottom"})("#example")
+var parcoords = d3.parcoords({ nullValueSeparator: "bottom" })("#parcoordsBody")
     .alpha(0.4);
 
 // parses JSON string data and renders par coords plot
@@ -69,3 +69,19 @@ parcoords.on("brush", function(d) {
 
    passSelectionToQt(selectionIDs);
 });
+
+window.onresize = function () {
+
+    document.getElementById("parcoordsBody").style.height = window.innerHeight - 50;
+    //document.getElementById("parcoordsBody").style.width = window.innerWidth - 50;
+
+    log(document.getElementById("parcoordsBody").style.height);
+
+    //parcoords.width(document.body.clientWidth);
+    //parcoords.height(document.body.clientHeight);
+
+    //parcoords.resize();
+    //parcoords.render();
+    //parcoords.brushMode("1D-axes")
+
+}
