@@ -37,7 +37,7 @@ public:
 
 private:
 	// Parses data to JSON and passes it to the web widget
-	void passDataToJS(const QString dataSetName);
+	void passDataToJS(const QString dataSetName, const std::vector<unsigned int>& pointIDsGlobal);
 
 	// informs the core about a selection 
 	void publishSelection(std::vector<unsigned int> selectedIDs);

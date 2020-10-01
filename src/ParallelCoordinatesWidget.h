@@ -3,7 +3,7 @@
 #include "widgets/WebWidget.h"
 
 #include <QWidget>
-#include <QString>
+#include <QVariantList>
 
 class QResizeEvent;
 class ParlCoorWidget;
@@ -21,15 +21,17 @@ public:
 
 signals:
 	// Signals to JS side
-	void qt_setDataInJS(QString data);
-	void qt_setSelectionInJS(QString selection);
+	void qt_setDataInJS(QVariantList data);
+	void qt_setSelectionInJS(QVariantList selection);
+	void qt_enableBrushHighlight();
+	void qt_disableBrushHighlight();
 
 	// Signal to Qt side
 	void newSelectionToQt(std::vector<unsigned int>& selectionIDs);
 
 public slots:
 	// Invoked from JS side
-	void js_passSelectionToQt(QString data);
+	void js_passSelectionToQt(QVariantList data);
 
 	// invoked from Qt side
 
@@ -51,8 +53,11 @@ class ParlCoorWidget : public hdps::gui::WebWidget
 public:
 	ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin);
 
-	void passDataToJS(std::string _jsonObject);
+	void passDataToJS(QVariantList);
 	void passSelectionToJS(std::vector<unsigned int>& selectionIDs);
+
+	void enableBrushHighlight();
+	void disableBrushHighlight();
 
 protected:
 	void resizeEvent(QResizeEvent * e) override;

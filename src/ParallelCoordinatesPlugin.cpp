@@ -6,9 +6,10 @@
 
 #include <QtCore>
 #include <QtConcurrent> 
+#include <QVariantList> 
+#include <QVariantMap> 
 #include <QtDebug>
 
-#include <string>
 #include <numeric>
 
 Q_PLUGIN_METADATA(IID "nl.tudelft.ParallelCoordinatesPlugin")
@@ -63,7 +64,7 @@ void ParallelCoordinatesPlugin::init()
 	addWidget(_settingsWidget);
 
 	//
-	connect(_settingsWidget, &ParlCoorSettings::onDataInput, this, &ParallelCoordinatesPlugin::onDataInput);
+	connect(_settingsWidget, &ParlCoorSettings::onDataInput, this, &ParallelCoordinatesPlugin::onDataInput);			// pass name to core
 	connect(_parCoordWidget, &ParlCoorWidget::newSelectionToQt, this, &ParallelCoordinatesPlugin::publishSelection);
 
 }
@@ -73,15 +74,6 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 	_currentDataSetName = dataSetName;
 	setWindowTitle(dataSetName);
 
-	// parse data to JS in a different thread as to not block the UI
-	QtConcurrent::run(this, &ParallelCoordinatesPlugin::passDataToJS, dataSetName);
-
-}
-
-
-void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName)
-{
-	// TODO: might be faster to not use JSON but rather hand over an array with the first entry for each point as the ID and then go .hideAxis([0])
 	// get data set from core
 	_currentDataSet = &_core->requestData<Points>(dataSetName);
 	// Get indices of selected points
@@ -98,49 +90,38 @@ void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName)
 	_numDims = _currentDataSet->getNumDimensions();
 	_numPoints = _currentDataSet->getNumPoints();
 
-	// write data to json string
-	std::string jsonObject = "[";
-	std::vector<std::string> jsonPoints(_numPoints, "");
+	_settingsWidget->setNumPoints(_numPoints);
+	qDebug() << _dimNames.length();
+	_settingsWidget->setNumDims(_dimNames.length());
+	_settingsWidget->setNumSel(0);
 
-	qDebug() << "ParallelCoordinatesPlugin: Prepare JSON string for data exchange";
+	// parse data to JS in a different thread as to not block the UI
+	QtConcurrent::run(this, &ParallelCoordinatesPlugin::passDataToJS, dataSetName, pointIDsGlobal);
+}
 
-	_currentDataSet->visitFromBeginToEnd([&jsonPoints, &pointIDsGlobal, this](auto beginOfData, auto endOfData)
+
+void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName, const std::vector<unsigned int>& pointIDsGlobal)
+{
+
+	QVariantList payload;
+	QVariantMap dimension;
+
+	_currentDataSet->visitFromBeginToEnd([&pointIDsGlobal, &dimension, &payload, this](auto beginOfData, auto endOfData)
 	{
-		std::string currentPoint = "";
-		// parse values of each point to JSON
-		// for each point "{ "__pointID" : ID, "dimName0" : Val, "dimName1" : Vals, ...}
-		// TODO: parallelize this
+		qDebug() << "ParallelCoordinatesPlugin: Prepare payload";
 		for (const auto& pointId : pointIDsGlobal)
 		{
-			currentPoint = "{";
-
-			// add point ID
-			currentPoint.append("\"__pointID\" : " + std::to_string(pointId) + ",");
-
-			// add channel names and values
+			dimension.clear();
+			dimension["__pointID"] = pointId;
 			for (unsigned int dimId = 0; dimId < _numDims; dimId++)
 			{
-				currentPoint.append("\"" + _dimNames[dimId].toStdString() + "\" : " + std::to_string(beginOfData[pointId * _numDims + dimId]) + ",");
+				dimension[_dimNames[dimId]] = (float)beginOfData[pointId * _numDims + dimId];
 			}
-			currentPoint.back() = '}';	// replace the last , with a closing brace
-
-			jsonPoints[pointId] = currentPoint;
+			payload.append(dimension);
 		}
 	});
 
-	// Join all points with a delimiter ","
-	jsonObject.append(
-		std::accumulate(std::begin(jsonPoints), std::end(jsonPoints), std::string(),
-			[](std::string &ss, std::string &s)
-	{
-		return ss.empty() ? s : ss + "," + s;
-	}));
-
-	jsonObject.append("]");	// end JSON
-
-
-	qDebug() << "ParallelCoordinatesPlugin: Passing JSON to .js side";
-	_parCoordWidget->passDataToJS(jsonObject);
+	_parCoordWidget->passDataToJS(payload);
 }
 
 
@@ -171,10 +152,16 @@ void ParallelCoordinatesPlugin::selectionChanged(const QString dataName)
 
 	// send them to js side
 	_parCoordWidget->passSelectionToJS(selectedPoints.indices);
+	_parCoordWidget->disableBrushHighlight();
+
+	//
+	_settingsWidget->setNumSel(selectedPoints.getNumPoints());
 }
 
 void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selectedIDs)
 {
+	_parCoordWidget->enableBrushHighlight();
+
 	// ask core for the selection set for the current data set
 	auto& selectionIndices = dynamic_cast<Points&>(_core->requestSelection(_currentDataSet->getDataName())).indices;
 	auto& sourceIndices = _currentDataSet->getSourceData<Points>(*_currentDataSet).indices;
@@ -195,6 +182,9 @@ void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selec
 		_core->notifySelectionChanged(_currentDataSet->getSourceData<Points>(*_currentDataSet).getDataName());
 	else
 		_core->notifySelectionChanged(_currentDataSet->getDataName());
+
+	//
+	_settingsWidget->setNumSel(selectedIDs.size());
 
 }
 

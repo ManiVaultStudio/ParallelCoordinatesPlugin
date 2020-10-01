@@ -11,6 +11,8 @@ try {
         // register signals 
         QtBridge.qt_setDataInJS.connect(function () { setParcoordsData(arguments[0]); });
         QtBridge.qt_setSelectionInJS.connect(function () { setSelectionIDs(arguments[0]); });
+        QtBridge.qt_enableBrushHighlight.connect(function () { enableBrushHighlight(); });
+        QtBridge.qt_disableBrushHighlight.connect(function () { disableBrushHighlight(); });
 
         // confirm successfull connection
         notifyBridgeAvailable();
@@ -46,7 +48,7 @@ function notifyBridgeAvailable() {
 
 function passSelectionToQt(dat) {
     if (isQtAvailable) {
-		QtBridge.js_passSelectionToQt(dat.toString());
+        QtBridge.js_passSelectionToQt(dat);
 	}
 }
 
