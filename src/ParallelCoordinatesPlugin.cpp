@@ -64,7 +64,7 @@ void ParallelCoordinatesPlugin::init()
 	addWidget(_settingsWidget);
 
 	//
-	connect(_settingsWidget, &ParlCoorSettings::onDataInput, this, &ParallelCoordinatesPlugin::onDataInput);
+	connect(_settingsWidget, &ParlCoorSettings::onDataInput, this, &ParallelCoordinatesPlugin::onDataInput);			// pass name to core
 	connect(_parCoordWidget, &ParlCoorWidget::newSelectionToQt, this, &ParallelCoordinatesPlugin::publishSelection);
 
 }
@@ -74,13 +74,6 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 	_currentDataSetName = dataSetName;
 	setWindowTitle(dataSetName);
 
-	// parse data to JS in a different thread as to not block the UI
-	QtConcurrent::run(this, &ParallelCoordinatesPlugin::passDataToJS, dataSetName);
-}
-
-
-void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName)
-{
 	// get data set from core
 	_currentDataSet = &_core->requestData<Points>(dataSetName);
 	// Get indices of selected points
@@ -97,6 +90,18 @@ void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName)
 	_numDims = _currentDataSet->getNumDimensions();
 	_numPoints = _currentDataSet->getNumPoints();
 
+	_settingsWidget->setNumPoints(_numPoints);
+	qDebug() << _dimNames.length();
+	_settingsWidget->setNumDims(_dimNames.length());
+	_settingsWidget->setNumSel(0);
+
+	// parse data to JS in a different thread as to not block the UI
+	QtConcurrent::run(this, &ParallelCoordinatesPlugin::passDataToJS, dataSetName, pointIDsGlobal);
+}
+
+
+void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName, const std::vector<unsigned int>& pointIDsGlobal)
+{
 
 	QVariantList payload;
 	QVariantMap dimension;
@@ -147,8 +152,10 @@ void ParallelCoordinatesPlugin::selectionChanged(const QString dataName)
 
 	// send them to js side
 	_parCoordWidget->passSelectionToJS(selectedPoints.indices);
-
 	_parCoordWidget->disableBrushHighlight();
+
+	//
+	_settingsWidget->setNumSel(selectedPoints.getNumPoints());
 }
 
 void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selectedIDs)
@@ -175,6 +182,9 @@ void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selec
 		_core->notifySelectionChanged(_currentDataSet->getSourceData<Points>(*_currentDataSet).getDataName());
 	else
 		_core->notifySelectionChanged(_currentDataSet->getDataName());
+
+	//
+	_settingsWidget->setNumSel(selectedIDs.size());
 
 }
 

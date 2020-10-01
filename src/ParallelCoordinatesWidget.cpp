@@ -6,6 +6,9 @@
 #include <vector>
 #include <iterator>
 
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QMimeData>
 #include <QResizeEvent>
 #include <QWebEngineView>
 #include <QDebug>
@@ -77,7 +80,6 @@ void ParlCoorWidget::initWebPage()
 	qDebug() << "ParlCoorWidget: WebChannel bridge is available.";
 }
 
-
 void ParlCoorWidget::passDataToJS(QVariantList data)
 {
 	emit _communicationObject->qt_setDataInJS(data);
@@ -92,7 +94,6 @@ void ParlCoorWidget::disableBrushHighlight()
 {
 	emit _communicationObject->qt_disableBrushHighlight();
 }
-
 
 void ParlCoorWidget::passSelectionToJS(std::vector<unsigned int>& selectionIDs)
 {

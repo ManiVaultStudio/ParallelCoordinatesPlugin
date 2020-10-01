@@ -1,5 +1,6 @@
 var dat = [];                 // JSON data
 var brushHighlight = false;   // guards brushing indicators
+var parcoords = null;
 
 function enableBrushHighlight(){
   brushHighlight = true;
@@ -9,25 +10,35 @@ function disableBrushHighlight(){
   brushHighlight = false;
 }
 
-var parcoords = d3.parcoords({ nullValueSeparator: "bottom" })("#parcoordsBody")
-    .alpha(0.4);
+function newParcoords() {
+    if (parcoords != null) {
+        parcoords.brushReset();
+    }
+    parcoords = null;
+    parcoords = d3.parcoords()("#parcoordsBody").alpha(0.4);
+
+}
 
 // parses JSON string data and renders par coords plot
 function setParcoordsData(d) {    
-  log("parcoords.tools: setting data");
-  dat = d;
+    // clear a potential previous par coord
+    newParcoords();
 
+    log("parcoords.tools: setting data");
+    dat = d;
+
+    // new par coords
     parcoords
-    .data(dat)
-    .composite("darker")
-    .hideAxis(["__pointID"])  // don't show the point ID channel
-    .alphaOnBrushed(0.15)
-    .render()
-  // .reorderable()         // deactivate by default since for high dim nums it is unhandy with brushing enabled
-    .mode("queue")          // enables progressive rendering when brushing
-    .rate(300)
-    .brushMode("1D-axes")  // enable brushing
-  ;
+        .data(dat)
+        .composite("darker")
+        .hideAxis(["__pointID"])  // don't show the point ID channel
+        .alphaOnBrushed(0.15)
+        .render()
+      // .reorderable()         // deactivate by default since for high dim nums it is unhandy with brushing enabled
+        .mode("queue")          // enables progressive rendering when brushing
+        .rate(300)
+        .brushMode("1D-axes")  // enable brushing
+        ;
 }
  
 // parses arrays string and highlights selection
@@ -70,18 +81,3 @@ parcoords.on("brush", function(d) {
    passSelectionToQt(selectionIDs);
 });
 
-window.onresize = function () {
-
-    document.getElementById("parcoordsBody").style.height = window.innerHeight - 50;
-    //document.getElementById("parcoordsBody").style.width = window.innerWidth - 50;
-
-    log(document.getElementById("parcoordsBody").style.height);
-
-    //parcoords.width(document.body.clientWidth);
-    //parcoords.height(document.body.clientHeight);
-
-    //parcoords.resize();
-    //parcoords.render();
-    //parcoords.brushMode("1D-axes")
-
-}
