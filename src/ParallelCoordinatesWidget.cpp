@@ -2,12 +2,13 @@
 #include "ParallelCoordinatesPlugin.h"
 
 #include <string>
-#include <sstream>
+#include <algorithm>
 #include <vector>
 #include <iterator>
 
-#include <QVariant>
-#include <QString>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QMimeData>
 #include <QResizeEvent>
 #include <QWebEngineView>
 #include <QDebug>
@@ -23,37 +24,30 @@ ParlCoorCommunicationObject::ParlCoorCommunicationObject(ParlCoorWidget* parent)
 }
 
 
-void ParlCoorCommunicationObject::js_passSelectionToQt(QString data) {
+void ParlCoorCommunicationObject::js_passSelectionToQt(QVariantList data){
+	// convert data structure
 	std::vector<unsigned int> selectedIDs;
-	char del = ',';
-
-	// convert the string of IDs "1,2,3..." to a vector of unsigned ints
-	std::istringstream iss(data.toStdString());
-	std::string IDstring;
-	auto IdIter = std::back_inserter(selectedIDs);
-	while (std::getline(iss, IDstring, del)) {
-		*IdIter++ = std::stoul(IDstring);
-	}
-
+	std::for_each(data.begin(), data.end(), [&selectedIDs](const auto &dat) {selectedIDs.push_back(dat.toUInt()); });
+	// hand selction to core
 	emit newSelectionToQt(selectedIDs);
 }
 
 void ParlCoorCommunicationObject::newSelectionToJS(std::vector<unsigned int>& selectionIDs) {
+	QVariantList selection;
+
 	// if nothing is selected, tell the parcoords to show all data
 	if (selectionIDs.size() == 0)
 	{
-		emit this->qt_setSelectionInJS("-");
-		return;
+		selection.append("-");
+	}
+	// otherwise send all IDs
+	else
+	{
+		for (const auto& ID : selectionIDs)
+			selection.append(ID);
 	}
 
-	// parse all IDs into a string
-	QString selection = "";
-	for (const auto& ID : selectionIDs) {
-		selection.append(QString::fromStdString(std::to_string(ID) + ","));
-	}
-	selection.chop(1);	// remove last ","
-
-	// send string array to JS
+	// send data to JS
 	emit this->qt_setSelectionInJS(selection);
 }
 
@@ -86,9 +80,19 @@ void ParlCoorWidget::initWebPage()
 	qDebug() << "ParlCoorWidget: WebChannel bridge is available.";
 }
 
-void ParlCoorWidget::passDataToJS(std::string _jsonObject)
+void ParlCoorWidget::passDataToJS(QVariantList data)
 {
-	emit _communicationObject->qt_setDataInJS(QString(_jsonObject.c_str()));
+	emit _communicationObject->qt_setDataInJS(data);
+}
+
+void ParlCoorWidget::enableBrushHighlight()
+{
+	emit _communicationObject->qt_enableBrushHighlight();
+}
+
+void ParlCoorWidget::disableBrushHighlight()
+{
+	emit _communicationObject->qt_disableBrushHighlight();
 }
 
 void ParlCoorWidget::passSelectionToJS(std::vector<unsigned int>& selectionIDs)

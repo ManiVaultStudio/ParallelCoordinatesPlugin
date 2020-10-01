@@ -3,7 +3,8 @@
 #include <widgets/SettingsWidget.h>
 
 #include <QWidget>
-#include <QLineEdit>
+#include <QString>
+#include <QLabel>
 
 using namespace hdps::gui;
 
@@ -13,6 +14,11 @@ class ParlCoorSettings : public QWidget
 
 public:
 	ParlCoorSettings();
+
+	void setCurrentDataSetName(QString datasetName) { currentDataSetName.setText(datasetName); };
+	void setNumPoints(int num) { numPoints.setNum(num); };
+	void setNumSel(int num) { numSel.setNum(num); };
+	void setNumDims(int num) { numDims.setNum(num); };
 
 private:
 	// Drag and drop
@@ -35,5 +41,8 @@ signals:
 	void onDataInput(QString dataName);
 
 public: 
-	QLineEdit	currentDataSetName;
+	QLabel	currentDataSetName;
+	QLabel	numPoints;
+	QLabel	numSel;
+	QLabel	numDims;
 };
