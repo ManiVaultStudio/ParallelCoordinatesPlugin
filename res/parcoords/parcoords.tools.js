@@ -1,44 +1,41 @@
 var dat = [];                 // JSON data
 var brushHighlight = false;   // guards brushing indicators
-var parcoords = null;
+
+var parcoords = d3.parcoords()("#parcoordsBody").alpha(0.4);
 
 function enableBrushHighlight(){
   brushHighlight = true;
 }
 
 function disableBrushHighlight(){
-  brushHighlight = false;
-}
-
-function newParcoords() {
-    if (parcoords != null) {
-        parcoords.brushReset();
-    }
-    parcoords = null;
-    parcoords = d3.parcoords()("#parcoordsBody").alpha(0.4);
-
+    brushHighlight = false;
 }
 
 // parses JSON string data and renders par coords plot
 function setParcoordsData(d) {    
     // clear a potential previous par coord
-    newParcoords();
+    if (dat == [])
+    {
+    }
+    d3.select("#parcoordsBody").selectAll("*").remove();
 
     log("parcoords.tools: setting data");
     dat = d;
 
     // new par coords
+    parcoords = d3.parcoords()("#parcoordsBody").alpha(0.4);
     parcoords
         .data(dat)
         .composite("darker")
         .hideAxis(["__pointID"])  // don't show the point ID channel
         .alphaOnBrushed(0.15)
         .render()
-      // .reorderable()         // deactivate by default since for high dim nums it is unhandy with brushing enabled
         .mode("queue")          // enables progressive rendering when brushing
         .rate(300)
         .brushMode("1D-axes")  // enable brushing
-        ;
+    ;
+
+    parcoords.brushReset();
 }
  
 // parses arrays string and highlights selection
@@ -55,7 +52,7 @@ function setSelectionIDs(IDs) {
   // then in e.g. the image viewer without de-selecting in the parcoords
   if (brushHighlight == false)
   {
-    parcoords.brushReset();
+      parcoords.brushReset();
   }
 
   // parse string of IDs to array
@@ -65,7 +62,7 @@ function setSelectionIDs(IDs) {
 }
 
 // Notify qt about a selection 
-parcoords.on("brush", function(d) {
+parcoords.on("brush", function (d) {
   let selectionIDs = [];
 
   // check if isBrushed since this listener is triggered at the end of brushing and would report all data set brushed/highlighted as that is the default state

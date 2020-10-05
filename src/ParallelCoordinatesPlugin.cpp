@@ -168,7 +168,10 @@ void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selec
 
 	// no need to update the selection when nothing is updated
 	if ((selectedIDs.size() == 0) & (selectionIndices.size() == 0))
+	{
+		_parCoordWidget->disableBrushHighlight();	// this makes sure that the brush indicator will be removed when selection from other plugins come in
 		return;
+	}
 
 	// clear the selection and add the new points
 	selectionIndices.clear();
