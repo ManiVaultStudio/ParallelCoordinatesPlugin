@@ -1,6 +1,6 @@
 var dat = [];                 // JSON data
+var selIDs = [];               // selected data
 var brushHighlight = false;   // guards brushing indicators
-
 var parcoords = d3.parcoords()("#parcoordsBody").alpha(0.4);
 
 function enableBrushHighlight(){
@@ -24,35 +24,50 @@ function setParcoordsData(d) {
         .composite("darker")
         .hideAxis(["__pointID"])  // don't show the point ID channel
         .alphaOnBrushed(0.15)
-        .render()
         .mode("queue")          // enables progressive rendering when brushing
         .rate(300)
-        .brushMode("1D-axes")  // enable brushing
     ;
+
+    // necessary  due to resizing issues witht the axis
+    parcoords.autoscale();
+    parcoords.updateAxes();
+    parcoords.render();
+    parcoords.brushMode("1D-axes");
 
 }
  
-// parses arrays string and highlights selection
-function setSelectionIDs(IDs) {
+// highlights selection from qt
+function setSelectionIDsFromQt(IDs) {
   // if nothing is selected, show all data
   if (IDs == "-")
   {
-    parcoords.unhighlight();
+      parcoords.unhighlight();
+      log('unhighlight');
     return;
   }
 
   // don't show the selection windows from previous selections
   // this would be the case if you first make a selection in the parcoords and
   // then in e.g. the image viewer without de-selecting in the parcoords
-  if (brushHighlight == false)
+  if ( (brushHighlight) == false)
   {
       parcoords.brushReset();
+      log('brushReset');
   }
 
-  // parse string of IDs to array
-  selectionIDs = IDs;
   // only highlight the selected IDs
-  parcoords.highlight(dat.filter(function(element){ return selectionIDs.includes(element.__pointID); }));
+  parcoords.highlight(dat.filter(function (element) { return IDs.includes(element.__pointID); }));
+
+  selIDs = IDs;
+}
+
+// TODO: Why does this not work?
+function highlightIDs(wasBrushedBeforeResize, IDs) {
+    if (wasBrushedBeforeResize == false) return;
+    //log("Highlight");
+    //log(IDs);
+    // only highlight the selected IDs
+    parcoords.highlight(dat.filter(function (element) { return IDs.includes(element.__pointID); }));
 }
 
 // Notify qt about a selection 
@@ -69,6 +84,28 @@ parcoords.on("brush", function (d) {
     }
   }
 
-   passSelectionToQt(selectionIDs);
+  passSelectionToQt(selectionIDs);
+  selIDs = selectionIDs;
 });
 
+
+function redrawPC(wasBrushedBeforeResize, ids, callback) {
+    parcoords.autoscale();
+    parcoords.updateAxes();
+    parcoords.render();
+    parcoords.brushMode("1D-axes");
+
+    callback(wasBrushedBeforeResize, selIDs);
+}
+
+window.onresize = function () {
+    let wasBrushedBeforeResize = parcoords.isBrushed();
+
+    // resize
+    parcoords.width(window.innerWidth);
+    parcoords.height(window.innerHeight * 0.9);
+    parcoords.resize();
+    // take care of axis rendering
+    redrawPC(wasBrushedBeforeResize, selIDs, highlightIDs)
+
+};
