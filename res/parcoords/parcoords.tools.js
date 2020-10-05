@@ -14,16 +14,11 @@ function disableBrushHighlight(){
 // parses JSON string data and renders par coords plot
 function setParcoordsData(d) {    
     // clear a potential previous par coord
-    if (dat == [])
-    {
-    }
-    d3.select("#parcoordsBody").selectAll("*").remove();
 
     log("parcoords.tools: setting data");
     dat = d;
 
     // new par coords
-    parcoords = d3.parcoords()("#parcoordsBody").alpha(0.4);
     parcoords
         .data(dat)
         .composite("darker")
@@ -35,7 +30,6 @@ function setParcoordsData(d) {
         .brushMode("1D-axes")  // enable brushing
     ;
 
-    parcoords.brushReset();
 }
  
 // parses arrays string and highlights selection
