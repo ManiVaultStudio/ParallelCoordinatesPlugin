@@ -86,12 +86,23 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 		pointIDsGlobal = all;
 	}
 
-	_dimNames = QStringList(_currentDataSet->getDimensionNames().begin(), _currentDataSet->getDimensionNames().end());
 	_numDims = _currentDataSet->getNumDimensions();
 	_numPoints = _currentDataSet->getNumPoints();
+	_dimNames = QStringList(_currentDataSet->getDimensionNames().begin(), _currentDataSet->getDimensionNames().end());
+
+	// if data set dimensions are not defined, just number them
+	if (_dimNames.isEmpty() && (_numDims > 0)) {
+		for (int dimensionIndex = 0; dimensionIndex < _currentDataSet->getNumDimensions(); dimensionIndex++) {
+			_dimNames.append(QString("Dim %1").arg(dimensionIndex));
+		}
+	}
+	else
+	{
+		qDebug() << "ParallelCoordinatesPlugin: unable to load data set";
+		return;
+	}
 
 	_settingsWidget->setNumPoints(_numPoints);
-	qDebug() << _dimNames.length();
 	_settingsWidget->setNumDims(_dimNames.length());
 	_settingsWidget->setNumSel(0);
 
