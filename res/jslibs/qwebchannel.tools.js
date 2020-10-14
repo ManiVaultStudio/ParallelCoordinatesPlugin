@@ -10,7 +10,7 @@ try {
 
         // register signals 
         QtBridge.qt_setDataInJS.connect(function () { setParcoordsData(arguments[0]); });
-        QtBridge.qt_setSelectionInJS.connect(function () { setSelectionIDs(arguments[0]); });
+        QtBridge.qt_setSelectionInJS.connect(function () { setSelectionIDsFromQt(arguments[0]); });
         QtBridge.qt_enableBrushHighlight.connect(function () { enableBrushHighlight(); });
         QtBridge.qt_disableBrushHighlight.connect(function () { disableBrushHighlight(); });
 
