@@ -91,15 +91,17 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 	_dimNames = QStringList(_currentDataSet->getDimensionNames().begin(), _currentDataSet->getDimensionNames().end());
 
 	// if data set dimensions are not defined, just number them
-	if (_dimNames.isEmpty() && (_numDims > 0)) {
-		for (int dimensionIndex = 0; dimensionIndex < _currentDataSet->getNumDimensions(); dimensionIndex++) {
-			_dimNames.append(QString("Dim %1").arg(dimensionIndex));
+	if (_dimNames.isEmpty()) {
+		if (_numDims > 0) {
+			for (int dimensionIndex = 0; dimensionIndex < _currentDataSet->getNumDimensions(); dimensionIndex++) {
+				_dimNames.append(QString("Dim %1").arg(dimensionIndex));
+			}
 		}
-	}
-	else
-	{
-		qDebug() << "ParallelCoordinatesPlugin: unable to load data set";
-		return;
+		else
+		{
+			qDebug() << "ParallelCoordinatesPlugin: unable to load data set";
+			return;
+		}
 	}
 
 	_settingsWidget->setNumPoints(_numPoints);
