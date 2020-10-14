@@ -1,28 +1,19 @@
 var dat = [];                 // JSON data
+var selIDs = [];               // selected data
 var brushHighlight = false;   // guards brushing indicators
-var parcoords = null;
+var parcoords = d3.parcoords()("#parcoordsBody").alpha(0.4);
 
 function enableBrushHighlight(){
   brushHighlight = true;
 }
 
 function disableBrushHighlight(){
-  brushHighlight = false;
-}
-
-function newParcoords() {
-    if (parcoords != null) {
-        parcoords.brushReset();
-    }
-    parcoords = null;
-    parcoords = d3.parcoords()("#parcoordsBody").alpha(0.4);
-
+    brushHighlight = false;
 }
 
 // parses JSON string data and renders par coords plot
 function setParcoordsData(d) {    
     // clear a potential previous par coord
-    newParcoords();
 
     log("parcoords.tools: setting data");
     dat = d;
@@ -33,39 +24,54 @@ function setParcoordsData(d) {
         .composite("darker")
         .hideAxis(["__pointID"])  // don't show the point ID channel
         .alphaOnBrushed(0.15)
-        .render()
-      // .reorderable()         // deactivate by default since for high dim nums it is unhandy with brushing enabled
         .mode("queue")          // enables progressive rendering when brushing
         .rate(300)
-        .brushMode("1D-axes")  // enable brushing
-        ;
+    ;
+
+    // necessary  due to resizing issues witht the axis
+    parcoords.autoscale();
+    parcoords.updateAxes();
+    parcoords.render();
+    parcoords.brushMode("1D-axes");
+
 }
  
-// parses arrays string and highlights selection
-function setSelectionIDs(IDs) {
+// highlights selection from qt
+function setSelectionIDsFromQt(IDs) {
   // if nothing is selected, show all data
   if (IDs == "-")
   {
-    parcoords.unhighlight();
+      parcoords.unhighlight();
+      log('unhighlight');
     return;
   }
 
   // don't show the selection windows from previous selections
   // this would be the case if you first make a selection in the parcoords and
   // then in e.g. the image viewer without de-selecting in the parcoords
-  if (brushHighlight == false)
+  if ( (brushHighlight) == false)
   {
-    parcoords.brushReset();
+      parcoords.brushReset();
+      log('brushReset');
   }
 
-  // parse string of IDs to array
-  selectionIDs = IDs;
   // only highlight the selected IDs
-  parcoords.highlight(dat.filter(function(element){ return selectionIDs.includes(element.__pointID); }));
+  parcoords.highlight(dat.filter(function (element) { return IDs.includes(element.__pointID); }));
+
+  selIDs = IDs;
+}
+
+// TODO: Why does this not work?
+function highlightIDs(wasBrushedBeforeResize, IDs) {
+    if (wasBrushedBeforeResize == false) return;
+    //log("Highlight");
+    //log(IDs);
+    // only highlight the selected IDs
+    parcoords.highlight(dat.filter(function (element) { return IDs.includes(element.__pointID); }));
 }
 
 // Notify qt about a selection 
-parcoords.on("brush", function(d) {
+parcoords.on("brush", function (d) {
   let selectionIDs = [];
 
   // check if isBrushed since this listener is triggered at the end of brushing and would report all data set brushed/highlighted as that is the default state
@@ -78,6 +84,28 @@ parcoords.on("brush", function(d) {
     }
   }
 
-   passSelectionToQt(selectionIDs);
+  passSelectionToQt(selectionIDs);
+  selIDs = selectionIDs;
 });
 
+
+function redrawPC(wasBrushedBeforeResize, ids, callback) {
+    parcoords.autoscale();
+    parcoords.updateAxes();
+    parcoords.render();
+    parcoords.brushMode("1D-axes");
+
+    callback(wasBrushedBeforeResize, selIDs);
+}
+
+window.onresize = function () {
+    let wasBrushedBeforeResize = parcoords.isBrushed();
+
+    // resize
+    parcoords.width(window.innerWidth);
+    parcoords.height(window.innerHeight * 0.9);
+    parcoords.resize();
+    // take care of axis rendering
+    redrawPC(wasBrushedBeforeResize, selIDs, highlightIDs)
+
+};

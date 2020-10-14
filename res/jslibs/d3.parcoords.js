@@ -70,7 +70,7 @@ var pc = function(selection) {
 };
 var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush", "brushend", "brushstart", "axesreorder"].concat(d3.keys(__))),
     w = function() { return __.width - __.margin.right - __.margin.left; },
-    h = function() { return __.height - __.margin.top - __.margin.bottom; },
+    h = function () { return __.height - __.margin.top - __.margin.bottom; },
     flags = {
       brushable: false,
       reorderable: false,
@@ -2368,7 +2368,7 @@ pc.g = function() { return g; };
 
 // rescale for height, width and margins
 // TODO currently assumes chart is brushable, and destroys old brushes
-pc.resize = function() {
+pc.resize = function () {
   // selection size
   pc.selection.select("svg")
     .attr("width", __.width)
@@ -2379,6 +2379,9 @@ pc.resize = function() {
   if (flags.brushable) pc.brushReset();
 
   // scales
+  d3.keys(__.dimensions).forEach(function (k) {
+      delete __.dimensions[k].yscale;
+  });
   pc.autoscale();
 
   // axes, destroys old brushes.
@@ -2389,6 +2392,7 @@ pc.resize = function() {
   events.resize.call(this, {width: __.width, height: __.height, margin: __.margin});
   return this;
 };
+
 
 // highlight an array of data
 pc.highlight = function(data) {

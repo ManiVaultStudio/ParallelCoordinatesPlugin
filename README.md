@@ -6,7 +6,6 @@ Based on the [d3.js](https://github.com/d3/d3) library [Parallel Coordinates](ht
 
 ## TODO
 Next steps:
-- Resize the plot automatically when the window size changes
 - Check if the webview can be used to drag something onto
 - Add interaction controls:
   - Make axis dragable (instead of brushing, since this does not work well at the same time when there are many axes)
@@ -17,4 +16,4 @@ Next steps:
 - Option to color lines based on values from one dimension
 
 ## Known bugs
-- After resizing, when plotting a new PC, the axis of the old one are still displayed
+- After resizing, a selction will not be highlighted anymore
