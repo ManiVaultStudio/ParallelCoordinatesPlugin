@@ -28,12 +28,11 @@ public:
     
     void init() override;
     
-    void dataAdded(const QString name) Q_DECL_OVERRIDE;
-    void dataChanged(const QString name) Q_DECL_OVERRIDE;
-    void dataRemoved(const QString name) Q_DECL_OVERRIDE;
-    void selectionChanged(const QString dataName) Q_DECL_OVERRIDE;
-    hdps::DataTypes supportedDataTypes() const Q_DECL_OVERRIDE;
-
+    /**
+     * Callback which is invoked when a \p dataEvent occurs
+     * @param dataEvent Data event that occurred
+     */
+    void onDataEvent(hdps::DataEvent* dataEvent);
 
 private:
 	// Parses data to JSON and passes it to the web widget
