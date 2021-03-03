@@ -23,7 +23,7 @@ class ParallelCoordinatesPlugin : public ViewPlugin
     Q_OBJECT
     
 public:
-	ParallelCoordinatesPlugin();
+    ParallelCoordinatesPlugin();
     ~ParallelCoordinatesPlugin(void) override;
     
     void init() override;
@@ -35,28 +35,28 @@ public:
     void onDataEvent(hdps::DataEvent* dataEvent);
 
 private:
-	// Parses data to JSON and passes it to the web widget
-	void passDataToJS(const QString dataSetName, const std::vector<unsigned int>& pointIDsGlobal);
+    // Parses data to JSON and passes it to the web widget
+    void passDataToJS(const QString dataSetName, const std::vector<unsigned int>& pointIDsGlobal);
 
-	// informs the core about a selection 
-	void publishSelection(std::vector<unsigned int> selectedIDs);
+    // informs the core about a selection 
+    void publishSelection(std::vector<unsigned int> selectedIDs);
 
 public slots:
-	// sets window title and calls passDataToJS in another thread
-	void onDataInput(const QString dataSetName);
+    // sets window title and calls passDataToJS in another thread
+    void onDataInput(const QString dataSetName);
 
 private:
-	QString _currentDataSetName;
-	Points* _currentDataSet;
+    QString _currentDataSetName;
+    Points* _currentDataSet;
 
-	QStringList _dimNames;
-	unsigned int _numDims;
-	unsigned int _numPoints;
+    QStringList _dimNames;
+    unsigned int _numDims;
+    unsigned int _numPoints;
 
-	ParlCoorWidget* _parCoordWidget;
-	ParlCoorSettings* _settingsWidget;
+    ParlCoorWidget* _parCoordWidget;
+    ParlCoorSettings* _settingsWidget;
 
-	QThread thread;
+    QThread thread;
 
 };
 
@@ -73,7 +73,7 @@ class ParallelCoordinatesPluginFactory : public ViewPluginFactory
                       FILE  "ParallelCoordinatesPlugin.json")
     
 public:
-	ParallelCoordinatesPluginFactory(void) {}
+    ParallelCoordinatesPluginFactory(void) {}
     ~ParallelCoordinatesPluginFactory(void) override {}
     
     ViewPlugin* produce() override;
