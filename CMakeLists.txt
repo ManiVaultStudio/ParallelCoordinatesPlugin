@@ -17,7 +17,7 @@ if(MSVC)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
 endif(MSVC)
 
-find_package(Qt5 COMPONENTS Widgets WebEngineWidgets REQUIRED)
+find_package(Qt5 COMPONENTS Widgets WebEngineWidgets Concurrent REQUIRED)
 
 qt5_add_resources(RESOURCE_FILES res/parcoords_resources.qrc)
 
@@ -38,19 +38,18 @@ source_group(Aux FILES ${AUX})
 
 QT5_WRAP_UI(UI_HEADERS ${UIS})
 
-target_include_directories(${PCPLUGIN} PUBLIC "$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/include/")
-
 add_library(${PCPLUGIN} SHARED ${SOURCES} ${UIS} ${WEB} ${AUX} ${WEB} ${RESOURCE_FILES})
 
-qt5_use_modules(${PCPLUGIN} Widgets WebEngineWidgets Concurrent)
+target_include_directories(${PCPLUGIN} PRIVATE "$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/include/")
 
 # Request C++17
-target_compile_features(${PCPLUGIN} PUBLIC cxx_std_17)
+target_compile_features(${PCPLUGIN} PRIVATE cxx_std_17)
 
-target_link_libraries(${PCPLUGIN} PUBLIC Qt5::Widgets)
-target_link_libraries(${PCPLUGIN} PUBLIC Qt5::WebEngineWidgets)
-target_link_libraries(${PCPLUGIN} PUBLIC "$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/lib/HDPS_Public.lib")
-target_link_libraries(${PCPLUGIN} PUBLIC "$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/lib/PointData.lib")
+target_link_libraries(${PCPLUGIN} PRIVATE Qt5::Widgets)
+target_link_libraries(${PCPLUGIN} PRIVATE Qt5::WebEngineWidgets)
+target_link_libraries(${PCPLUGIN} PRIVATE Qt5::Concurrent)
+target_link_libraries(${PCPLUGIN} PRIVATE "$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/lib/HDPS_Public.lib")
+target_link_libraries(${PCPLUGIN} PRIVATE "$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/lib/PointData.lib")
 
 add_custom_command(TARGET ${PCPLUGIN} POST_BUILD
     COMMAND "${CMAKE_COMMAND}" -E copy_if_different
