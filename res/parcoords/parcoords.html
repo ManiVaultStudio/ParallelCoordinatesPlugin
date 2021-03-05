@@ -14,10 +14,23 @@
     <!-- stylesheets -->
     <link rel="stylesheet" type="text/css" href="../jslibs/d3.parcoords.css">
     <link rel="stylesheet" type="text/css" href="../jslibs/styles.css">
+
+    <!-- drag and drop data -->
+    <script>function allowDrop(ev) {
+      ev.preventDefault();
+    }
+
+    function drop(ev) {
+      ev.preventDefault();
+      var data = ev.dataTransfer.getData("text");
+      passDataNameToQt(data);
+    }
+    </script>
+
 </head>
 
 <body>
-    <div id="parcoordsBody" class="parcoords" style="width:100%;height:300px;"></div>
+    <div id="parcoordsBody" class="parcoords" ondrop="drop(event)" ondragover="allowDrop(event)" style="width:100%;height:300px;"></div>
 </body>
 
 <!-- parcoords functions -->

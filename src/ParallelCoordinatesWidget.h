@@ -4,6 +4,7 @@
 
 #include <QWidget>
 #include <QVariantList>
+#include <QJsonValue>
 
 class QResizeEvent;
 class ParlCoorWidget;
@@ -28,10 +29,12 @@ signals:
 
     // Signal to Qt side
     void newSelectionToQt(std::vector<unsigned int>& selectionIDs);
+    void newDataSetName(QString dataSetName);
 
 public slots:
     // Invoked from JS side
     void js_passSelectionToQt(QVariantList data);
+    void js_passDataNameToQt(QJsonValue name);
 
     // invoked from Qt side
 
@@ -56,6 +59,8 @@ public:
     void passDataToJS(QVariantList);
     void passSelectionToJS(std::vector<unsigned int>& selectionIDs);
 
+    void setDataName(QString dataName);
+
     void enableBrushHighlight();
     void disableBrushHighlight();
 
@@ -72,7 +77,7 @@ private slots:
 
 private:
     ParlCoorCommunicationObject*  _communicationObject;
-    ParallelCoordinatesPlugin*    _parentPlugin;            // TODO: remove if this remains unused
+    ParallelCoordinatesPlugin*    _parentPlugin;
 
     /** Whether the web view has loaded and web-functions are ready to be called. */
     bool loaded;
