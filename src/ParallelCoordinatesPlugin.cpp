@@ -78,7 +78,7 @@ void ParallelCoordinatesPlugin::onDataEvent(hdps::DataEvent* dataEvent)
         if (dataEvent->dataSetName != _currentDataSetName || _currentDataSet == nullptr)
             return;
 
-        auto& selectionSet      = dynamic_cast<Points&>(_currentDataSet->getSelection());
+      auto& selectionSet      = dynamic_cast<Points&>(_currentDataSet->getSelection());
         auto& selectionIndices  = selectionSet.indices;
 
         // send them to js side
