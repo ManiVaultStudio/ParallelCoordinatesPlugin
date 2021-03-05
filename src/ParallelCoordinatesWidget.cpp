@@ -32,6 +32,20 @@ void ParlCoorCommunicationObject::js_passSelectionToQt(QVariantList data){
     emit newSelectionToQt(selectedIDs);
 }
 
+void ParlCoorCommunicationObject::js_passDataNameToQt(QJsonValue name) {
+    QString dataSetName = name.toString("___NODATASET___");
+    qDebug() << dataSetName;
+    if (!dataSetName.contains("\nPoints") || dataSetName == "___NODATASET___")
+    {
+        qDebug() << "Invalid drop into the parallel coordinates widget";
+        return;
+    }
+
+    dataSetName = dataSetName.split("\n")[0];
+
+    emit newDataSetName(dataSetName);
+}
+
 void ParlCoorCommunicationObject::newSelectionToJS(std::vector<unsigned int>& selectionIDs) {
     QVariantList selection;
 
@@ -63,11 +77,22 @@ ParlCoorWidget::ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin):
     _communicationObject = new ParlCoorCommunicationObject(this);
     init(_communicationObject);
 
+    // enable drag and drop of data elements, see https://doc.qt.io/qt-5/dnd.html#dropping
+    setAcceptDrops(true);
+
     // TODO: adaptive resize of html/d3 content
     getView()->resize(size());
 
     // re-emit the signal from the communication objection to the main plugin class where the selection is made public to the core
     connect(_communicationObject, &ParlCoorCommunicationObject::newSelectionToQt, [&](std::vector<unsigned int> selectedIDs) {emit newSelectionToQt(selectedIDs); });
+
+    // set new data from drag and drop on web view
+    connect(_communicationObject, &ParlCoorCommunicationObject::newDataSetName, this, &ParlCoorWidget::setDataName);
+}
+
+void ParlCoorWidget::setDataName(QString dataName) {
+    _parentPlugin->onDataInput(dataName);
+
 }
 
 void ParlCoorWidget::resizeEvent(QResizeEvent * e) {

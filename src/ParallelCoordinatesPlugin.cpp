@@ -69,6 +69,8 @@ void ParallelCoordinatesPlugin::init()
 
     // Register for data events for points datasets
     registerDataEventByType(PointType, std::bind(&ParallelCoordinatesPlugin::onDataEvent, this, std::placeholders::_1));
+
+    updateWindowTitle();
 }
 
 void ParallelCoordinatesPlugin::onDataEvent(hdps::DataEvent* dataEvent)
@@ -130,6 +132,9 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
 
     // parse data to JS in a different thread as to not block the UI
     QtConcurrent::run(this, &ParallelCoordinatesPlugin::passDataToJS, dataSetName, pointIDsGlobal);
+
+    updateWindowTitle();
+
 }
 
 
@@ -191,6 +196,15 @@ void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selec
     _settingsWidget->setNumSel(selectedIDs.size());
 
 }
+
+void ParallelCoordinatesPlugin::updateWindowTitle()
+{
+    if (_currentDataSetName.isEmpty())
+        setWindowTitle(getGuiName());
+    else
+        setWindowTitle(QString("%1: %2").arg(getGuiName(), _currentDataSetName));
+}
+
 
 // =============================================================================
 // Factory DOES NOT NEED TO BE ALTERED

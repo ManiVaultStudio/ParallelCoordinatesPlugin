@@ -52,6 +52,14 @@ function passSelectionToQt(dat) {
 	}
 }
 
+function passDataNameToQt(dataName) {
+    if (isQtAvailable) {
+        //let payload = [];
+        //payload.push(dataName);
+        QtBridge.js_passDataNameToQt(dataName);
+    }
+}
+
 function setViewBusy() {
 
     if (isQtAvailable) {
