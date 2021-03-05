@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.17)
 
-set(PROJECT "ParallelCoordinatesPlugin")
+set(PCPLUGIN "ParallelCoordinatesPlugin")
 
-PROJECT(${PROJECT})
+PROJECT(${PCPLUGIN})
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -38,22 +38,22 @@ source_group(Aux FILES ${AUX})
 
 QT5_WRAP_UI(UI_HEADERS ${UIS})
 
-include_directories("$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/include/")
+target_include_directories(${PCPLUGIN} PUBLIC "$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/include/")
 
-add_library(${PROJECT} SHARED ${SOURCES} ${UIS} ${WEB} ${AUX} ${WEB} ${RESOURCE_FILES})
+add_library(${PCPLUGIN} SHARED ${SOURCES} ${UIS} ${WEB} ${AUX} ${WEB} ${RESOURCE_FILES})
 
-qt5_use_modules(${PROJECT} Widgets WebEngineWidgets Concurrent)
+qt5_use_modules(${PCPLUGIN} Widgets WebEngineWidgets Concurrent)
 
 # Request C++17
-set_property(TARGET ${PROJECT} PROPERTY CXX_STANDARD 17)
+target_compile_features(${PCPLUGIN} PUBLIC cxx_std_17)
 
-target_link_libraries(${PROJECT} Qt5::Widgets)
-target_link_libraries(${PROJECT} Qt5::WebEngineWidgets)
-target_link_libraries(${PROJECT} "$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/lib/HDPS_Public.lib")
-target_link_libraries(${PROJECT} "$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/lib/PointData.lib")
+target_link_libraries(${PCPLUGIN} PUBLIC Qt5::Widgets)
+target_link_libraries(${PCPLUGIN} PUBLIC Qt5::WebEngineWidgets)
+target_link_libraries(${PCPLUGIN} PUBLIC "$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/lib/HDPS_Public.lib")
+target_link_libraries(${PCPLUGIN} PUBLIC "$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/lib/PointData.lib")
 
-add_custom_command(TARGET ${PROJECT} POST_BUILD
+add_custom_command(TARGET ${PCPLUGIN} POST_BUILD
     COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-	"$<TARGET_FILE:${PROJECT}>"
-	"$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/Plugins/$<TARGET_FILE_NAME:${PROJECT}>"
+	"$<TARGET_FILE:${PCPLUGIN}>"
+	"$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/Plugins/$<TARGET_FILE_NAME:${PCPLUGIN}>"
 )
