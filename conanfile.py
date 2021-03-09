@@ -88,8 +88,8 @@ class ParallelCoordsConan(ConanFile):
         print("Install dir type: ", self.install_dir)
         shutil.copytree(hdps_pkg_root, self.install_dir)
 
-        # cmake_debug = self._configure_cmake('Debug')
-        # cmake_debug.build()
+        cmake_debug = self._configure_cmake('Debug')
+        cmake_debug.build()
 
         cmake_release = self._configure_cmake('Release')
         cmake_release.build()
