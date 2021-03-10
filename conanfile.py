@@ -2,6 +2,7 @@ from conans import ConanFile, CMake
 import os
 import shutil
 import pathlib
+import subprocess
 from rules_support import CoreBranchInfo
 
 
@@ -65,7 +66,7 @@ class ParallelCoordsConan(ConanFile):
         qt_root = str(list(qtpath.glob('**/Qt5Config.cmake'))[0].parents[3])
         print("Qt root ", qt_root)
 
-        cmake = CMake(self, build_type=build_type, msbuild_verbosity='normal')
+        cmake = CMake(self, build_type=build_type)
         if self.settings.os == "Windows" and self.options.shared:
             cmake.definitions["CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS"] = True
         if self.settings.os == "Linux" or self.settings.os == "Macos":
@@ -95,8 +96,17 @@ class ParallelCoordsConan(ConanFile):
         cmake_release.build()
 
     def package(self):
-        print('Packaging install dir: ', self.install_dir)
-        self.copy(pattern="*", src=self.install_dir)
+        package_dir = os.path.join(self.build_folder, "package")
+        print('Packaging install dir: ', package_dir)
+        subprocess.run(["cmake",
+                        "--install", self.build_folder,
+                        "--config", "Debug",
+                        "--prefix", os.path.join(package_dir, "Debug")])
+        subprocess.run(["cmake",
+                        "--install", self.build_folder,
+                        "--config", "Release",
+                        "--prefix", os.path.join(package_dir, "Release")])
+        self.copy(pattern="*", src=package_dir)
 
     def package_info(self):
         self.cpp_info.debug.libdirs = ['Debug/lib']
