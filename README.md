@@ -4,6 +4,9 @@ A parallel coordinates plugin for the [hdps](https://github.com/hdps/core).
 
 Based on the [d3.js](https://github.com/d3/d3) library [Parallel Coordinates](https://syntagmatic.github.io/parallel-coordinates/) from [here](https://github.com/syntagmatic/parallel-coordinates).
 
+
+## Build status: [![Actions Status](https://github.com/hdps/ParallelCoordinatesPlugin/workflows/ParallelCoordinatesPlugin/badge.svg)](https://github.com/hdps/ParallelCoordinatesPlugin/actions)
+
 ## TODO
 Next steps:
 - Check if the webview can be used to drag something onto
