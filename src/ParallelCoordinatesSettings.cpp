@@ -28,7 +28,7 @@ ParlCoorSettings::ParlCoorSettings(ParallelCoordinatesPlugin* parent): _parentPl
     _comboBox->setMaximumWidth(300);
     _comboBoxLineModel = new QStandardItemModel();
     _comboBox->setModel(_comboBoxLineModel);
-
+    _comboBox->setStyleSheet("QComboBox QAbstractItemView{min-height: 250px;}");
     _applyDimsButton = new QPushButton("Apply");
 
     // read only displays
