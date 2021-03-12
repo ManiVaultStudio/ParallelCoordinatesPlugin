@@ -24,11 +24,11 @@ function setParcoordsData(d) {
         .composite("darker")
         .hideAxis(["__pointID"])  // don't show the point ID channel
         .alphaOnBrushed(0.15)
-        .mode("queue")          // enables progressive rendering when brushing
+        .mode("queue")            // enables progressive rendering when brushing
         .rate(300)
     ;
 
-    // necessary  due to resizing issues witht the axis
+    // necessary due to resizing issues witht the axis
     parcoords.autoscale();
     parcoords.updateAxes();
     parcoords.render();
