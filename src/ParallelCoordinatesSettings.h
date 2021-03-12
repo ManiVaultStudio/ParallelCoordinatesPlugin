@@ -5,25 +5,44 @@
 #include <QWidget>
 #include <QString>
 #include <QLabel>
+#include <QStandardItem>
+#include <QStandardItemModel>
+#include <QComboBox>
+#include <QPushButton>
 
 using namespace hdps::gui;
+
+class ParallelCoordinatesPlugin;
 
 class ParlCoorSettings : public QWidget
 {
     Q_OBJECT
 
 public:
-    ParlCoorSettings();
+    ParlCoorSettings(ParallelCoordinatesPlugin* parent);
 
-    void setNumPoints(int num) { numPoints.setNum(num); };
-    void setNumSel(int num) { numSel.setNum(num); };
-    void setNumDims(int num) { numDims.setNum(num); };
+    void setDimensionNames(QStringList dimNames);
+    QStringList getSelectedDimensionNames();
+    std::vector<bool> getSelectedDimensions();
 
-signals:
-    void onDataInput(QString dataName);
+    void setNumPoints(int num) { _numPoints.setNum(num); };
+    void setNumSel(int num) { _numSel.setNum(num); };
+    void setNumDims(int num) { _numDims.setNum(num); };
 
-public: 
-    QLabel  numPoints;
-    QLabel  numSel;
-    QLabel  numDims;
+private:
+    ParallelCoordinatesPlugin* _parentPlugin;
+
+    QLabel _numPoints;
+    QLabel _numSel;
+    QLabel _numDims;
+
+    QStringList _dimNames;
+
+    // For ComboBoxOfCheckBoxes, see http://programmingexamples.net/wiki/Qt/ModelView/ComboBoxOfCheckBoxes
+    QStandardItemModel* _comboBoxLineModel;
+    std::vector<QStandardItem*> _comboBoxItems;
+    QComboBox* _comboBox;
+
+    QPushButton* _applyDimsButton;
+
 };

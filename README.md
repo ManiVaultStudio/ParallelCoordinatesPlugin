@@ -9,7 +9,6 @@ Based on the [d3.js](https://github.com/d3/d3) library [Parallel Coordinates](ht
 
 ## TODO
 Next steps:
-- Check if the webview can be used to drag something onto
 - Add interaction controls:
   - Make axis dragable (instead of brushing, since this does not work well at the same time when there are many axes)
     - This could be expanded to an automatic axis reordering
@@ -19,4 +18,4 @@ Next steps:
 - Option to color lines based on values from one dimension
 
 ## Known bugs
-- After resizing, a selction will not be highlighted anymore
+- After resizing, a selection will not be highlighted anymore

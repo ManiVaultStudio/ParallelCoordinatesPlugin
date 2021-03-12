@@ -102,8 +102,8 @@ window.onresize = function () {
     let wasBrushedBeforeResize = parcoords.isBrushed();
 
     // resize
-    parcoords.width(window.innerWidth);
-    parcoords.height(window.innerHeight * 0.9);
+    parcoords.width(window.innerWidth * 0.95);
+    parcoords.height(window.innerHeight * 0.95);
     parcoords.resize();
     // take care of axis rendering
     redrawPC(wasBrushedBeforeResize, selIDs, highlightIDs)
