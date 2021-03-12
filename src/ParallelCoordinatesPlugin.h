@@ -41,6 +41,9 @@ private:
     // informs the core about a selection 
     void publishSelection(std::vector<unsigned int> selectedIDs);
 
+    // Sets the html page in the main viewer widger
+    void initMainView();
+
     /** Updates the window title (includes the name of the loaded dataset) */
     void updateWindowTitle();
 
@@ -48,12 +51,21 @@ public slots:
     // sets window title and calls passDataToJS in another thread
     void onDataInput(const QString dataSetName);
 
+    // update selected dimensions
+    void onDimensionSelectionChanged();
+
+    // calls initMainView
+    void onRefreshMainView();
+
 private:
     QString _currentDataSetName;
     Points* _currentDataSet;
+    std::vector<unsigned int> _pointIDsGlobal;
 
     QStringList _dimNames;
+    std::vector<bool> _selectedDimensions;
     unsigned int _numDims;
+    unsigned int _numSelectedDims;
     unsigned int _numPoints;
 
     ParlCoorWidget* _parCoordWidget;

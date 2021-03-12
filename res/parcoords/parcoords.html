@@ -14,9 +14,13 @@
     <!-- stylesheets -->
     <link rel="stylesheet" type="text/css" href="../jslibs/d3.parcoords.css">
     <link rel="stylesheet" type="text/css" href="../jslibs/styles.css">
-
+    <style>
+        div.parcoordsBody {
+            resize: both;
+        }
+    </style>
     <!-- drag and drop data -->
-    <script>function allowDrop(ev) {
+    <script> function allowDrop(ev) {
       ev.preventDefault();
     }
 
@@ -26,7 +30,7 @@
       passDataNameToQt(data);
     }
     </script>
-
+    
 </head>
 
 <body>

@@ -77,9 +77,6 @@ ParlCoorWidget::ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin):
     _communicationObject = new ParlCoorCommunicationObject(this);
     init(_communicationObject);
 
-    // enable drag and drop of data elements, see https://doc.qt.io/qt-5/dnd.html#dropping
-    setAcceptDrops(true);
-
     // TODO: adaptive resize of html/d3 content
     getView()->resize(size());
 
