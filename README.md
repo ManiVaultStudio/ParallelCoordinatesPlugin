@@ -8,12 +8,11 @@ Based on the [d3.js](https://github.com/d3/d3) library [Parallel Coordinates](ht
 ## Build status: [![Actions Status](https://github.com/hdps/ParallelCoordinatesPlugin/workflows/ParallelCoordinatesPlugin/badge.svg)](https://github.com/hdps/ParallelCoordinatesPlugin/actions)
 
 ## TODO
-Next steps:
+Possible future features:
 - Add interaction controls:
   - Make axis dragable (instead of brushing, since this does not work well at the same time when there are many axes)
     - This could be expanded to an automatic axis reordering
   - Several brush options
-- For many dimensions, don't print their names over the axis but just number them and provide a legend
 - Option to not show all axis ticks but just the min and max values for each axis
 - Option to color lines based on values from one dimension
 
