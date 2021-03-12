@@ -151,8 +151,8 @@ void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName, const st
 {
     // Qt has an internal maximum size for JSON files
     // For now, set an arbitrary, lower limit for points to display
-    // If you want to instepct more then 5 million elements - don't use parallel coordinates
-    if (_numSelectedDims * _numPoints > 5000000)
+    // If you want to instepct more then 7 million elements - don't use parallel coordinates
+    if (_numSelectedDims * _numPoints > 7000000)
     {
         qDebug() << "ParallelCoordinatesPlugin: Data set too large - select fewer dimensions";
         return;
