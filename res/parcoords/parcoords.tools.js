@@ -15,7 +15,7 @@ function disableBrushHighlight(){
 function setParcoordsData(d) {    
     // clear a potential previous par coord
 
-    log("parcoords.tools: setting data");
+    log("ParallelCoordinatesPlugin: parcoords.tools.js: setting data");
     dat = d;
 
     // new par coords
@@ -42,7 +42,7 @@ function setSelectionIDsFromQt(IDs) {
   if (IDs == "-")
   {
       parcoords.unhighlight();
-      log('unhighlight');
+      //log('ParallelCoordinatesPlugin: Unhighlighting');
     return;
   }
 
@@ -52,7 +52,7 @@ function setSelectionIDsFromQt(IDs) {
   if ( (brushHighlight) == false)
   {
       parcoords.brushReset();
-      log('brushReset');
+      //log('ParallelCoordinatesPlugin: Resetting brush');
   }
 
   // only highlight the selected IDs
@@ -64,8 +64,7 @@ function setSelectionIDsFromQt(IDs) {
 // TODO: Why does this not work?
 function highlightIDs(wasBrushedBeforeResize, IDs) {
     if (wasBrushedBeforeResize == false) return;
-    //log("Highlight");
-    //log(IDs);
+    //log(ParallelCoordinatesPlugin: "Highlighting");
     // only highlight the selected IDs
     parcoords.highlight(dat.filter(function (element) { return IDs.includes(element.__pointID); }));
 }

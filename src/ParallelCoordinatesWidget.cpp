@@ -20,7 +20,6 @@
 ParlCoorCommunicationObject::ParlCoorCommunicationObject(ParlCoorWidget* parent):
     _parent(parent)
 {
-
 }
 
 
@@ -77,7 +76,6 @@ ParlCoorWidget::ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin):
     _communicationObject = new ParlCoorCommunicationObject(this);
     init(_communicationObject);
 
-    // TODO: adaptive resize of html/d3 content
     getView()->resize(size());
 
     // re-emit the signal from the communication objection to the main plugin class where the selection is made public to the core
@@ -89,7 +87,6 @@ ParlCoorWidget::ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin):
 
 void ParlCoorWidget::setDataName(QString dataName) {
     _parentPlugin->onDataInput(dataName);
-
 }
 
 void ParlCoorWidget::resizeEvent(QResizeEvent * e) {
