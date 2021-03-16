@@ -15,6 +15,3 @@ Possible future features:
   - Several brush options
 - Option to not show all axis ticks but just the min and max values for each axis
 - Option to color lines based on values from one dimension
-
-## Known bugs
-- After resizing, a selection will not be highlighted anymore
