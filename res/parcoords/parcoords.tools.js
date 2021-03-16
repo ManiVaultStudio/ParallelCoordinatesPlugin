@@ -3,6 +3,13 @@ var selIDs = [];               // selected data
 var brushHighlight = false;   // guards brushing indicators
 var parcoords = d3.parcoords()("#parcoordsBody").alpha(0.4);
 
+parcoords.margin({
+    top: 5,
+    left: 10,
+    right: 0,
+    bottom: 25
+})
+
 function enableBrushHighlight() {
     brushHighlight = true;
 }
