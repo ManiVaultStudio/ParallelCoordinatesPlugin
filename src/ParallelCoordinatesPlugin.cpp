@@ -11,7 +11,7 @@
 #include <QtDebug>
 
 #include <numeric>      // iota, accumulate
-#include <algorithm>    // std::equal
+#include <algorithm>    // std::equal, clamp
 
 Q_PLUGIN_METADATA(IID "nl.tudelft.ParallelCoordinatesPlugin")
 
@@ -38,7 +38,8 @@ namespace hdps
 }
 
 ParallelCoordinatesPlugin::ParallelCoordinatesPlugin() : 
-    ViewPlugin("Parallel Coordinates"), _currentDataSet(nullptr), _parCoordWidget(nullptr), _settingsWidget(nullptr)
+    ViewPlugin("Parallel Coordinates"), _currentDataSetName(""), _currentDataSet(nullptr), _parCoordWidget(nullptr), _settingsWidget(nullptr),
+    _minClampPercent(0), _maxClampPercent(100), _numDims(0), _numSelectedDims(0), _numPoints(0)
 { 
 }
 
@@ -79,7 +80,7 @@ void ParallelCoordinatesPlugin::onDataEvent(hdps::DataEvent* dataEvent)
         if (dataEvent->dataSetName != _currentDataSetName || _currentDataSet == nullptr)
             return;
 
-      auto& selectionSet      = dynamic_cast<Points&>(_currentDataSet->getSelection());
+        auto& selectionSet      = dynamic_cast<Points&>(_currentDataSet->getSelection());
         auto& selectionIndices  = selectionSet.indices;
 
         // send them to js side
@@ -128,6 +129,11 @@ void ParallelCoordinatesPlugin::onDataInput(const QString dataSetName)
         }
     }
 
+    // calc min and max per channel of source data
+    calculateMinMaxPerDim();
+    // init the clamping valies
+    calculateMinMaxClampPerDim();
+
     _settingsWidget->setNumPoints(_numPoints);
     _settingsWidget->setDimensionNames(_dimNames);
     _settingsWidget->setNumDims(_dimNames.length());
@@ -145,6 +151,78 @@ void ParallelCoordinatesPlugin::initMainView() {
 
 void ParallelCoordinatesPlugin::onRefreshMainView() {
     initMainView();
+}
+
+void ParallelCoordinatesPlugin::minDimClampChanged(int min)
+{
+    _minClampPercent = min;
+}
+
+void ParallelCoordinatesPlugin::maxDimClampChanged(int max)
+{
+    _maxClampPercent = max;
+}
+
+void ParallelCoordinatesPlugin::calculateMinMaxPerDim()
+{
+    _minMaxPerDim.clear();
+    _minMaxPerDim.resize(2 * _numDims);
+
+    std::vector<float> attribute_data;
+    _currentDataSet->visitFromBeginToEnd([&attribute_data](auto begin, auto end)
+    {
+        attribute_data.insert(attribute_data.begin(), begin, end);
+    });
+
+    float valRange = 0;
+    int minIndex = 0;
+    int maxIndex = 0;
+    // for each dimension iterate over all values
+    // remember data stucture (point1 d0, point1 d1,... point1 dn, point2 d0, point2 d1, ...)
+    for (unsigned int dimCount = 0; dimCount < _numDims; dimCount++) {
+        // init min and max
+        minIndex = 2 * dimCount;
+        maxIndex = 2 * dimCount + 1;
+
+        float currentVal = attribute_data[dimCount];
+        _minMaxPerDim[minIndex] = currentVal;
+        _minMaxPerDim[maxIndex] = currentVal;
+
+        for (unsigned int pointCount = 0; pointCount < _numPoints; pointCount++) {
+            currentVal = attribute_data[pointCount * _numDims + dimCount];
+            // min
+            if (currentVal < _minMaxPerDim[minIndex])
+                _minMaxPerDim[minIndex] = currentVal;
+            // max
+            else if (currentVal > _minMaxPerDim[maxIndex])
+                _minMaxPerDim[maxIndex] = currentVal;
+        }
+    }
+
+}
+
+void ParallelCoordinatesPlugin::calculateMinMaxClampPerDim()
+{
+    if (_currentDataSet == nullptr) // data set not yet set
+        return;
+
+    _minMaxClampPerDim.clear();
+    _minMaxClampPerDim.resize(2 * _numDims);
+
+    float valRange = 0;
+    int minIndex = 0;
+    int maxIndex = 0;
+
+    for (unsigned int dimCount = 0; dimCount < _numDims; dimCount++) {
+        // init min and max
+        minIndex = 2 * dimCount;
+        maxIndex = 2 * dimCount + 1;
+
+        // set clamp values wrt to min and max in each dim and the user specified percentages
+        valRange = _minMaxPerDim[maxIndex] - _minMaxPerDim[minIndex];
+        _minMaxClampPerDim[minIndex] = _minMaxPerDim[minIndex] + (float)_minClampPercent / 100.0 * valRange;
+        _minMaxClampPerDim[maxIndex] = _minMaxPerDim[maxIndex] - (1 - ((float)_maxClampPercent / 100.0)) * valRange;
+    }
 }
 
 void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName, const std::vector<unsigned int>& pointIDsGlobal)
@@ -181,7 +259,8 @@ void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName, const st
                 else
                     dimName = QString::number(dimId);
 
-                dimension[dimName] = (float)beginOfData[pointId * _numDims + dimId];
+                // clamp data if necessary
+                dimension[dimName] = std::clamp((float)beginOfData[pointId * _numDims + dimId], _minMaxClampPerDim[2 * dimId], _minMaxClampPerDim[2 * dimId +1]);
             }
             payload.append(dimension);
         }
@@ -190,22 +269,49 @@ void ParallelCoordinatesPlugin::passDataToJS(const QString dataSetName, const st
     _parCoordWidget->passDataToJS(payload);
 }
 
-void ParallelCoordinatesPlugin::onDimensionSelectionChanged() {
+void ParallelCoordinatesPlugin::onApplySettings() {
+    bool settingChanged = true;
+
+    // current settings
     std::vector<bool> newDimSelection = _settingsWidget->getSelectedDimensions();
     unsigned int newNumSelectedDims = std::accumulate(newDimSelection.begin(), newDimSelection.end(), (unsigned int)(0));
+
+    int newMinClamp = _settingsWidget->getMinClamp();
+    int newMaxClamp = _settingsWidget->getMaxClamp();
+
+    // compare to saved settings
 
     // check if new dim selection is any different from the current one
     if (std::equal(_selectedDimensions.begin(), _selectedDimensions.end(), newDimSelection.begin()))
     {
-        qDebug() << "ParallelCoordinatesPlugin: View not changed - same dimension selection";
-        return;
+        qDebug() << "ParallelCoordinatesPlugin: Same dimension selection";
+        settingChanged = false;
     }
     // don't show less than two dimensions
     if (newNumSelectedDims < 2)
     {
-        qDebug() << "ParallelCoordinatesPlugin: View not changed - select at least 2 dimensions";
-        return;
+        qDebug() << "ParallelCoordinatesPlugin: Select at least 2 dimensions";
+        settingChanged = false;
     }
+
+    // min and max clamp are the same
+    if ((newMinClamp == _minClampPercent) && (newMaxClamp == _maxClampPercent) && !settingChanged)
+    {
+        qDebug() << "ParallelCoordinatesPlugin: Same clamping values";
+        settingChanged = false;
+    }
+    else
+    {
+        settingChanged = true;
+
+        // Adjust clamping
+        minDimClampChanged(newMinClamp);
+        maxDimClampChanged(newMaxClamp);
+        calculateMinMaxClampPerDim();
+    }
+
+    if (!settingChanged)
+        return;
 
     _selectedDimensions = newDimSelection;
     _numSelectedDims = newNumSelectedDims;

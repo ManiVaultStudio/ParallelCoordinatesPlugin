@@ -47,15 +47,23 @@ private:
     /** Updates the window title (includes the name of the loaded dataset) */
     void updateWindowTitle();
 
+    void calculateMinMaxPerDim();
+
+
 public slots:
     // sets window title and calls passDataToJS in another thread
     void onDataInput(const QString dataSetName);
 
     // update selected dimensions
-    void onDimensionSelectionChanged();
+    void onApplySettings();
 
     // calls initMainView
     void onRefreshMainView();
+
+    void minDimClampChanged(int min);
+    void maxDimClampChanged(int max);
+    void calculateMinMaxClampPerDim();
+
 
 private:
     QString _currentDataSetName;
@@ -67,6 +75,11 @@ private:
     unsigned int _numDims;
     unsigned int _numSelectedDims;
     unsigned int _numPoints;
+
+    std::vector<float> _minMaxPerDim;    // [min_Ch0, max_Ch0, min_Ch1, max_Ch1, ...]
+    std::vector<float> _minMaxClampPerDim;    // [min_Ch0, max_Ch0, min_Ch1, max_Ch1, ...]
+    int _minClampPercent;
+    int _maxClampPercent;
 
     ParlCoorWidget* _parCoordWidget;
     ParlCoorSettings* _settingsWidget;
