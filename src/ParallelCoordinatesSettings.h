@@ -9,6 +9,8 @@
 #include <QStandardItemModel>
 #include <QComboBox>
 #include <QPushButton>
+#include <QSlider>
+#include <QCheckBox>
 
 using namespace hdps::gui;
 
@@ -29,6 +31,13 @@ public:
     void setNumSel(int num) { _numSel.setNum(num); };
     void setNumDims(int num) { _numDims.setNum(num); };
 
+    int getMinClamp() { return _minClamp->value(); };
+    int getMaxClamp() { return _maxClamp->value(); };
+
+private slots:
+    void adjustMinClamp(int val);
+    void adjustMaxClamp(int val);
+
 private:
     ParallelCoordinatesPlugin* _parentPlugin;
 
@@ -44,5 +53,13 @@ private:
     QComboBox* _comboBox;
 
     QPushButton* _applyDimsButton;
+
+    // Clamp axis sliders
+    QSlider* _minClamp;
+    QSlider* _maxClamp;
+
+    QLabel* _minClampValLabel;
+    QLabel* _maxClampValLabel;
+
 
 };
