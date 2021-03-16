@@ -1,5 +1,5 @@
 var dat = [];                 // JSON data
-var selIDs = [];               // selected data
+var selIDs = [];              // selected data
 var brushHighlight = false;   // guards brushing indicators
 var parcoords = d3.parcoords()("#parcoordsBody").alpha(0.4);
 
@@ -43,7 +43,7 @@ function setSelectionIDsFromQt(IDs) {
     // if nothing is selected, show all data
     if (IDs == "-") {
         parcoords.unhighlight();
-        log('ParallelCoordinatesPlugin: Unhighlighting');
+        //log('ParallelCoordinatesPlugin: Unhighlighting');
         selIDs = [];
     }
     else
@@ -56,7 +56,7 @@ function setSelectionIDsFromQt(IDs) {
     // then in e.g. the image viewer without de-selecting in the parcoords
     if (brushHighlight == false) {
         parcoords.brushReset();
-        log('ParallelCoordinatesPlugin: Resetting brush');
+        //log('ParallelCoordinatesPlugin: Resetting brush');
     }
 
     highlightIDs();
@@ -66,7 +66,7 @@ function setSelectionIDsFromQt(IDs) {
 function highlightIDs() {
     //log(ParallelCoordinatesPlugin: "Highlighting");
     if (selIDs.length == 0) {
-        log('ParallelCoordinatesPlugin: No highlight IDs');
+        //log('ParallelCoordinatesPlugin: No highlight IDs');
         return;
     }
 
@@ -109,8 +109,5 @@ function redrawPC() {
 }
 
 window.onresize = function () {
-    //let wasBrushedBeforeResize = parcoords.isBrushed();
-
     redrawPC()
-
 };
