@@ -38,6 +38,8 @@ private slots:
     void adjustMinClamp(int val);
     void adjustMaxClamp(int val);
 
+    void onLoadDims();
+
 private:
     ParallelCoordinatesPlugin* _parentPlugin;
 
@@ -53,6 +55,7 @@ private:
     QComboBox* _comboBox;
 
     QPushButton* _applyDimsButton;
+    QPushButton* _loadDimsButton;
 
     // Clamp axis sliders
     QSlider* _minClamp;
@@ -61,5 +64,6 @@ private:
     QLabel* _minClampValLabel;
     QLabel* _maxClampValLabel;
 
-
+    bool disableAllDimensions();
+    bool tryToEnableDimensionByName(QString name);
 };

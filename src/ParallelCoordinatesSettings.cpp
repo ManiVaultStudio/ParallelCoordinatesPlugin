@@ -6,6 +6,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QPalette>
+#include <QFileDialog>
 
 #include <assert.h> // for NDEBUG
 
@@ -29,6 +30,7 @@ ParlCoorSettings::ParlCoorSettings(ParallelCoordinatesPlugin* parent): _parentPl
     _comboBoxLineModel = new QStandardItemModel();
     _comboBox->setModel(_comboBoxLineModel);
     _comboBox->setStyleSheet("QComboBox QAbstractItemView{min-height: 250px;}");
+    _loadDimsButton = new QPushButton("Load ...");
     _applyDimsButton = new QPushButton("Apply");
 
     // clamping slders
@@ -69,6 +71,7 @@ ParlCoorSettings::ParlCoorSettings(ParallelCoordinatesPlugin* parent): _parentPl
     _numDims.setAlignment(Qt::AlignCenter | Qt::AlignLeft);
 
     // only show selected dimensions
+    connect(_loadDimsButton, &QPushButton::released, this, &ParlCoorSettings::onLoadDims);
     connect(_applyDimsButton, &QPushButton::released, _parentPlugin, &ParallelCoordinatesPlugin::onApplySettings);
 
     // add elements to gui
@@ -88,7 +91,8 @@ ParlCoorSettings::ParlCoorSettings(ParallelCoordinatesPlugin* parent): _parentPl
 
     settingsLayout->addWidget(comboBoxLabel, 1, 7, Qt::AlignRight);
     settingsLayout->addWidget(_comboBox, 1, 8, Qt::AlignRight);
-    settingsLayout->addWidget(_applyDimsButton, 1, 9, Qt::AlignRight);
+    settingsLayout->addWidget(_loadDimsButton, 1, 9, Qt::AlignRight);
+    settingsLayout->addWidget(_applyDimsButton, 1, 10, Qt::AlignRight);
 
     // button to refresh html page
 #if !defined(NDEBUG)
@@ -157,4 +161,61 @@ std::vector<bool> ParlCoorSettings::getSelectedDimensions() {
     }
 
     return selectedDimensions;
+}
+
+void ParlCoorSettings::onLoadDims() {
+
+    const auto fileName = QFileDialog::getOpenFileName(this,QObject::tr("Dimension selection"), {}, "*.txt");
+
+    if (!fileName.isEmpty())
+    {
+        QFile file(fileName);
+
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            disableAllDimensions();
+
+            while (!file.atEnd())
+            {
+                const auto trimmedLine = file.readLine().trimmed();
+
+                if (!trimmedLine.isEmpty())
+                {
+                    const auto name = QString::fromUtf8(trimmedLine);
+
+                    if (!tryToEnableDimensionByName(name))
+                    {
+                        qWarning() << "Failed to select dimension (name not found): " << name;
+                    }
+                }
+            }
+        }
+        else
+        {
+            qCritical() << "Load failed to open file: " << fileName;
+        }
+    }
+
+    qDebug() << "HELLO!";
+}
+
+bool ParlCoorSettings::disableAllDimensions() {
+    for (size_t i = 0; i < _comboBoxLineModel->rowCount(); i++) {
+        _comboBoxLineModel->item(i)->setCheckState(Qt::Unchecked);
+    }
+
+    return true;
+}
+
+bool ParlCoorSettings::tryToEnableDimensionByName(QString name) {
+    
+    for (std::size_t i{}; i < _dimNames.size(); ++i)
+    {
+        if (name == _dimNames[i])
+        {
+            _comboBoxLineModel->item(i)->setCheckState(Qt::Checked);
+            return true;
+        }
+    }
+    return false;
 }
