@@ -195,8 +195,6 @@ void ParlCoorSettings::onLoadDims() {
             qCritical() << "Load failed to open file: " << fileName;
         }
     }
-
-    qDebug() << "HELLO!";
 }
 
 bool ParlCoorSettings::disableAllDimensions() {

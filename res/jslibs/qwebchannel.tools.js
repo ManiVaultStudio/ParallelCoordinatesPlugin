@@ -19,12 +19,12 @@ try {
     });
 } catch (error) {
 	isQtAvailable = false;
-	log("could not connect qt");
+	log("ParllelCoordinatesPlugin: qwebchannel: could not connect qt");
 }
 
 // pipe errors to log
 window.onerror = function (msg, url, num) {
-	log("Error: " + msg + "\nURL: " + url + "\nLine: " + num);
+    log("ParllelCoordinatesPlugin: qwebchannel: Error: " + msg + "\nURL: " + url + "\nLine: " + num);
 };
 
 // auto log for Qt and console
@@ -54,8 +54,6 @@ function passSelectionToQt(dat) {
 
 function passDataNameToQt(dataName) {
     if (isQtAvailable) {
-        //let payload = [];
-        //payload.push(dataName);
         QtBridge.js_passDataNameToQt(dataName);
     }
 }
