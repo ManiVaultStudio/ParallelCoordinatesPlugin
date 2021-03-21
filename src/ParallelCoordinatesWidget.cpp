@@ -42,7 +42,7 @@ void ParlCoorCommunicationObject::js_passDataNameToQt(QJsonValue name) {
     // data name from drop action ends in "\nPoints" which needs to be deleted 
     dataSetName = dataSetName.split("\n")[0];
 
-    qDebug() << "ParllelCoordinatesPlugin: Load data set " << dataSetName;
+    qDebug() << "ParallelCoordinatesPlugin: Load data set " << dataSetName;
 
     emit newDataSetName(dataSetName);
 }

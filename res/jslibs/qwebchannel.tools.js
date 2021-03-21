@@ -19,12 +19,12 @@ try {
     });
 } catch (error) {
 	isQtAvailable = false;
-	log("ParllelCoordinatesPlugin: qwebchannel: could not connect qt");
+	log("ParallelCoordinatesPlugin: qwebchannel: could not connect qt");
 }
 
 // pipe errors to log
 window.onerror = function (msg, url, num) {
-    log("ParllelCoordinatesPlugin: qwebchannel: Error: " + msg + "\nURL: " + url + "\nLine: " + num);
+    log("ParallelCoordinatesPlugin: qwebchannel: Error: " + msg + "\nURL: " + url + "\nLine: " + num);
 };
 
 // auto log for Qt and console
