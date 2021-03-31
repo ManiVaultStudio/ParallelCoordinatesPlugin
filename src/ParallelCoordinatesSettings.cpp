@@ -17,6 +17,9 @@
 ParlCoorSettings::ParlCoorSettings(ParallelCoordinatesPlugin* parent): _parentPlugin(parent){
     // layout structure
     setFixedHeight(75);
+    setAutoFillBackground(true);
+    setAcceptDrops(true);
+
     auto* settingsLayout = new QGridLayout();
     //settingsLayout->setColumnStretch(0, 5);
     //settingsLayout->setColumnStretch(1, 200);

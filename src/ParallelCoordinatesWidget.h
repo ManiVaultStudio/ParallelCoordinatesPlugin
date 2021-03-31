@@ -10,6 +10,11 @@ class QResizeEvent;
 class ParlCoorWidget;
 class ParallelCoordinatesPlugin;
 
+namespace hdps {
+    namespace gui {
+        class DropWidget;
+    }
+}
 // =============================================================================
 // ParlCoorCommunicationObject
 // =============================================================================
@@ -59,8 +64,6 @@ public:
     void passDataToJS(QVariantList);
     void passSelectionToJS(std::vector<unsigned int>& selectionIDs);
 
-    void setDataName(QString dataName);
-
     void enableBrushHighlight();
     void disableBrushHighlight();
 
@@ -76,8 +79,9 @@ private slots:
     void initWebPage() override;
 
 private:
-    ParlCoorCommunicationObject*  _communicationObject;
-    ParallelCoordinatesPlugin*    _parentPlugin;
+    ParlCoorCommunicationObject*    _communicationObject;
+    ParallelCoordinatesPlugin*      _parentPlugin;
+    hdps::gui::DropWidget*          _dropWidget;
 
     /** Whether the web view has loaded and web-functions are ready to be called. */
     bool loaded;

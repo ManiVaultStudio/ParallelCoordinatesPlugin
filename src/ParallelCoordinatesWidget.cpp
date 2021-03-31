@@ -1,17 +1,21 @@
 #include "ParallelCoordinatesWidget.h"
 #include "ParallelCoordinatesPlugin.h"
 
+#include <widgets/DropWidget.h>
+#include <PointData.h>
+
 #include <string>
 #include <algorithm>
 #include <vector>
 #include <iterator>
 
-#include <QDragEnterEvent>
-#include <QDropEvent>
 #include <QMimeData>
 #include <QResizeEvent>
 #include <QWebEngineView>
 #include <QDebug>
+
+using namespace hdps;
+using namespace hdps::gui;
 
 // =============================================================================
 // ParlCoorCommunicationObject
@@ -66,29 +70,68 @@ void ParlCoorCommunicationObject::newSelectionToJS(std::vector<unsigned int>& se
     emit this->qt_setSelectionInJS(selection);
 }
 
-
 // =============================================================================
 // ParlCoorWidget
 // =============================================================================
 
 ParlCoorWidget::ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin):
-    loaded(false), _parentPlugin(parentPlugin)
+    loaded(false), _parentPlugin(parentPlugin), _dropWidget(nullptr)
 {
+    setAcceptDrops(true);
+
     Q_INIT_RESOURCE(parcoords_resources);
     _communicationObject = new ParlCoorCommunicationObject(this);
     init(_communicationObject);
 
+    layout()->setMargin(0);
+
     getView()->resize(size());
+    getView()->setAcceptDrops(false);
 
     // re-emit the signal from the communication objection to the main plugin class where the selection is made public to the core
     connect(_communicationObject, &ParlCoorCommunicationObject::newSelectionToQt, [&](std::vector<unsigned int> selectedIDs) {emit newSelectionToQt(selectedIDs); });
 
-    // set new data from drag and drop on web view
-    connect(_communicationObject, &ParlCoorCommunicationObject::newDataSetName, this, &ParlCoorWidget::setDataName);
-}
+    _dropWidget = new DropWidget(this);
 
-void ParlCoorWidget::setDataName(QString dataName) {
-    _parentPlugin->onDataInput(dataName);
+    _dropWidget->setDropIndicatorWidget(new DropWidget::DropIndicatorWidget(this, "No data loaded", "Drag an item from the data hierarchy to this view to visualize data..."));
+    _dropWidget->initialize([this, parentPlugin](const QMimeData* mimeData) -> DropWidget::DropRegions {
+        DropWidget::DropRegions dropRegions;
+
+        const auto mimeText             = mimeData->text();
+        const auto tokens               = mimeText.split("\n");
+        const auto datasetName          = tokens[0];
+        const auto dataType             = DataType(tokens[1]);
+        const auto dataTypes            = DataTypes({ PointType });
+        const auto candidateDataset     = parentPlugin->getCore()->requestData<Points>(datasetName);
+        const auto candidateDatasetName = candidateDataset.getName();
+
+        if (!dataTypes.contains(dataType))
+            dropRegions << new DropWidget::DropRegion(this, "Incompatible data", "This type of data is not supported", false);
+
+        if (dataType == PointType) {
+            const auto currentDatasetName = parentPlugin->getCurrentDataSetName();
+
+            if (currentDatasetName.isEmpty()) {
+                dropRegions << new DropWidget::DropRegion(this, "Points", "Visualize points as parallel coordinates", true, [this, parentPlugin, candidateDatasetName]() {
+                    parentPlugin->onDataInput(candidateDatasetName);
+                    _dropWidget->setShowDropIndicator(false);
+                });
+            }
+            else {
+                if (candidateDatasetName == currentDatasetName) {
+                    dropRegions << new DropWidget::DropRegion(this, "Warning", "Data already loaded", false);
+                }
+                else {
+                    dropRegions << new DropWidget::DropRegion(this, "Points", "Visualize points as parallel coordinates", true, [this, parentPlugin, candidateDatasetName]() {
+                        parentPlugin->onDataInput(candidateDatasetName);
+                        _dropWidget->setShowDropIndicator(false);
+                    });
+                }
+            }
+        }
+
+        return dropRegions;
+    });
 }
 
 void ParlCoorWidget::resizeEvent(QResizeEvent * e) {
