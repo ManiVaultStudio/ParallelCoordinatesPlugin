@@ -93,7 +93,8 @@ ParlCoorWidget::ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin):
 
     _dropWidget = new DropWidget(this);
 
-    _dropWidget->setDropIndicatorWidget(new DropWidget::DropIndicatorWidget(this, "No data loaded", "Drag an item from the data hierarchy to this view to visualize data..."));
+    _dropWidget->setDropIndicatorWidget(new DropWidget::DropIndicatorWidget(this, "No data loaded", "Drag an item from the data hierarchy and drop it here to visualize data..."));
+
     _dropWidget->initialize([this, parentPlugin](const QMimeData* mimeData) -> DropWidget::DropRegions {
         DropWidget::DropRegions dropRegions;
 
@@ -109,10 +110,11 @@ ParlCoorWidget::ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin):
             dropRegions << new DropWidget::DropRegion(this, "Incompatible data", "This type of data is not supported", false);
 
         if (dataType == PointType) {
-            const auto currentDatasetName = parentPlugin->getCurrentDataSetName();
+            const auto currentDatasetName   = parentPlugin->getCurrentDataSetName();
+            const auto description          = QString("Visualize %1 as parallel coordinates").arg(candidateDatasetName);
 
             if (currentDatasetName.isEmpty()) {
-                dropRegions << new DropWidget::DropRegion(this, "Points", "Visualize points as parallel coordinates", true, [this, parentPlugin, candidateDatasetName]() {
+                dropRegions << new DropWidget::DropRegion(this, "Points", description, true, [this, parentPlugin, candidateDatasetName]() {
                     parentPlugin->onDataInput(candidateDatasetName);
                     _dropWidget->setShowDropIndicator(false);
                 });
@@ -122,7 +124,7 @@ ParlCoorWidget::ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin):
                     dropRegions << new DropWidget::DropRegion(this, "Warning", "Data already loaded", false);
                 }
                 else {
-                    dropRegions << new DropWidget::DropRegion(this, "Points", "Visualize points as parallel coordinates", true, [this, parentPlugin, candidateDatasetName]() {
+                    dropRegions << new DropWidget::DropRegion(this, "Points", description, true, [this, parentPlugin, candidateDatasetName]() {
                         parentPlugin->onDataInput(candidateDatasetName);
                         _dropWidget->setShowDropIndicator(false);
                     });
