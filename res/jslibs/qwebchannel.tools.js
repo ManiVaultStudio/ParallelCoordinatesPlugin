@@ -52,12 +52,6 @@ function passSelectionToQt(dat) {
 	}
 }
 
-function passDataNameToQt(dataName) {
-    if (isQtAvailable) {
-        QtBridge.js_passDataNameToQt(dataName);
-    }
-}
-
 function setViewBusy() {
 
     if (isQtAvailable) {
