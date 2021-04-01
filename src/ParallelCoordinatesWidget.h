@@ -34,12 +34,10 @@ signals:
 
     // Signal to Qt side
     void newSelectionToQt(std::vector<unsigned int>& selectionIDs);
-    void newDataSetName(QString dataSetName);
 
 public slots:
     // Invoked from JS side
     void js_passSelectionToQt(QVariantList data);
-    void js_passDataNameToQt(QJsonValue name);
 
     // invoked from Qt side
 

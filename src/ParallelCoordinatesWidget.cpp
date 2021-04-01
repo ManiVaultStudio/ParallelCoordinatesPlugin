@@ -35,22 +35,6 @@ void ParlCoorCommunicationObject::js_passSelectionToQt(QVariantList data){
     emit newSelectionToQt(selectedIDs);
 }
 
-void ParlCoorCommunicationObject::js_passDataNameToQt(QJsonValue name) {
-    QString dataSetName = name.toString("___NODATASET___");
-    if (!dataSetName.contains("\nPoints") || dataSetName == "___NODATASET___")
-    {
-        qDebug() << "Invalid drop into the parallel coordinates widget";
-        return;
-    }
-
-    // data name from drop action ends in "\nPoints" which needs to be deleted 
-    dataSetName = dataSetName.split("\n")[0];
-
-    qDebug() << "ParallelCoordinatesPlugin: Load data set " << dataSetName;
-
-    emit newDataSetName(dataSetName);
-}
-
 void ParlCoorCommunicationObject::newSelectionToJS(std::vector<unsigned int>& selectionIDs) {
     QVariantList selection;
 
