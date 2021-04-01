@@ -34,6 +34,9 @@ public:
      */
     void onDataEvent(hdps::DataEvent* dataEvent);
 
+    hdps::CoreInterface* getCore() { return _core;  }
+    QString getCurrentDataSetName() const { return _currentDataSetName; }
+
 private:
     // Parses data to JSON and passes it to the web widget
     void passDataToJS(const QString dataSetName, const std::vector<unsigned int>& pointIDsGlobal);
