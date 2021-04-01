@@ -60,17 +60,17 @@ ParlCoorSettings::ParlCoorSettings(ParallelCoordinatesPlugin* parent): _parentPl
 
     // number of points
     QLabel* numPointsLabel = new QLabel("Num. points:");
-    _numPoints.setFixedWidth(25);
+    _numPoints.setFixedWidth(35);
     _numPoints.setAlignment(Qt::AlignCenter | Qt::AlignLeft);
 
     // (number of) selected points 
     QLabel* numSelLabel = new QLabel("Selection size:");
-    _numSel.setFixedWidth(25);
+    _numSel.setFixedWidth(35);
     _numSel.setAlignment(Qt::AlignCenter | Qt::AlignLeft);
 
     // number of dims
     QLabel* numDimsLabel = new QLabel("Num. dims.:");
-    _numDims.setFixedWidth(25);
+    _numDims.setFixedWidth(35);
     _numDims.setAlignment(Qt::AlignCenter | Qt::AlignLeft);
 
     // only show selected dimensions
@@ -92,10 +92,10 @@ ParlCoorSettings::ParlCoorSettings(ParallelCoordinatesPlugin* parent): _parentPl
     settingsLayout->addWidget(numDimsLabel, 0, 8, Qt::AlignRight);
     settingsLayout->addWidget(&_numDims, 0, 9, Qt::AlignRight);
 
-    settingsLayout->addWidget(comboBoxLabel, 1, 7, Qt::AlignRight);
-    settingsLayout->addWidget(_comboBox, 1, 8, Qt::AlignRight);
-    settingsLayout->addWidget(_loadDimsButton, 1, 9, Qt::AlignRight);
-    settingsLayout->addWidget(_applyDimsButton, 1, 10, Qt::AlignRight);
+    settingsLayout->addWidget(comboBoxLabel, 1, 6, Qt::AlignRight);
+    settingsLayout->addWidget(_comboBox, 1, 7, Qt::AlignRight);
+    settingsLayout->addWidget(_loadDimsButton, 1, 8, Qt::AlignRight);
+    settingsLayout->addWidget(_applyDimsButton, 1, 9, Qt::AlignRight);
 
     // button to refresh html page
 #if !defined(NDEBUG)
