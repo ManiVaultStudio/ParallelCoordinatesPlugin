@@ -50,11 +50,19 @@ target_compile_features(${PCPLUGIN} PRIVATE cxx_std_17)
 target_link_libraries(${PCPLUGIN} PRIVATE Qt5::Widgets)
 target_link_libraries(${PCPLUGIN} PRIVATE Qt5::WebEngineWidgets)
 target_link_libraries(${PCPLUGIN} PRIVATE Qt5::Concurrent)
-target_link_libraries(${PCPLUGIN} PRIVATE "${INSTALL_DIR}/$<CONFIGURATION>/lib/HDPS_Public.lib")
-target_link_libraries(${PCPLUGIN} PRIVATE "${INSTALL_DIR}/$<CONFIGURATION>/lib/PointData.lib")
+if(MSVC)
+	set(LIB_SUFFIX "${CMAKE_STATIC_LIBRARY_SUFFIX}")
+else()
+	set(LIB_SUFFIX "${CMAKE_SHARED_LIBRARY_SUFFIX}")
+endif()
+
+target_link_libraries(${PROJECT} "$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/lib/${CMAKE_SHARED_LIBRARY_PREFIX}HDPS_Public${LIB_SUFFIX}")
+target_link_libraries(${PROJECT} "$ENV{HDPS_INSTALL_DIR}/$<CONFIGURATION>/lib/${CMAKE_SHARED_LIBRARY_PREFIX}PointData${LIB_SUFFIX}")
 
 install(TARGETS ${PCPLUGIN}
    RUNTIME DESTINATION Plugins COMPONENT SHAREDLIB
+   LIBRARY DESTINATION lib COMPONENT LINKLIB
+   ARCHIVE DESTINATION lib COMPONENT LINKLIB
 )
 
 add_custom_command(TARGET ${PCPLUGIN} POST_BUILD
