@@ -23,7 +23,7 @@ class ParallelCoordinatesPlugin : public ViewPlugin
     Q_OBJECT
     
 public:
-    ParallelCoordinatesPlugin();
+    ParallelCoordinatesPlugin(const PluginFactory* factory);
     ~ParallelCoordinatesPlugin(void) override;
     
     void init() override;
@@ -108,4 +108,7 @@ public:
     ~ParallelCoordinatesPluginFactory(void) override {}
     
     ViewPlugin* produce() override;
+
+    /** Returns the data types that are supported by the example view plugin */
+    hdps::DataTypes supportedDataTypes() const override;
 };

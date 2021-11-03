@@ -37,8 +37,8 @@ namespace hdps
     }
 }
 
-ParallelCoordinatesPlugin::ParallelCoordinatesPlugin() : 
-    ViewPlugin("Parallel Coordinates"), _currentDataSetName(""), _currentDataSet(nullptr), _parCoordWidget(nullptr), _settingsWidget(nullptr),
+ParallelCoordinatesPlugin::ParallelCoordinatesPlugin(const PluginFactory* factory) :
+    ViewPlugin(factory), _currentDataSetName(""), _currentDataSet(nullptr), _parCoordWidget(nullptr), _settingsWidget(nullptr),
     _minClampPercent(0), _maxClampPercent(100), _numDims(0), _numSelectedDims(0), _numPoints(0)
 { 
 }
@@ -372,5 +372,15 @@ void ParallelCoordinatesPlugin::updateWindowTitle()
 
 ViewPlugin* ParallelCoordinatesPluginFactory::produce()
 {
-    return new ParallelCoordinatesPlugin();
+    return new ParallelCoordinatesPlugin(this);
+}
+
+hdps::DataTypes ParallelCoordinatesPluginFactory::supportedDataTypes() const
+{
+    DataTypes supportedTypes;
+
+    // This example analysis plugin is compatible with points datasets
+    supportedTypes.append(PointType);
+
+    return supportedTypes;
 }

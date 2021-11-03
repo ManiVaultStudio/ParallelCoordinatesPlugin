@@ -87,8 +87,9 @@ ParlCoorWidget::ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin):
         const auto datasetName          = tokens[0];
         const auto dataType             = DataType(tokens[1]);
         const auto dataTypes            = DataTypes({ PointType });
-        const auto candidateDataset     = parentPlugin->getCore()->requestData<Points>(datasetName);
-        const auto candidateDatasetName = candidateDataset.getName();
+        //const auto candidateDataset     = parentPlugin->getCore()->requestData<Points>(datasetName);
+        //const auto candidateDatasetName = candidateDataset.getName();
+        const auto candidateDatasetName = datasetName;
 
         if (!dataTypes.contains(dataType))
             dropRegions << new DropWidget::DropRegion(this, "Incompatible data", "This type of data is not supported", false);
