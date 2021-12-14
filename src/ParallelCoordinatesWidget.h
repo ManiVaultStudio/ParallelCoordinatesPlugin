@@ -32,14 +32,23 @@ signals:
     void qt_enableBrushHighlight();
     void qt_disableBrushHighlight();
 
+    // to make sure that the web view is loaded: js->notifyBridgeAvailable triggers ParlCoorWidget::initWebPage emits qt_triggerDataRequest which in turn lets the js side call askForDataFromQt back here 
+    void qt_triggerDataRequest();
+
     // Signal to Qt side
     void newSelectionToQt(std::vector<unsigned int>& selectionIDs);
 
+    // Signals from qt to qt
+    void askForDataFromQt();
+
 public slots:
-    // Invoked from JS side
+    // Invoked from JS side //
     void js_passSelectionToQt(QVariantList data);
 
-    // invoked from Qt side
+    // to make sure that the web view is loaded: js->notifyBridgeAvailable triggers ParlCoorWidget::initWebPage emits qt_triggerDataRequest which in turn lets the js side call askForDataFromQt back here 
+    void js_askForDataFromQt();
+
+    // invoked from Qt side //
 
     // converts vector to array string and emits qt_setSelectionInJS
     void newSelectionToJS(const std::vector<unsigned int>& selectionIDs);
@@ -72,6 +81,7 @@ protected:
 
 signals:
     void newSelectionToQt(std::vector<unsigned int> selectionIDs);
+    void webViewLoaded();
 
 private slots:
     /** Is invoked when the js side calls js_available of the WebCommunicationObject (ParlCoorCommunicationObject) 
@@ -83,6 +93,4 @@ private:
     ParallelCoordinatesPlugin*      _parentPlugin;
     hdps::gui::DropWidget*          _dropWidget;
 
-    /** Whether the web view has loaded and web-functions are ready to be called. */
-    bool loaded;
 };

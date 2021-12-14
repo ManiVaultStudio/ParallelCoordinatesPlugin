@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ViewPlugin.h>
-#include <Dataset.h>
  
 #include <vector>
 
@@ -40,10 +39,9 @@ public:
     void setData(QString newDatasetGuid);
 
     /**
-     * Callback which is invoked when a \p dataEvent occurs
-     * @param dataEvent Data event that occurred
+     * Callback which is invoked when &Dataset<Points>::dataSelectionChanged is emitted
      */
-    void onDataEvent(hdps::DataEvent* dataEvent);
+    void onDataSelectionChanged();
 
     hdps::CoreInterface* getCore() { return _core;  }
     QString getCurrentDataSetName() const;
@@ -80,7 +78,7 @@ public slots:
     void calculateMinMaxClampPerDim();
 
 signals:
-    void dataSetChanged(QString datasetGuid);
+    void dataSetChanged();
 
 private:
     hdps::Dataset<Points> _currentDataSet;

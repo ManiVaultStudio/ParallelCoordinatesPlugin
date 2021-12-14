@@ -35,6 +35,11 @@ void ParlCoorCommunicationObject::js_passSelectionToQt(QVariantList data){
     emit newSelectionToQt(selectedIDs);
 }
 
+void ParlCoorCommunicationObject::js_askForDataFromQt() {
+    emit askForDataFromQt();
+}
+    
+
 void ParlCoorCommunicationObject::newSelectionToJS(const std::vector<unsigned int>& selectionIDs) {
     QVariantList selection;
 
@@ -59,7 +64,7 @@ void ParlCoorCommunicationObject::newSelectionToJS(const std::vector<unsigned in
 // =============================================================================
 
 ParlCoorWidget::ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin):
-    loaded(false), _parentPlugin(parentPlugin), _dropWidget(nullptr)
+    _parentPlugin(parentPlugin), _dropWidget(nullptr)
 {
     setAcceptDrops(true);
 
@@ -74,6 +79,9 @@ ParlCoorWidget::ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin):
 
     // re-emit the signal from the communication objection to the main plugin class where the selection is made public to the core
     connect(_communicationObject, &ParlCoorCommunicationObject::newSelectionToQt, [&](std::vector<unsigned int> selectedIDs) {emit newSelectionToQt(selectedIDs); });
+
+    // re-emit the signal from the communication objection to the main plugin class: ask for new data after web view is loaded
+    connect(_communicationObject, &ParlCoorCommunicationObject::askForDataFromQt, _parentPlugin, &ParallelCoordinatesPlugin::onDataInput);
 
     _dropWidget = new DropWidget(this);
 
@@ -133,8 +141,8 @@ void ParlCoorWidget::resizeEvent(QResizeEvent * e) {
 
 void ParlCoorWidget::initWebPage()
 {
-    loaded = true;
     qDebug() << "ParlCoorWidget: WebChannel bridge is available.";
+    emit _communicationObject->qt_triggerDataRequest();
 }
 
 void ParlCoorWidget::passDataToJS(QVariantList data)

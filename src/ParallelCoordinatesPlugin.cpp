@@ -4,6 +4,7 @@
 
 #include "DataHierarchyItem.h"
 #include "event/Event.h"
+#include "Dataset.h"
 #include "PointData.h"
 
 #include <QtCore>
@@ -67,17 +68,20 @@ void ParallelCoordinatesPlugin::init()
     _settingsWidget = new ParlCoorSettings(this);
     layout->addWidget(_settingsWidget);
 
+    // load data after drop action
+    connect(this, &ParallelCoordinatesPlugin::dataSetChanged, this, &ParallelCoordinatesPlugin::onDataInput);
+
+    // load data after right-click view 
+    connect(_parCoordWidget, &ParlCoorWidget::webViewLoaded, this, &ParallelCoordinatesPlugin::onDataInput);
+
     // Pass selection from js to core
     connect(_parCoordWidget, &ParlCoorWidget::newSelectionToQt, this, &ParallelCoordinatesPlugin::publishSelection);
-
-    // Load data
-    connect(&_currentDataSet, &Dataset<Points>::changed, this, &ParallelCoordinatesPlugin::onDataInput);
 
     // Update the window title when the GUI name of the position dataset changes
     connect(&_currentDataSet, &Dataset<Points>::dataGuiNameChanged, this, &ParallelCoordinatesPlugin::updateWindowTitle);
 
-    // Register for data events for points datasets
-    registerDataEventByType(PointType, std::bind(&ParallelCoordinatesPlugin::onDataEvent, this, std::placeholders::_1));
+    // Update the selection
+    connect(&_currentDataSet, &Dataset<Points>::dataSelectionChanged, this, &ParallelCoordinatesPlugin::onDataSelectionChanged);
 
     updateWindowTitle();
 }
@@ -97,6 +101,7 @@ void ParallelCoordinatesPlugin::loadData(const QVector<Dataset<DatasetImpl>>& da
 void ParallelCoordinatesPlugin::setData(QString newDatasetGuid)
 { 
     _currentDataSet = _core->requestDataset<Points>(newDatasetGuid); 
+    emit dataSetChanged();
 }
 
 QString ParallelCoordinatesPlugin::getCurrentDataSetName() const 
@@ -115,58 +120,25 @@ QString ParallelCoordinatesPlugin::getCurrentDataSetGuid() const
         return QString{};
 }
 
-void ParallelCoordinatesPlugin::onDataEvent(hdps::DataEvent* dataEvent)
+void ParallelCoordinatesPlugin::onDataSelectionChanged()
 {
-    // Get smart pointer to dataset that changed
-    const auto changedDataSet = dataEvent->getDataset();
+    // Get the selection set and respective IDs that changed
+    const auto& selectionSet = _currentDataSet->getSelection<Points>();
+    const auto& selectionIndices = selectionSet->indices;
 
-    // Only act if this plugin holds the changed data set
-    if (changedDataSet != _currentDataSet)
-        return;
+    // send them to js side
+    _parCoordWidget->passSelectionToJS(selectionIndices);
+    _parCoordWidget->disableBrushHighlight();
 
-    // Get GUI name of the dataset that changed
-    const auto datasetGuiName = changedDataSet->getGuiName();
+    _settingsWidget->setNumSel(selectionSet->getNumPoints());
 
-    switch (dataEvent->getType()) {
-        case EventType::DataSelectionChanged:
-        {
-            // Get the selection set and respective IDs that changed
-            const auto& selectionSet = changedDataSet->getSelection<Points>();
-            const auto& selectionIndices = selectionSet->indices;
-
-            // send them to js side
-            _parCoordWidget->passSelectionToJS(selectionIndices);
-            _parCoordWidget->disableBrushHighlight();
-
-            _settingsWidget->setNumSel(selectionSet->getNumPoints());
-
-            break;
-        }
-
-        // A points dataset was added
-        case EventType::DataAdded:
-        {
-            // Not implemented yet. TODO
-            break;
-        }
-
-        // Points dataset data has changed
-        case EventType::DataChanged:
-        {
-            // Not implemented yet. TODO
-            break;
-        }
-        case EventType::DataRemoved:
-        {
-            // Not implemented yet. TODO
-            break;
-        }
-    }
 }
 
 void ParallelCoordinatesPlugin::onDataInput()
 {
-    //_currentDataSet = _core->requestDataset<Points>(dataSetGuid);
+    if (!_currentDataSet.isValid())
+        return;
+
     setWindowTitle(_currentDataSet->getGuiName());
 
     // get data set from core

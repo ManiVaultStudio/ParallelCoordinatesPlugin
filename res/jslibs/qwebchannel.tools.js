@@ -13,6 +13,7 @@ try {
         QtBridge.qt_setSelectionInJS.connect(function () { setSelectionIDsFromQt(arguments[0]); });
         QtBridge.qt_enableBrushHighlight.connect(function () { enableBrushHighlight(); });
         QtBridge.qt_disableBrushHighlight.connect(function () { disableBrushHighlight(); });
+        QtBridge.qt_triggerDataRequest.connect(function () { dataRequest(); });
 
         // confirm successfull connection
         notifyBridgeAvailable();
@@ -43,6 +44,9 @@ function notifyBridgeAvailable() {
     if (isQtAvailable) {
         QtBridge.js_available();
     }
+    else {
+        log("ParallelCoordinatesPlugin: qwebchannel: QtBridge is not available - something went wrong");
+    }
 
 }
 
@@ -68,4 +72,10 @@ function setViewAvailable() {
 
 function clamp(min, val, max) {
 	return Math.max(min, Math.min(val, max));
+}
+
+function dataRequest() {
+    if (isQtAvailable) {
+        QtBridge.js_askForDataFromQt();
+    }
 }
