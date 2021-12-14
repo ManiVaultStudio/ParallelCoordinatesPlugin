@@ -370,10 +370,8 @@ void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selec
     _parCoordWidget->enableBrushHighlight();
 
     // ask core for the selection set for the current data set
-
-    auto& selectionSet      = _currentDataSet->getSelection<Points>();
+    auto selectionSet      = _currentDataSet->getSelection<Points>();
     auto& selectionIndices  = selectionSet->indices;
-    //auto& sourceIndices     = _currentDataSet->getSourceData<Points>(*_currentDataSet).indices;
 
     // no need to update the selection when nothing is updated
     if ((selectedIDs.size() == 0) & (selectionIndices.size() == 0))
