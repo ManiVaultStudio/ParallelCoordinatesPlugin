@@ -1,6 +1,6 @@
 #pragma once
 
-#include <widgets/SettingsWidget.h>
+//#include <widgets/SettingsWidget.h>
 
 #include <QWidget>
 #include <QString>
@@ -12,7 +12,7 @@
 #include <QSlider>
 #include <QCheckBox>
 
-using namespace hdps::gui;
+//using namespace hdps::gui;
 
 class ParallelCoordinatesPlugin;
 

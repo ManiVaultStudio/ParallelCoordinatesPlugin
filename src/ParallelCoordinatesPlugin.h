@@ -1,45 +1,55 @@
 #pragma once
 
 #include <ViewPlugin.h>
-
+ 
 #include <vector>
 
 #include <QString>
 #include <QStringList>
-#include <QThread>
 
 using namespace hdps::plugin;
+using namespace hdps::util;
+using namespace hdps::gui;
 
 // =============================================================================
 // View
 // =============================================================================
 
+class Points;
+
 class ParlCoorSettings;
 class ParlCoorWidget;
-class Points;
 
 class ParallelCoordinatesPlugin : public ViewPlugin
 {
     Q_OBJECT
     
 public:
-    ParallelCoordinatesPlugin();
-    ~ParallelCoordinatesPlugin(void) override;
+    ParallelCoordinatesPlugin(const PluginFactory* factory);
+    ~ParallelCoordinatesPlugin() override;
     
     void init() override;
     
     /**
-     * Callback which is invoked when a \p dataEvent occurs
-     * @param dataEvent Data event that occurred
+     * Load one (or more datasets in the view)
+     * @param datasets Dataset(s) to load
      */
-    void onDataEvent(hdps::DataEvent* dataEvent);
+    void loadData(const QVector<hdps::Dataset<hdps::DatasetImpl>>& datasets) override;
+
+    void setData(QString newDatasetGuid);
+
+    /**
+     * Callback which is invoked when &Dataset<Points>::dataSelectionChanged is emitted
+     */
+    void onDataSelectionChanged();
 
     hdps::CoreInterface* getCore() { return _core;  }
-    QString getCurrentDataSetName() const { return _currentDataSetName; }
+    QString getCurrentDataSetName() const;
+    QString getCurrentDataSetGuid() const;
 
 private:
     // Parses data to JSON and passes it to the web widget
-    void passDataToJS(const QString dataSetName, const std::vector<unsigned int>& pointIDsGlobal);
+    void passDataToJS(const std::vector<unsigned int>& pointIDsGlobal);
 
     // informs the core about a selection 
     void publishSelection(std::vector<unsigned int> selectedIDs);
@@ -55,7 +65,7 @@ private:
 
 public slots:
     // sets window title and calls passDataToJS in another thread
-    void onDataInput(const QString dataSetName);
+    void onDataInput();
 
     // update selected dimensions
     void onApplySettings();
@@ -67,10 +77,11 @@ public slots:
     void maxDimClampChanged(int max);
     void calculateMinMaxClampPerDim();
 
+signals:
+    void dataSetChanged();
 
 private:
-    QString _currentDataSetName;
-    Points* _currentDataSet;
+    hdps::Dataset<Points> _currentDataSet;
     std::vector<unsigned int> _pointIDsGlobal;
 
     QStringList _dimNames;
@@ -86,8 +97,6 @@ private:
 
     ParlCoorWidget* _parCoordWidget;
     ParlCoorSettings* _settingsWidget;
-
-    QThread thread;
 
 };
 
@@ -108,4 +117,7 @@ public:
     ~ParallelCoordinatesPluginFactory(void) override {}
     
     ViewPlugin* produce() override;
+
+    /** Returns the data types that are supported by the example view plugin */
+    hdps::DataTypes supportedDataTypes() const override;
 };
