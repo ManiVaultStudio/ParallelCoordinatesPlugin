@@ -35,7 +35,7 @@ void ParlCoorCommunicationObject::js_passSelectionToQt(QVariantList data){
     emit newSelectionToQt(selectedIDs);
 }
 
-void ParlCoorCommunicationObject::newSelectionToJS(std::vector<unsigned int>& selectionIDs) {
+void ParlCoorCommunicationObject::newSelectionToJS(const std::vector<unsigned int>& selectionIDs) {
     QVariantList selection;
 
     // if nothing is selected, tell the parcoords to show all data
@@ -82,35 +82,41 @@ ParlCoorWidget::ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin):
     _dropWidget->initialize([this, parentPlugin](const QMimeData* mimeData) -> DropWidget::DropRegions {
         DropWidget::DropRegions dropRegions;
 
-        const auto mimeText             = mimeData->text();
-        const auto tokens               = mimeText.split("\n");
-        const auto datasetName          = tokens[0];
-        const auto dataType             = DataType(tokens[1]);
-        const auto dataTypes            = DataTypes({ PointType });
-        //const auto candidateDataset     = parentPlugin->getCore()->requestData<Points>(datasetName);
-        //const auto candidateDatasetName = candidateDataset.getName();
-        const auto candidateDatasetName = datasetName;
+        const auto mimeText = mimeData->text();
+        const auto tokens = mimeText.split("\n");
 
-        if (!dataTypes.contains(dataType))
-            dropRegions << new DropWidget::DropRegion(this, "Incompatible data", "This type of data is not supported", false);
+        if (tokens.count() == 1)
+            return dropRegions;
 
-        if (dataType == PointType) {
-            const auto currentDatasetName   = parentPlugin->getCurrentDataSetName();
-            const auto description          = QString("Visualize %1 as parallel coordinates").arg(candidateDatasetName);
+        // Gather information to generate appropriate drop regions
+        const auto datasetName = tokens[0];
+        const auto datasetId = tokens[1];
+        const auto dataType = DataType(tokens[2]);
+        const auto dataTypes = DataTypes({ PointType });
 
-            if (currentDatasetName.isEmpty()) {
-                dropRegions << new DropWidget::DropRegion(this, "Points", description, true, [this, parentPlugin, candidateDatasetName]() {
-                    parentPlugin->onDataInput(candidateDatasetName);
+        if (!dataTypes.contains(dataType)) {
+            dropRegions << new DropWidget::DropRegion(this, "Incompatible data", "This type of data is not supported", "exclamation-circle", false);
+        }
+        else {
+
+            const auto currentDatasetGuid   = parentPlugin->getCurrentDataSetGuid();
+            const auto description          = QString("Visualize %1 as parallel coordinates").arg(datasetName);
+
+            // if no data has been loaded, load the data
+            if (currentDatasetGuid.isEmpty()) {
+                dropRegions << new DropWidget::DropRegion(this, "Points", description, "map-marker-alt", true, [this, parentPlugin, datasetId]() {
+                    parentPlugin->setData(datasetId);
                     _dropWidget->setShowDropIndicator(false);
                 });
             }
             else {
-                if (candidateDatasetName == currentDatasetName) {
-                    dropRegions << new DropWidget::DropRegion(this, "Warning", "Data already loaded", false);
+                // if new data is dropped, load it
+                if (datasetId == currentDatasetGuid) {
+                    dropRegions << new DropWidget::DropRegion(this, "Warning", "Data already loaded", "exclamation-circle", false);
                 }
                 else {
-                    dropRegions << new DropWidget::DropRegion(this, "Points", description, true, [this, parentPlugin, candidateDatasetName]() {
-                        parentPlugin->onDataInput(candidateDatasetName);
+                    dropRegions << new DropWidget::DropRegion(this, "Points", description, "map-marker-alt", true, [this, parentPlugin, datasetId]() {
+                        parentPlugin->setData(datasetId);
                         _dropWidget->setShowDropIndicator(false);
                     });
                 }
@@ -146,7 +152,12 @@ void ParlCoorWidget::disableBrushHighlight()
     emit _communicationObject->qt_disableBrushHighlight();
 }
 
-void ParlCoorWidget::passSelectionToJS(std::vector<unsigned int>& selectionIDs)
+void ParlCoorWidget::passSelectionToJS(const std::vector<unsigned int>& selectionIDs)
 {
     _communicationObject->newSelectionToJS(selectionIDs);
+}
+
+void ParlCoorWidget::setDropWidgetShowDropIndicator(bool show) 
+{
+    _dropWidget->setShowDropIndicator(show);
 }

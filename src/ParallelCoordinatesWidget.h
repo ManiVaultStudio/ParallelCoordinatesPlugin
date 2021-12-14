@@ -42,7 +42,7 @@ public slots:
     // invoked from Qt side
 
     // converts vector to array string and emits qt_setSelectionInJS
-    void newSelectionToJS(std::vector<unsigned int>& selectionIDs);
+    void newSelectionToJS(const std::vector<unsigned int>& selectionIDs);
 
 private:
     ParlCoorWidget* _parent;
@@ -60,10 +60,12 @@ public:
     ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin);
 
     void passDataToJS(QVariantList);
-    void passSelectionToJS(std::vector<unsigned int>& selectionIDs);
+    void passSelectionToJS(const std::vector<unsigned int>& selectionIDs);
 
     void enableBrushHighlight();
     void disableBrushHighlight();
+
+    void setDropWidgetShowDropIndicator(bool);
 
 protected:
     void resizeEvent(QResizeEvent * e) override;
