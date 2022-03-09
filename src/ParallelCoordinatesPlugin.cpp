@@ -57,7 +57,8 @@ void ParallelCoordinatesPlugin::init()
     QVBoxLayout* layout = new QVBoxLayout();
     layout->setMargin(0);
     layout->setSpacing(0);
-    setLayout(layout);
+    
+    _widget.setLayout(layout);
 
     // Main Widget view
     _parCoordWidget = new ParlCoorWidget(this);
@@ -139,7 +140,7 @@ void ParallelCoordinatesPlugin::onDataInput()
     if (!_currentDataSet.isValid())
         return;
 
-    setWindowTitle(_currentDataSet->getGuiName());
+    _widget.setWindowTitle(_currentDataSet->getGuiName());
 
     // get data set from core
     // Get indices of selected points
@@ -389,9 +390,9 @@ void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selec
 
     // notify core about the selection change
     if (_currentDataSet->isDerivedData())
-        _core->notifyDataSelectionChanged(_currentDataSet->getSourceDataset<DatasetImpl>());
+        _core->notifyDatasetSelectionChanged(_currentDataSet->getSourceDataset<DatasetImpl>());
     else
-        _core->notifyDataSelectionChanged(_currentDataSet);
+        _core->notifyDatasetSelectionChanged(_currentDataSet);
 
     //
     _settingsWidget->setNumSel(selectedIDs.size());
@@ -401,9 +402,9 @@ void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selec
 void ParallelCoordinatesPlugin::updateWindowTitle()
 {
     if (!_currentDataSet.isValid())
-        setWindowTitle(getGuiName());
+        _widget.setWindowTitle(getGuiName());
     else
-        setWindowTitle(QString("%1: %2").arg(getGuiName(), _currentDataSet->getDataHierarchyItem().getFullPathName()));
+        _widget.setWindowTitle(QString("%1: %2").arg(getGuiName(), _currentDataSet->getDataHierarchyItem().getFullPathName()));
 }
 
 
