@@ -30,10 +30,6 @@ class ParallelCoordsConan(ConanFile):
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": True, "fPIC": True}
 
-    requires = (
-        "hdps-core/latest@lkeb/stable"
-    )
-
     scm = {
         "type": "git",
         "subfolder": "hdps/ParallelCoordinatesPlugin",
