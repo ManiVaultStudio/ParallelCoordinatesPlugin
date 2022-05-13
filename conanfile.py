@@ -41,10 +41,31 @@ class ParallelCoordsConan(ConanFile):
         "revision": "auto"
     }
 
+    def __get_git_path(self):
+        path = load(
+            pathlib.Path(pathlib.Path(__file__).parent.resolve(), "__gitpath.txt")
+        )
+        print(f"git info from {path}")
+        return path
+
+    def export(self):
+        print("In export")
+        # save the original source path to the directory used to build the package
+        save(
+            pathlib.Path(self.export_folder, "__gitpath.txt"),
+            str(pathlib.Path(__file__).parent.resolve()),
+        )
+
     def set_version(self):
         # Assign a version from the branch name
-        branch_info = CoreBranchInfo(self.recipe_folder)
+        branch_info = PluginBranchInfo(self.recipe_folder)
+        # print(f"Version from branch {branch_info.version}")
         self.version = branch_info.version
+
+    def requirements(self):
+        branch_info = PluginBranchInfo(self.__get_git_path())
+        print(f"Core requirement {branch_info.core_requirement}")
+        self.requires(branch_info.core_requirement)
 
     # Remove runtime and use always default (MD/MDd)
     def configure(self):
