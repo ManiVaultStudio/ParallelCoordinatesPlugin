@@ -3,8 +3,7 @@ import os
 import shutil
 import pathlib
 import subprocess
-from rules_support import CoreBranchInfo
-
+from rules_support import CoreBranchInfo, PluginBranchInfo
 
 class ParallelCoordsConan(ConanFile):
     """Class to package the ParallelCoordinatesPlugin using conan
