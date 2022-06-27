@@ -55,7 +55,7 @@ void ParallelCoordinatesPlugin::init()
 {
     // General
     QVBoxLayout* layout = new QVBoxLayout();
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     
     _widget.setLayout(layout);

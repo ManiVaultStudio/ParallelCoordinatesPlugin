@@ -19,9 +19,9 @@ endif(MSVC)
 
 # Normalize the incoming install path
 file(TO_CMAKE_PATH $ENV{HDPS_INSTALL_DIR} INSTALL_DIR)
-find_package(Qt5 COMPONENTS Widgets WebEngineWidgets Concurrent REQUIRED)
+find_package(Qt6 6.3.1 COMPONENTS Widgets WebEngineWidgets Concurrent REQUIRED)
 
-qt5_add_resources(RESOURCE_FILES res/parcoords_resources.qrc)
+qt6_add_resources(RESOURCE_FILES res/parcoords_resources.qrc)
 
 file(GLOB H src/*.h)
 file(GLOB CPP src/*.cpp)
@@ -38,7 +38,7 @@ source_group(UI FILES ${UIS})
 source_group(Web FILES ${WEB})
 source_group(Aux FILES ${AUX})
 
-QT5_WRAP_UI(UI_HEADERS ${UIS})
+QT6_WRAP_UI(UI_HEADERS ${UIS})
 
 add_library(${PCPLUGIN} SHARED ${SOURCES} ${UIS} ${WEB} ${AUX} ${WEB} ${RESOURCE_FILES})
 
@@ -47,9 +47,9 @@ target_include_directories(${PCPLUGIN} PRIVATE "${INSTALL_DIR}/$<CONFIGURATION>/
 # Request C++17
 target_compile_features(${PCPLUGIN} PRIVATE cxx_std_17)
 
-target_link_libraries(${PCPLUGIN} PRIVATE Qt5::Widgets)
-target_link_libraries(${PCPLUGIN} PRIVATE Qt5::WebEngineWidgets)
-target_link_libraries(${PCPLUGIN} PRIVATE Qt5::Concurrent)
+target_link_libraries(${PCPLUGIN} PRIVATE Qt6::Widgets)
+target_link_libraries(${PCPLUGIN} PRIVATE Qt6::WebEngineWidgets)
+target_link_libraries(${PCPLUGIN} PRIVATE Qt6::Concurrent)
 if(MSVC)
 	set(LIB_SUFFIX "${CMAKE_STATIC_LIBRARY_SUFFIX}")
 else()
