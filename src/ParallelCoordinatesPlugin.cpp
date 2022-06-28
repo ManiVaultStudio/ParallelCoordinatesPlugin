@@ -8,10 +8,12 @@
 #include "PointData.h"
 
 #include <QtCore>
-#include <QtConcurrent> 
+
 #include <QVariantList> 
 #include <QVariantMap> 
 #include <QtDebug>
+
+#include <QtConcurrent> 
 
 #include <numeric>      // iota, accumulate
 #include <algorithm>    // std::equal, clamp
@@ -185,7 +187,7 @@ void ParallelCoordinatesPlugin::onDataInput()
     _settingsWidget->setNumSel(0);
 
     // parse data to JS in a different thread as to not block the UI
-    QtConcurrent::run(this, &ParallelCoordinatesPlugin::passDataToJS, _pointIDsGlobal);
+    QtConcurrent::run(&ParallelCoordinatesPlugin::passDataToJS, this, _pointIDsGlobal);
 
     updateWindowTitle();
 }
@@ -362,7 +364,7 @@ void ParallelCoordinatesPlugin::onApplySettings() {
     _numSelectedDims = newNumSelectedDims;
 
     // parse data to JS in a different thread as to not block the UI
-    QtConcurrent::run(this, &ParallelCoordinatesPlugin::passDataToJS, _pointIDsGlobal);
+    QtConcurrent::run(&ParallelCoordinatesPlugin::passDataToJS, this, _pointIDsGlobal);
 
 }
 
