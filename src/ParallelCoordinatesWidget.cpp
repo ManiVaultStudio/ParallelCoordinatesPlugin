@@ -72,7 +72,7 @@ ParlCoorWidget::ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin):
     _communicationObject = new ParlCoorCommunicationObject(this);
     init(_communicationObject);
 
-    layout()->setMargin(0);
+    layout()->setContentsMargins(0, 0, 0, 0);
 
     getView()->resize(size());
     getView()->setAcceptDrops(false);
