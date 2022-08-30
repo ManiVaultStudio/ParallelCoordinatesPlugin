@@ -7,6 +7,8 @@
 #include "Dataset.h"
 #include "PointData.h"
 
+#include <actions/PluginTriggerAction.h>
+
 #include <QtCore>
 
 #include <QVariantList> 
@@ -410,6 +412,11 @@ void ParallelCoordinatesPlugin::updateWindowTitle()
 }
 
 
+QIcon ParallelCoordinatesPluginFactory::getIcon(const QColor& color /*= Qt::black*/) const
+{
+    return hdps::Application::getIconFont("FontAwesome").getIcon("chart-bar", color);
+}
+
 // =============================================================================
 // Factory DOES NOT NEED TO BE ALTERED
 // Merely responsible for generating new plugins when requested
@@ -428,4 +435,32 @@ hdps::DataTypes ParallelCoordinatesPluginFactory::supportedDataTypes() const
     supportedTypes.append(PointType);
 
     return supportedTypes;
+}
+
+hdps::gui::PluginTriggerActions ParallelCoordinatesPluginFactory::getPluginTriggerActions(const hdps::Datasets& datasets) const
+{
+    PluginTriggerActions pluginTriggerActions;
+
+    const auto getInstance = [this]() -> ParallelCoordinatesPlugin* {
+        return dynamic_cast<ParallelCoordinatesPlugin*>(Application::core()->requestPlugin(getKind()));
+    };
+
+    const auto numberOfDatasets = datasets.count();
+
+    if (PluginFactory::areAllDatasetsOfTheSameType(datasets, PointType)) {
+        if (numberOfDatasets >= 1) {
+            if (datasets.first()->getDataType() == PointType) {
+                auto pluginTriggerAction = createPluginTriggerAction("Parallel coordinates viewer", "Load dataset in parallel coordinates viewer", datasets, "chart-bar");
+
+                connect(pluginTriggerAction, &QAction::triggered, [this, getInstance, datasets]() -> void {
+                    for (auto dataset : datasets)
+                        getInstance()->loadData(Datasets({ dataset }));
+                });
+
+                pluginTriggerActions << pluginTriggerAction;
+            }
+        }
+    }
+
+    return pluginTriggerActions;
 }
