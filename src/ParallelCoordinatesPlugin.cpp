@@ -450,7 +450,7 @@ hdps::gui::PluginTriggerActions ParallelCoordinatesPluginFactory::getPluginTrigg
     if (PluginFactory::areAllDatasetsOfTheSameType(datasets, PointType)) {
         if (numberOfDatasets >= 1) {
             if (datasets.first()->getDataType() == PointType) {
-                auto pluginTriggerAction = createPluginTriggerAction("Parallel coordinates viewer", "Load dataset in parallel coordinates viewer", datasets, "chart-bar");
+                auto pluginTriggerAction = createPluginTriggerAction("Parallel coordinates", "Load dataset in parallel coordinates viewer", datasets, "chart-bar");
 
                 connect(pluginTriggerAction, &QAction::triggered, [this, getInstance, datasets]() -> void {
                     for (auto dataset : datasets)
