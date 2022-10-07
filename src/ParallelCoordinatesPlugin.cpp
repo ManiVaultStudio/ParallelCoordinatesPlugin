@@ -76,6 +76,9 @@ void ParallelCoordinatesPlugin::init()
     // load data after drop action
     connect(this, &ParallelCoordinatesPlugin::dataSetChanged, this, &ParallelCoordinatesPlugin::onDataInput);
 
+    // update data when data set changed
+    connect(&_currentDataSet, &Dataset<Points>::dataChanged, this, &ParallelCoordinatesPlugin::onDataInput);
+
     // load data after right-click view 
     connect(_parCoordWidget, &ParlCoorWidget::webViewLoaded, this, &ParallelCoordinatesPlugin::onDataInput);
 
