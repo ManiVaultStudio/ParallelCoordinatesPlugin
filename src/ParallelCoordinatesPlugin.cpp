@@ -62,7 +62,7 @@ void ParallelCoordinatesPlugin::init()
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     
-    _widget.setLayout(layout);
+    getWidget().setLayout(layout);
 
     // Main Widget view
     _parCoordWidget = new ParlCoorWidget(this);
@@ -147,7 +147,7 @@ void ParallelCoordinatesPlugin::onDataInput()
     if (!_currentDataSet.isValid())
         return;
 
-    _widget.setWindowTitle(_currentDataSet->getGuiName());
+    getWidget().setWindowTitle(_currentDataSet->getGuiName());
 
     // get data set from core
     // Get indices of selected points
@@ -409,9 +409,9 @@ void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selec
 void ParallelCoordinatesPlugin::updateWindowTitle()
 {
     if (!_currentDataSet.isValid())
-        _widget.setWindowTitle(getGuiName());
+        getWidget().setWindowTitle(getGuiName());
     else
-        _widget.setWindowTitle(QString("%1: %2").arg(getGuiName(), _currentDataSet->getDataHierarchyItem().getFullPathName()));
+        getWidget().setWindowTitle(QString("%1: %2").arg(getGuiName(), _currentDataSet->getDataHierarchyItem().getFullPathName()));
 }
 
 
