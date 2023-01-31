@@ -397,9 +397,9 @@ void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selec
 
     // notify core about the selection change
     if (_currentDataSet->isDerivedData())
-        _core->notifyDatasetSelectionChanged(_currentDataSet->getSourceDataset<DatasetImpl>());
+        events().notifyDatasetSelectionChanged(_currentDataSet->getSourceDataset<DatasetImpl>());
     else
-        _core->notifyDatasetSelectionChanged(_currentDataSet);
+        events().notifyDatasetSelectionChanged(_currentDataSet);
 
     //
     _settingsWidget->setNumSel(selectedIDs.size());
@@ -445,7 +445,7 @@ hdps::gui::PluginTriggerActions ParallelCoordinatesPluginFactory::getPluginTrigg
     PluginTriggerActions pluginTriggerActions;
 
     const auto getInstance = [this]() -> ParallelCoordinatesPlugin* {
-        return dynamic_cast<ParallelCoordinatesPlugin*>(Application::core()->requestPlugin(getKind()));
+        return dynamic_cast<ParallelCoordinatesPlugin*>(plugins().requestPlugin(getKind()));
     };
 
     const auto numberOfDatasets = datasets.count();
@@ -453,9 +453,7 @@ hdps::gui::PluginTriggerActions ParallelCoordinatesPluginFactory::getPluginTrigg
     if (PluginFactory::areAllDatasetsOfTheSameType(datasets, PointType)) {
         if (numberOfDatasets >= 1) {
             if (datasets.first()->getDataType() == PointType) {
-                auto pluginTriggerAction = createPluginTriggerAction("Parallel coordinates", "Load dataset in parallel coordinates viewer", datasets, "chart-bar");
-
-                connect(pluginTriggerAction, &QAction::triggered, [this, getInstance, datasets]() -> void {
+                auto pluginTriggerAction = new PluginTriggerAction(const_cast<ParallelCoordinatesPluginFactory*>(this), this, "Parallel coordinates", "Load dataset in parallel coordinates viewer", getIcon(), [this, getInstance, datasets](PluginTriggerAction& pluginTriggerAction) -> void {
                     for (auto dataset : datasets)
                         getInstance()->loadData(Datasets({ dataset }));
                 });
