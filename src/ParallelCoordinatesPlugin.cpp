@@ -176,7 +176,7 @@ void ParallelCoordinatesPlugin::onDataInput()
     _settingsWidget->setNumSel(0);
 
     // parse data to JS in a different thread as to not block the UI
-    QtConcurrent::run(&ParallelCoordinatesPlugin::passDataToJS, this, _pointIDsGlobal);
+    QFuture<void> fvoid = QtConcurrent::run(&ParallelCoordinatesPlugin::passDataToJS, this, _pointIDsGlobal);
 
     updateWindowTitle();
 }
@@ -353,7 +353,7 @@ void ParallelCoordinatesPlugin::onApplySettings() {
     _numSelectedDims = newNumSelectedDims;
 
     // parse data to JS in a different thread as to not block the UI
-    QtConcurrent::run(&ParallelCoordinatesPlugin::passDataToJS, this, _pointIDsGlobal);
+    QFuture<void> fvoid = QtConcurrent::run(&ParallelCoordinatesPlugin::passDataToJS, this, _pointIDsGlobal);
 
 }
 
