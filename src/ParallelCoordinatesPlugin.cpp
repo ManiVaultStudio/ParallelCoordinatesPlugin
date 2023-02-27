@@ -19,6 +19,7 @@
 
 #include <numeric>      // iota, accumulate
 #include <algorithm>    // std::equal, clamp
+#include <memory>
 
 Q_PLUGIN_METADATA(IID "nl.tudelft.ParallelCoordinatesPlugin")
 
@@ -28,22 +29,6 @@ using namespace hdps::util;
 // =============================================================================
 // View
 // =============================================================================
-
-namespace hdps
-{
-    /**
-     * Creates a container of the specified type, and copies the elements from the
-     * specified `std::vector` into the created container.
-     */
-    template <typename ContainerType, typename ValueType>
-    auto fromStdVector(const std::vector<ValueType>& stdVector)
-    {
-        ContainerType result;
-        result.reserve(static_cast<int>(stdVector.size()));
-        std::copy(stdVector.cbegin(), stdVector.cend(), std::back_inserter(result));
-        return result;
-    }
-}
 
 ParallelCoordinatesPlugin::ParallelCoordinatesPlugin(const PluginFactory* factory) :
     ViewPlugin(factory),  _currentDataSet(nullptr), _parCoordWidget(nullptr), _settingsWidget(nullptr),
