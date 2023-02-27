@@ -3,6 +3,7 @@
 #include <ViewPlugin.h>
  
 #include <vector>
+#include <memory>
 
 #include <QString>
 #include <QStringList>
@@ -95,8 +96,8 @@ private:
     int _minClampPercent;
     int _maxClampPercent;
 
-    ParlCoorWidget* _parCoordWidget;
-    ParlCoorSettings* _settingsWidget;
+    std::shared_ptr<ParlCoorWidget> _parCoordWidget;
+    std::shared_ptr<ParlCoorSettings> _settingsWidget;
 
 };
 

@@ -19,7 +19,6 @@
 
 #include <numeric>      // iota, accumulate
 #include <algorithm>    // std::equal, clamp
-#include <memory>
 
 Q_PLUGIN_METADATA(IID "nl.tudelft.ParallelCoordinatesPlugin")
 
@@ -50,13 +49,13 @@ void ParallelCoordinatesPlugin::init()
     getWidget().setLayout(layout);
 
     // Main Widget view
-    _parCoordWidget = new ParlCoorWidget(this);
+    _parCoordWidget = std::make_shared<ParlCoorWidget>(this);
     initMainView();     // sets html page in _parCoordWidget
-    layout->addWidget(_parCoordWidget);
+    layout->addWidget(_parCoordWidget.get());
 
     // Plugin setting
-    _settingsWidget = new ParlCoorSettings(this);
-    layout->addWidget(_settingsWidget);
+    _settingsWidget = std::make_shared<ParlCoorSettings>(this);
+    layout->addWidget(_settingsWidget.get());
 
     // load data after drop action
     connect(this, &ParallelCoordinatesPlugin::dataSetChanged, this, &ParallelCoordinatesPlugin::onDataInput);
@@ -65,10 +64,10 @@ void ParallelCoordinatesPlugin::init()
     connect(&_currentDataSet, &Dataset<Points>::dataChanged, this, &ParallelCoordinatesPlugin::onDataInput);
 
     // load data after right-click view 
-    connect(_parCoordWidget, &ParlCoorWidget::webViewLoaded, this, &ParallelCoordinatesPlugin::onDataInput);
+    connect(_parCoordWidget.get(), &ParlCoorWidget::webViewLoaded, this, &ParallelCoordinatesPlugin::onDataInput);
 
     // Pass selection from js to core
-    connect(_parCoordWidget, &ParlCoorWidget::newSelectionToQt, this, &ParallelCoordinatesPlugin::publishSelection);
+    connect(_parCoordWidget.get(), &ParlCoorWidget::newSelectionToQt, this, &ParallelCoordinatesPlugin::publishSelection);
 
     // Update the window title when the GUI name of the position dataset changes
     connect(&_currentDataSet, &Dataset<Points>::dataGuiNameChanged, this, &ParallelCoordinatesPlugin::updateWindowTitle);
