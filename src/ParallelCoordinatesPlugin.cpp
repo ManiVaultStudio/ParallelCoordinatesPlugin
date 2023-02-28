@@ -41,22 +41,23 @@ ParallelCoordinatesPlugin::~ParallelCoordinatesPlugin()
 
 void ParallelCoordinatesPlugin::init()
 {
-    // General
+    getWidget().setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+
+    // set layout
     QVBoxLayout* layout = new QVBoxLayout();
+    
+    _settingsWidget = std::make_shared<ParallelCoordinatesSettings>(*this);
+    _parCoordWidget = std::make_shared<ParlCoorWidget>(this);
+
+    _parCoordWidget->setPage(":parcoords/parcoords.html", "qrc:/parcoords/");     // set html contents of webpage
+
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
-    
+
+    layout->addWidget(_settingsWidget.get()->createWidget(&getWidget()));
+    layout->addWidget(_parCoordWidget.get(), 1);
+
     getWidget().setLayout(layout);
-
-    // Main Widget view
-    _parCoordWidget = std::make_shared<ParlCoorWidget>(this);
-    // sets html page in _parCoordWidget
-    _parCoordWidget->setPage(":parcoords/parcoords.html", "qrc:/parcoords/");
-    layout->addWidget(_parCoordWidget.get());
-
-    // Plugin setting
-    _settingsWidget = std::make_shared<ParlCoorSettings>(this);
-    layout->addWidget(_settingsWidget.get());
 
     // load data after drop action
     connect(this, &ParallelCoordinatesPlugin::dataSetChanged, this, &ParallelCoordinatesPlugin::onDataInput);
@@ -122,9 +123,6 @@ void ParallelCoordinatesPlugin::onDataSelectionChanged()
     // send them to js side
     _parCoordWidget->passSelectionToJS(selectionIndices);
     _parCoordWidget->disableBrushHighlight();
-
-    _settingsWidget->setNumSel(selectionSet->getNumPoints());
-
 }
 
 void ParallelCoordinatesPlugin::onDataInput()
@@ -171,10 +169,12 @@ void ParallelCoordinatesPlugin::onDataInput()
     // init the clamping valies
     calculateMinMaxClampPerDim();
 
-    _settingsWidget->setNumPoints(_numPoints);
-    _settingsWidget->setDimensionNames(_dimNames);
-    _settingsWidget->setNumDims(_dimNames.length());
-    _settingsWidget->setNumSel(0);
+    //auto& dimensionSelectionWidget = _settingsWidget->getDimensionSelectionAction();
+
+    //dimensionSelectionWidget.setNumPoints(_numPoints);
+    //dimensionSelectionWidget.setDimensionNames(_dimNames);
+    //dimensionSelectionWidget.setNumDims(_dimNames.length());
+    //dimensionSelectionWidget.setNumItems(_numPoints * _dimNames.length());
 
     // parse data to JS in a different thread as to not block the UI
     QFuture<void> fvoid = QtConcurrent::run(&ParallelCoordinatesPlugin::passDataToJS, this, _pointIDsGlobal);
@@ -298,56 +298,53 @@ void ParallelCoordinatesPlugin::passDataToJS(const std::vector<unsigned int>& po
     _parCoordWidget->passDataToJS(payload);
 }
 
-void ParallelCoordinatesPlugin::onApplySettings() {
-    bool settingChanged = true;
+void ParallelCoordinatesPlugin::applyClamping() {
 
-    // current settings
-    std::vector<bool> newDimSelection = _settingsWidget->getSelectedDimensions();
-    unsigned int newNumSelectedDims = std::accumulate(newDimSelection.begin(), newDimSelection.end(), (unsigned int)(0));
-
-    int newMinClamp = _settingsWidget->getMinClamp();
-    int newMaxClamp = _settingsWidget->getMaxClamp();
-
-    // compare to saved settings
-
-    // check if new dim selection is any different from the current one
-    if (std::equal(_selectedDimensions.begin(), _selectedDimensions.end(), newDimSelection.begin()))
-    {
-        qDebug() << "ParallelCoordinatesPlugin: Same dimension selection";
-        settingChanged = false;
-    }
-    // don't show less than two dimensions
-    if (newNumSelectedDims < 2)
-    {
-        qDebug() << "ParallelCoordinatesPlugin: Select at least 2 dimensions";
-        settingChanged = false;
-    }
+    int32_t newMinClamp = _settingsWidget->getClampAction().getMinClamp();
+    int32_t newMaxClamp = _settingsWidget->getClampAction().getMaxClamp();
 
     // min and max clamp are the same
-    if ((newMinClamp == _minClampPercent) && (newMaxClamp == _maxClampPercent) && !settingChanged)
+    if ((newMinClamp == _minClampPercent) && (newMaxClamp == _maxClampPercent))
     {
         qDebug() << "ParallelCoordinatesPlugin: Same clamping values";
-        settingChanged = false;
-    }
-    else
-    {
-        settingChanged = true;
-
-        // Adjust clamping
-        minDimClampChanged(newMinClamp);
-        maxDimClampChanged(newMaxClamp);
-        calculateMinMaxClampPerDim();
-    }
-
-    if (!settingChanged)
         return;
+    }
 
-    _selectedDimensions = newDimSelection;
-    _numSelectedDims = newNumSelectedDims;
+    // Adjust clamping
+    minDimClampChanged(newMinClamp);
+    maxDimClampChanged(newMaxClamp);
+    calculateMinMaxClampPerDim();
 
     // parse data to JS in a different thread as to not block the UI
     QFuture<void> fvoid = QtConcurrent::run(&ParallelCoordinatesPlugin::passDataToJS, this, _pointIDsGlobal);
+}
 
+void ParallelCoordinatesPlugin::applyDimensionSelection() {
+//
+//    // current settings
+//    std::vector<bool> newDimSelection = _settingsWidget->getDimensionSelectionAction().getSelectedDimensions();
+//    unsigned int newNumSelectedDims = std::accumulate(newDimSelection.begin(), newDimSelection.end(), (unsigned int)(0));
+//
+//    // check if new dim selection is any different from the current one
+//    if (std::equal(_selectedDimensions.begin(), _selectedDimensions.end(), newDimSelection.begin()))
+//    {
+//        qDebug() << "ParallelCoordinatesPlugin: Same dimension selection";
+//        return;
+//
+//    }
+//    // don't show less than two dimensions
+//    if (newNumSelectedDims < 2)
+//    {
+//        qDebug() << "ParallelCoordinatesPlugin: Select at least 2 dimensions";
+//        return;
+//    }
+//
+//    _selectedDimensions = newDimSelection;
+//    _numSelectedDims = newNumSelectedDims;
+//
+//    // parse data to JS in a different thread as to not block the UI
+//    QFuture<void> fvoid = QtConcurrent::run(&ParallelCoordinatesPlugin::passDataToJS, this, _pointIDsGlobal);
+//
 }
 
 void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selectedIDs)
@@ -377,9 +374,6 @@ void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selec
         events().notifyDatasetSelectionChanged(_currentDataSet->getSourceDataset<DatasetImpl>());
     else
         events().notifyDatasetSelectionChanged(_currentDataSet);
-
-    //
-    _settingsWidget->setNumSel(selectedIDs.size());
 
 }
 

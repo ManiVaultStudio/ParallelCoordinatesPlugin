@@ -18,7 +18,7 @@ using namespace hdps::gui;
 
 class Points;
 
-class ParlCoorSettings;
+class ParallelCoordinatesSettings;
 class ParlCoorWidget;
 
 class ParallelCoordinatesPlugin : public ViewPlugin
@@ -48,6 +48,9 @@ public:
     QString getCurrentDataSetName() const;
     QString getCurrentDataSetGuid() const;
 
+    void applyClamping();
+    void applyDimensionSelection();
+
 private:
     // Parses data to JSON and passes it to the web widget
     void passDataToJS(const std::vector<unsigned int>& pointIDsGlobal);
@@ -65,9 +68,6 @@ public slots:
     // sets window title and calls passDataToJS in another thread
     void onDataInput();
 
-    // update selected dimensions
-    void onApplySettings();
-
     void minDimClampChanged(int min);
     void maxDimClampChanged(int max);
     void calculateMinMaxClampPerDim();
@@ -81,17 +81,17 @@ private:
 
     QStringList _dimNames;
     std::vector<bool> _selectedDimensions;
-    unsigned int _numDims;
-    unsigned int _numSelectedDims;
-    unsigned int _numPoints;
+    int32_t _numDims;
+    int32_t _numSelectedDims;
+    int32_t _numPoints;
 
-    std::vector<float> _minMaxPerDim;    // [min_Ch0, max_Ch0, min_Ch1, max_Ch1, ...]
+    std::vector<float> _minMaxPerDim;         // [min_Ch0, max_Ch0, min_Ch1, max_Ch1, ...]
     std::vector<float> _minMaxClampPerDim;    // [min_Ch0, max_Ch0, min_Ch1, max_Ch1, ...]
-    int _minClampPercent;
-    int _maxClampPercent;
+    int32_t _minClampPercent;
+    int32_t _maxClampPercent;
 
-    std::shared_ptr<ParlCoorWidget> _parCoordWidget;
-    std::shared_ptr<ParlCoorSettings> _settingsWidget;
+    std::shared_ptr<ParlCoorWidget>              _parCoordWidget;
+    std::shared_ptr<ParallelCoordinatesSettings> _settingsWidget;
 
 };
 
