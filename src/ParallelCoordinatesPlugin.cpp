@@ -429,7 +429,7 @@ hdps::gui::PluginTriggerActions ParallelCoordinatesPluginFactory::getPluginTrigg
     PluginTriggerActions pluginTriggerActions;
 
     const auto getInstance = [this]() -> ParallelCoordinatesPlugin* {
-        return dynamic_cast<ParallelCoordinatesPlugin*>(plugins().requestPlugin(getKind()));
+        return dynamic_cast<ParallelCoordinatesPlugin*>(plugins().requestViewPlugin(getKind()));
     };
 
     const auto numberOfDatasets = datasets.count();
