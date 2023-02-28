@@ -1,11 +1,9 @@
-# Parallel coordinates plugin
+# Parallel coordinates plugin [![Actions Status](https://github.com/hdps/ParallelCoordinatesPlugin/workflows/ParallelCoordinatesPlugin/badge.svg)](https://github.com/hdps/ParallelCoordinatesPlugin/actions)
 
-A parallel coordinates plugin for the [hdps](https://github.com/hdps/core). 
+A parallel coordinates plugin for the [hdps](https://github.com/hdps/core) based on the [d3.js](https://github.com/d3/d3) library [Parallel Coordinates](https://syntagmatic.github.io/parallel-coordinates/) from [here](https://github.com/syntagmatic/parallel-coordinates).
 
-Based on the [d3.js](https://github.com/d3/d3) library [Parallel Coordinates](https://syntagmatic.github.io/parallel-coordinates/) from [here](https://github.com/syntagmatic/parallel-coordinates).
+**Limitations**: limit of number of Dimensions * number of Points <= 7,000,000. Qt uses an internal json data representation to communicate between the c++ and js side, and this sets some data size limit for use here. This specific number is a bit arbitrary and does not correspond to the exact max Qt json size but it's pretty close. 
 
-
-## Build status: [![Actions Status](https://github.com/hdps/ParallelCoordinatesPlugin/workflows/ParallelCoordinatesPlugin/badge.svg)](https://github.com/hdps/ParallelCoordinatesPlugin/actions)
 
 ## TODO
 Possible future features:

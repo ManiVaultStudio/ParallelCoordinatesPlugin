@@ -258,7 +258,7 @@ void ParallelCoordinatesPlugin::passDataToJS(const std::vector<unsigned int>& po
 {
     // Qt has an internal maximum size for JSON files
     // For now, set an arbitrary, lower limit for points to display
-    // If you want to instepct more then 7 million elements - don't use parallel coordinates
+    // If you want to instepct more then 7 million elements - don't use this parallel coordinates plugin
     if (_numSelectedDims * _numPoints > 7000000)
     {
         qDebug() << "ParallelCoordinatesPlugin: Data set too large - select fewer dimensions";
@@ -392,14 +392,14 @@ void ParallelCoordinatesPlugin::updateWindowTitle()
 }
 
 
+// =============================================================================
+// Plugin Factory 
+// =============================================================================
+
 QIcon ParallelCoordinatesPluginFactory::getIcon(const QColor& color /*= Qt::black*/) const
 {
     return hdps::Application::getIconFont("FontAwesome").getIcon("chart-bar", color);
 }
-
-// =============================================================================
-// Plugin Factory 
-// =============================================================================
 
 ViewPlugin* ParallelCoordinatesPluginFactory::produce()
 {
