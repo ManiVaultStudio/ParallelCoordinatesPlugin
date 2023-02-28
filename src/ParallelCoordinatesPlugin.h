@@ -55,9 +55,6 @@ private:
     // informs the core about a selection 
     void publishSelection(std::vector<unsigned int> selectedIDs);
 
-    // Sets the html page in the main viewer widger
-    void initMainView();
-
     /** Updates the window title (includes the name of the loaded dataset) */
     void updateWindowTitle();
 
@@ -70,9 +67,6 @@ public slots:
 
     // update selected dimensions
     void onApplySettings();
-
-    // calls initMainView
-    void onRefreshMainView();
 
     void minDimClampChanged(int min);
     void maxDimClampChanged(int max);

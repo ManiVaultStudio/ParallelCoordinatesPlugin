@@ -50,7 +50,8 @@ void ParallelCoordinatesPlugin::init()
 
     // Main Widget view
     _parCoordWidget = std::make_shared<ParlCoorWidget>(this);
-    initMainView();     // sets html page in _parCoordWidget
+    // sets html page in _parCoordWidget
+    _parCoordWidget->setPage(":parcoords/parcoords.html", "qrc:/parcoords/");
     layout->addWidget(_parCoordWidget.get());
 
     // Plugin setting
@@ -179,14 +180,6 @@ void ParallelCoordinatesPlugin::onDataInput()
     QFuture<void> fvoid = QtConcurrent::run(&ParallelCoordinatesPlugin::passDataToJS, this, _pointIDsGlobal);
 
     updateWindowTitle();
-}
-
-void ParallelCoordinatesPlugin::initMainView() {
-    _parCoordWidget->setPage(":parcoords/parcoords.html", "qrc:/parcoords/");
-}
-
-void ParallelCoordinatesPlugin::onRefreshMainView() {
-    initMainView();
 }
 
 void ParallelCoordinatesPlugin::minDimClampChanged(int min)
@@ -405,8 +398,7 @@ QIcon ParallelCoordinatesPluginFactory::getIcon(const QColor& color /*= Qt::blac
 }
 
 // =============================================================================
-// Factory DOES NOT NEED TO BE ALTERED
-// Merely responsible for generating new plugins when requested
+// Plugin Factory 
 // =============================================================================
 
 ViewPlugin* ParallelCoordinatesPluginFactory::produce()
@@ -417,10 +409,7 @@ ViewPlugin* ParallelCoordinatesPluginFactory::produce()
 hdps::DataTypes ParallelCoordinatesPluginFactory::supportedDataTypes() const
 {
     DataTypes supportedTypes;
-
-    // This example analysis plugin is compatible with points datasets
     supportedTypes.append(PointType);
-
     return supportedTypes;
 }
 

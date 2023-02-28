@@ -97,14 +97,6 @@ ParlCoorSettings::ParlCoorSettings(ParallelCoordinatesPlugin* parent): _parentPl
     settingsLayout->addWidget(_loadDimsButton, 1, 8, Qt::AlignRight);
     settingsLayout->addWidget(_applyDimsButton, 1, 9, Qt::AlignRight);
 
-    // button to refresh html page
-#if !defined(NDEBUG)
-    QPushButton* refreshButton = new QPushButton("Refresh HTML", this);
-    connect(refreshButton, &QPushButton::released, _parentPlugin, &ParallelCoordinatesPlugin::onRefreshMainView);
-
-    settingsLayout->addWidget(numPointsLabel, 0, 0, Qt::AlignLeft);
-#endif NDEBUG
-
     setLayout(settingsLayout);
 }
 
