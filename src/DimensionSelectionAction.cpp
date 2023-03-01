@@ -1,11 +1,11 @@
 #include "DimensionSelectionAction.h"
 #include "ParallelCoordinatesSettings.h"
-#include "ParallelCoordinatesPlugin.h"
 
 #include <Application.h>
 
 #include <QString>
 #include <QLabel>
+#include <QVBoxLayout>
 
 DimensionSelectionAction::DimensionSelectionAction(PCPSettings& parallelCoordinatesSettings) :
     WidgetAction(&parallelCoordinatesSettings),

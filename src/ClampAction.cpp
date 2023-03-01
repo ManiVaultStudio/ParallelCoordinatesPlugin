@@ -5,7 +5,7 @@
 
 #include <QDebug>
 #include <QLabel>
-#include <QGroupBox>
+#include <QVBoxLayout>
 
 using namespace hdps;
 using namespace hdps::gui;
