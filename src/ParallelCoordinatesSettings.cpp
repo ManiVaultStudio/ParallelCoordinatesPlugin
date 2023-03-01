@@ -9,7 +9,7 @@ using namespace hdps::gui;
 
 PCPSettings::PCPSettings(ParallelCoordinatesPlugin& parallelCoordinatesPlugin) :
     WidgetAction(&parallelCoordinatesPlugin),
-    _parentPlugin(parallelCoordinatesPlugin),
+    _pcpPlugin(parallelCoordinatesPlugin),
     _clampAction(*this)
     //    _dimensionSelectionAction(*this)
 {
@@ -18,12 +18,12 @@ PCPSettings::PCPSettings(ParallelCoordinatesPlugin& parallelCoordinatesPlugin) :
 
 void PCPSettings::onApplyClamping()
 {
-    _parentPlugin.applyClamping();
+    _pcpPlugin.applyClamping();
 }
 
 void PCPSettings::onApplyDimensionFiltering()
 {
-    _parentPlugin.applyDimensionSelection();
+    _pcpPlugin.applyDimensionSelection();
 }
 
 

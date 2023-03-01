@@ -59,7 +59,7 @@ private:
     void passDataToJS(const std::vector<unsigned int>& pointIDsGlobal);
 
     // informs the core about a selection 
-    void publishSelection(std::vector<unsigned int> selectedIDs);
+    void publishSelection(const std::vector<unsigned int>& selectedIDs);
 
     /** Updates the window title (includes the name of the loaded dataset) */
     void updateWindowTitle();

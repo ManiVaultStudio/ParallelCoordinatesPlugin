@@ -378,7 +378,7 @@ void ParallelCoordinatesPlugin::applyDimensionSelection() {
 //
 }
 
-void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selectedIDs)
+void ParallelCoordinatesPlugin::publishSelection(const std::vector<unsigned int>& selectedIDs)
 {
     _pcpWidget->enableBrushHighlight();
 
@@ -396,7 +396,7 @@ void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selec
     // clear the selection and add the new points
     selectionIndices.clear();
     selectionIndices.reserve(_numPoints);
-    for (auto id : selectedIDs) {
+    for (const auto id : selectedIDs) {
         selectionIndices.push_back(id);
     }
 

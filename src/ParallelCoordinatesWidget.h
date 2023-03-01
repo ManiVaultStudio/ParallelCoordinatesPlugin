@@ -18,7 +18,7 @@ class ParlCoorCommunicationObject : public hdps::gui::WebCommunicationObject
 {
     Q_OBJECT
 public:
-    ParlCoorCommunicationObject(PCPWidget* parent);
+    ParlCoorCommunicationObject();
 
 signals:
     // Signals to JS side
@@ -31,7 +31,7 @@ signals:
     void qt_triggerDataRequest();
 
     // Signal to Qt side
-    void newSelectionToQt(std::vector<unsigned int>& selectionIDs);
+    void newSelectionToQt(const std::vector<unsigned int>& selectionIDs);
 
     // Signals from qt to qt
     void askForDataFromQt();
@@ -49,7 +49,8 @@ public slots:
     void newSelectionToJS(const std::vector<unsigned int>& selectionIDs);
 
 private:
-    PCPWidget* _parent;
+    std::vector<unsigned int> _selectedIDsFromjs;
+
 };
 
 
@@ -61,7 +62,7 @@ class PCPWidget : public hdps::gui::WebWidget
 {
     Q_OBJECT
 public:
-    PCPWidget(ParallelCoordinatesPlugin* parentPlugin);
+    PCPWidget(ParallelCoordinatesPlugin* pcpPlugin);
 
     void passDataToJS(QVariantList);
     void passSelectionToJS(const std::vector<unsigned int>& selectionIDs);
@@ -73,7 +74,7 @@ protected:
     void resizeEvent(QResizeEvent * e) override;
 
 signals:
-    void newSelectionToQt(std::vector<unsigned int> selectionIDs);
+    void newSelectionToQt(const std::vector<unsigned int>& selectionIDs);
 
 private slots:
     /** Is invoked when the js side calls js_available of the WebCommunicationObject (ParlCoorCommunicationObject) 
@@ -82,6 +83,6 @@ private slots:
 
 private:
     ParlCoorCommunicationObject*    _communicationObject;
-    ParallelCoordinatesPlugin*      _parentPlugin;
+    ParallelCoordinatesPlugin*      _pcpPlugin;
 
 };

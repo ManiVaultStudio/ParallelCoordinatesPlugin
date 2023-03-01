@@ -20,18 +20,17 @@ using namespace hdps::gui;
 // ParlCoorCommunicationObject
 // =============================================================================
 
-ParlCoorCommunicationObject::ParlCoorCommunicationObject(PCPWidget* parent):
-    _parent(parent)
+ParlCoorCommunicationObject::ParlCoorCommunicationObject()
 {
 }
 
 
 void ParlCoorCommunicationObject::js_passSelectionToQt(QVariantList data){
     // convert data structure
-    std::vector<unsigned int> selectedIDs;
-    std::for_each(data.begin(), data.end(), [&selectedIDs](const auto &dat) {selectedIDs.push_back(dat.toUInt()); });
+    _selectedIDsFromjs.clear();
+    std::for_each(data.begin(), data.end(), [this](const auto &dat) {_selectedIDsFromjs.push_back(dat.toUInt()); });
     // hand selction to core
-    emit newSelectionToQt(selectedIDs);
+    emit newSelectionToQt(_selectedIDsFromjs);
 }
 
 void ParlCoorCommunicationObject::js_askForDataFromQt() {
@@ -55,20 +54,20 @@ void ParlCoorCommunicationObject::newSelectionToJS(const std::vector<unsigned in
     }
 
     // send data to JS
-    emit this->qt_setSelectionInJS(selection);
+    emit qt_setSelectionInJS(selection);
 }
 
 // =============================================================================
 // PCPWidget
 // =============================================================================
 
-PCPWidget::PCPWidget(ParallelCoordinatesPlugin* parentPlugin):
-    _parentPlugin(parentPlugin)
+PCPWidget::PCPWidget(ParallelCoordinatesPlugin* pcpPlugin):
+    _pcpPlugin(pcpPlugin)
 {
     setAcceptDrops(true);
 
     Q_INIT_RESOURCE(parcoords_resources);
-    _communicationObject = new ParlCoorCommunicationObject(this);
+    _communicationObject = new ParlCoorCommunicationObject();
     init(_communicationObject);
 
     layout()->setContentsMargins(0, 0, 0, 0);
@@ -76,10 +75,10 @@ PCPWidget::PCPWidget(ParallelCoordinatesPlugin* parentPlugin):
     getView()->resize(size());
 
     // re-emit the signal from the communication objection to the main plugin class where the selection is made public to the core
-    connect(_communicationObject, &ParlCoorCommunicationObject::newSelectionToQt, [&](std::vector<unsigned int> selectedIDs) {emit newSelectionToQt(selectedIDs); });
+    connect(_communicationObject, &ParlCoorCommunicationObject::newSelectionToQt, this, &PCPWidget::newSelectionToQt);
 
     // re-emit the signal from the communication objection to the main plugin class: ask for new data after web view is loaded
-    connect(_communicationObject, &ParlCoorCommunicationObject::askForDataFromQt, _parentPlugin, &ParallelCoordinatesPlugin::onDataInput);
+    connect(_communicationObject, &ParlCoorCommunicationObject::askForDataFromQt, _pcpPlugin, &ParallelCoordinatesPlugin::onDataInput);
 
 }
 

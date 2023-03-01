@@ -40,7 +40,7 @@ public: // Action getters
 //    DimensionSelectionAction& getDimensionSelectionAction() { return _dimensionSelectionAction; }
 
 private:
-    ParallelCoordinatesPlugin&  _parentPlugin;
+    ParallelCoordinatesPlugin&  _pcpPlugin;
     ClampAction                 _clampAction;
 //    DimensionSelectionAction    _dimensionSelectionAction;
 };
