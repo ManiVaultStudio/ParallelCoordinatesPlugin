@@ -213,16 +213,6 @@ void ParallelCoordinatesPlugin::onDataInput()
     updateWindowTitle();
 }
 
-void ParallelCoordinatesPlugin::minDimClampChanged(int min)
-{
-    _minClampPercent = min;
-}
-
-void ParallelCoordinatesPlugin::maxDimClampChanged(int max)
-{
-    _maxClampPercent = max;
-}
-
 void ParallelCoordinatesPlugin::calculateMinMaxPerDim()
 {
     _minMaxPerDim.clear();
@@ -235,11 +225,11 @@ void ParallelCoordinatesPlugin::calculateMinMaxPerDim()
     });
 
     float valRange = 0;
-    int minIndex = 0;
-    int maxIndex = 0;
+    uint32_t minIndex = 0;
+    uint32_t maxIndex = 0;
     // for each dimension iterate over all values
     // remember data stucture (point1 d0, point1 d1,... point1 dn, point2 d0, point2 d1, ...)
-    for (unsigned int dimCount = 0; dimCount < _numDims; dimCount++) {
+    for (uint32_t dimCount = 0; dimCount < _numDims; dimCount++) {
         // init min and max
         minIndex = 2 * dimCount;
         maxIndex = 2 * dimCount + 1;
@@ -248,7 +238,7 @@ void ParallelCoordinatesPlugin::calculateMinMaxPerDim()
         _minMaxPerDim[minIndex] = currentVal;
         _minMaxPerDim[maxIndex] = currentVal;
 
-        for (unsigned int pointCount = 0; pointCount < _numPoints; pointCount++) {
+        for (uint32_t pointCount = 0; pointCount < _numPoints; pointCount++) {
             currentVal = attribute_data[pointCount * _numDims + dimCount];
             // min
             if (currentVal < _minMaxPerDim[minIndex])
@@ -270,18 +260,18 @@ void ParallelCoordinatesPlugin::calculateMinMaxClampPerDim()
     _minMaxClampPerDim.resize(2 * _numDims);
 
     float valRange = 0;
-    int minIndex = 0;
-    int maxIndex = 0;
+    uint32_t minIndex = 0;
+    uint32_t maxIndex = 0;
 
-    for (unsigned int dimCount = 0; dimCount < _numDims; dimCount++) {
+    for (uint32_t dimCount = 0; dimCount < _numDims; dimCount++) {
         // init min and max
         minIndex = 2 * dimCount;
         maxIndex = 2 * dimCount + 1;
 
         // set clamp values wrt to min and max in each dim and the user specified percentages
         valRange = _minMaxPerDim[maxIndex] - _minMaxPerDim[minIndex];
-        _minMaxClampPerDim[minIndex] = _minMaxPerDim[minIndex] + (float)_minClampPercent / 100.0 * valRange;
-        _minMaxClampPerDim[maxIndex] = _minMaxPerDim[maxIndex] - (1 - ((float)_maxClampPercent / 100.0)) * valRange;
+        _minMaxClampPerDim[minIndex] = _minMaxPerDim[minIndex] + static_cast<float>(_minClampPercent) / 100.0f * valRange;
+        _minMaxClampPerDim[maxIndex] = _minMaxPerDim[maxIndex] - (1 - (static_cast<float>(_maxClampPercent) / 100.0f)) * valRange;
     }
 }
 
@@ -308,7 +298,7 @@ void ParallelCoordinatesPlugin::passDataToJS(const std::vector<unsigned int>& po
         {
             dimension.clear();
             dimension["__pointID"] = pointId;
-            for (unsigned int dimId = 0; dimId < _numDims; dimId++)
+            for (uint32_t dimId = 0; dimId < _numDims; dimId++)
             {
                 if (_selectedDimensions[dimId] == false)
                     continue;
@@ -342,8 +332,8 @@ void ParallelCoordinatesPlugin::applyClamping() {
     }
 
     // Adjust clamping
-    minDimClampChanged(newMinClamp);
-    maxDimClampChanged(newMaxClamp);
+    _minClampPercent = newMinClamp;
+    _maxClampPercent = newMaxClamp;
     calculateMinMaxClampPerDim();
 
     // parse data to JS in a different thread as to not block the UI

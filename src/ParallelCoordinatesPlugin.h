@@ -65,15 +65,11 @@ private:
     void updateWindowTitle();
 
     void calculateMinMaxPerDim();
-
+    void calculateMinMaxClampPerDim();
 
 public slots:
     // sets window title and calls passDataToJS in another thread
     void onDataInput();
-
-    void minDimClampChanged(int min);
-    void maxDimClampChanged(int max);
-    void calculateMinMaxClampPerDim();
 
 signals:
     void dataSetChanged();
@@ -84,9 +80,9 @@ private:
 
     QStringList                 _dimNames;
     std::vector<bool>           _selectedDimensions;
-    int32_t                     _numDims;
-    int32_t                     _numSelectedDims;
-    int32_t                     _numPoints;
+    uint32_t                    _numDims;
+    uint32_t                    _numSelectedDims;
+    uint32_t                    _numPoints;
 
     std::vector<float>          _minMaxPerDim;         // [min_Ch0, max_Ch0, min_Ch1, max_Ch1, ...]
     std::vector<float>          _minMaxClampPerDim;    // [min_Ch0, max_Ch0, min_Ch1, max_Ch1, ...]
