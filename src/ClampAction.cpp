@@ -1,13 +1,11 @@
 #include "ClampAction.h"
 #include "ParallelCoordinatesSettings.h"
-#include "ParallelCoordinatesPlugin.h"
 
 #include <Application.h>
 
 #include <QDebug>
 #include <QLabel>
-#include <QComboBox>
-#include <QGroupBox>
+#include <QVBoxLayout>
 
 using namespace hdps;
 using namespace hdps::gui;

@@ -58,14 +58,15 @@ private:
     // Parses data to JSON and passes it to the web widget
     void passDataToJS(const std::vector<unsigned int>& pointIDsGlobal);
 
-    // informs the core about a selection 
-    void publishSelection(const std::vector<unsigned int>& selectedIDs);
-
     /** Updates the window title (includes the name of the loaded dataset) */
     void updateWindowTitle();
 
     void calculateMinMaxPerDim();
     void calculateMinMaxClampPerDim();
+
+protected:
+    // informs the core about a selection 
+    void publishSelection(const std::vector<unsigned int>& selectedIDs);
 
 public slots:
     // sets window title and calls passDataToJS in another thread
@@ -93,6 +94,7 @@ private:
     PCPSettings*                _settingsWidget;
     hdps::gui::DropWidget*      _dropWidget;
 
+    friend                      PCPWidget;
 };
 
 

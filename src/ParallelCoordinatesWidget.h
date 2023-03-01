@@ -2,11 +2,8 @@
 
 #include "widgets/WebWidget.h"
 
-#include <QWidget>
 #include <QVariantList>
-#include <QJsonValue>
 
-class QResizeEvent;
 class PCPWidget;
 class ParallelCoordinatesPlugin;
 
@@ -27,26 +24,15 @@ signals:
     void qt_enableBrushHighlight();
     void qt_disableBrushHighlight();
 
-    // to make sure that the web view is loaded: js->notifyBridgeAvailable triggers PCPWidget::initWebPage emits qt_triggerDataRequest which in turn lets the js side call askForDataFromQt back here 
-    void qt_triggerDataRequest();
-
-    // Signal to Qt side
-    void newSelectionToQt(const std::vector<unsigned int>& selectionIDs);
-
-    // Signals from qt to qt
-    void askForDataFromQt();
+    // Signals Qt internal
+    void newSelectionInPCP(const std::vector<unsigned int>& selectionIDs);
 
 public slots:
     // Invoked from JS side //
     void js_passSelectionToQt(QVariantList data);
 
-    // to make sure that the web view is loaded: js->notifyBridgeAvailable triggers PCPWidget::initWebPage emits qt_triggerDataRequest which in turn lets the js side call askForDataFromQt back here 
-    void js_askForDataFromQt();
-
-    // invoked from Qt side //
-
     // converts vector to array string and emits qt_setSelectionInJS
-    void newSelectionToJS(const std::vector<unsigned int>& selectionIDs);
+    void newSelectionToJS(const std::vector<unsigned int>& selectionIDs); 
 
 private:
     std::vector<unsigned int> _selectedIDsFromjs;
@@ -69,12 +55,6 @@ public:
 
     void enableBrushHighlight();
     void disableBrushHighlight();
-
-protected:
-    void resizeEvent(QResizeEvent * e) override;
-
-signals:
-    void newSelectionToQt(const std::vector<unsigned int>& selectionIDs);
 
 private slots:
     /** Is invoked when the js side calls js_available of the WebCommunicationObject (ParlCoorCommunicationObject) 

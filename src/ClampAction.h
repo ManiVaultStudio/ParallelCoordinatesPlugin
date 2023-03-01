@@ -12,7 +12,7 @@ class ClampAction : public WidgetAction
 {
 protected:
 
-    class Widget : public hdps::gui::WidgetActionWidget {
+    class Widget : public WidgetActionWidget {
     public:
         Widget(QWidget* parent, ClampAction* ClampAction);
     };
