@@ -19,7 +19,7 @@
 #include <QtConcurrent> 
 
 #include <numeric>      // iota, accumulate
-#include <algorithm>    // std::equal, clamp
+#include <algorithm>    // std::equal, clamp, count_if
 
 Q_PLUGIN_METADATA(IID "nl.tudelft.ParallelCoordinatesPlugin")
 
@@ -200,12 +200,12 @@ void ParallelCoordinatesPlugin::onDataInput()
     // init the clamping valies
     calculateMinMaxClampPerDim();
 
-    //auto& dimensionSelectionWidget = _settingsWidget->getDimensionSelectionAction();
-
-    //dimensionSelectionWidget.setNumPoints(_numPoints);
-    //dimensionSelectionWidget.setDimensionNames(_dimNames);
-    //dimensionSelectionWidget.setNumDims(_dimNames.length());
-    //dimensionSelectionWidget.setNumItems(_numPoints * _dimNames.length());
+    // setup dimensio selection widget
+    auto& dimensionSelectionWidget = _settingsWidget->getDimensionSelectionAction();
+    dimensionSelectionWidget.getDimensionsPickerAction().setPointsDataset(_currentDataSet);
+    dimensionSelectionWidget.setNumPoints(_numPoints);
+    dimensionSelectionWidget.setNumDims(_numSelectedDims);
+    dimensionSelectionWidget.setNumItems(_numPoints * _numSelectedDims);
 
     // parse data to JS in a different thread as to not block the UI
     QFuture<void> fvoid = QtConcurrent::run(&ParallelCoordinatesPlugin::passDataToJS, this, _pointIDsGlobal);
@@ -351,31 +351,35 @@ void ParallelCoordinatesPlugin::applyClamping() {
 }
 
 void ParallelCoordinatesPlugin::applyDimensionSelection() {
-//
-//    // current settings
-//    std::vector<bool> newDimSelection = _settingsWidget->getDimensionSelectionAction().getSelectedDimensions();
-//    unsigned int newNumSelectedDims = std::accumulate(newDimSelection.begin(), newDimSelection.end(), (unsigned int)(0));
-//
-//    // check if new dim selection is any different from the current one
-//    if (std::equal(_selectedDimensions.begin(), _selectedDimensions.end(), newDimSelection.begin()))
-//    {
-//        qDebug() << "ParallelCoordinatesPlugin: Same dimension selection";
-//        return;
-//
-//    }
-//    // don't show less than two dimensions
-//    if (newNumSelectedDims < 2)
-//    {
-//        qDebug() << "ParallelCoordinatesPlugin: Select at least 2 dimensions";
-//        return;
-//    }
-//
-//    _selectedDimensions = newDimSelection;
-//    _numSelectedDims = newNumSelectedDims;
-//
-//    // parse data to JS in a different thread as to not block the UI
-//    QFuture<void> fvoid = QtConcurrent::run(&ParallelCoordinatesPlugin::passDataToJS, this, _pointIDsGlobal);
-//
+
+    auto& dimensionSelectionWidget = _settingsWidget->getDimensionSelectionAction();
+    std::vector<bool> newDimSelection = dimensionSelectionWidget.getDimensionsPickerAction().getEnabledDimensions();
+    const auto newNumSelectedDims = std::count_if(newDimSelection.begin(), newDimSelection.end(), [](bool b) { return b; });
+
+    // check if new dim selection is any different from the current one
+    if (std::equal(_selectedDimensions.begin(), _selectedDimensions.end(), newDimSelection.begin()))
+    {
+        qDebug() << "ParallelCoordinatesPlugin: Same dimension selection";
+        return;
+
+    }
+    // don't show less than two dimensions
+    if (newNumSelectedDims < 2)
+    {
+        qDebug() << "ParallelCoordinatesPlugin: Select at least 2 dimensions";
+        return;
+    }
+
+    _selectedDimensions = newDimSelection;
+    _numSelectedDims = newNumSelectedDims;
+
+    // update info
+    dimensionSelectionWidget.setNumDims(_numSelectedDims);
+    dimensionSelectionWidget.setNumItems(_numPoints * _numSelectedDims);
+
+    // parse data to JS in a different thread as to not block the UI
+    QFuture<void> fvoid = QtConcurrent::run(&ParallelCoordinatesPlugin::passDataToJS, this, _pointIDsGlobal);
+
 }
 
 void ParallelCoordinatesPlugin::publishSelection(const std::vector<unsigned int>& selectedIDs)

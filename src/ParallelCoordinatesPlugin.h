@@ -79,23 +79,23 @@ signals:
     void dataSetChanged();
 
 private:
-    hdps::Dataset<Points> _currentDataSet;
-    std::vector<unsigned int> _pointIDsGlobal;
+    hdps::Dataset<Points>       _currentDataSet;
+    std::vector<unsigned int>   _pointIDsGlobal;
 
-    QStringList _dimNames;
-    std::vector<bool> _selectedDimensions;
-    int32_t _numDims;
-    int32_t _numSelectedDims;
-    int32_t _numPoints;
+    QStringList                 _dimNames;
+    std::vector<bool>           _selectedDimensions;
+    int32_t                     _numDims;
+    int32_t                     _numSelectedDims;
+    int32_t                     _numPoints;
 
-    std::vector<float> _minMaxPerDim;         // [min_Ch0, max_Ch0, min_Ch1, max_Ch1, ...]
-    std::vector<float> _minMaxClampPerDim;    // [min_Ch0, max_Ch0, min_Ch1, max_Ch1, ...]
-    int32_t _minClampPercent;
-    int32_t _maxClampPercent;
+    std::vector<float>          _minMaxPerDim;         // [min_Ch0, max_Ch0, min_Ch1, max_Ch1, ...]
+    std::vector<float>          _minMaxClampPerDim;    // [min_Ch0, max_Ch0, min_Ch1, max_Ch1, ...]
+    int32_t                     _minClampPercent;
+    int32_t                     _maxClampPercent;
 
     PCPWidget*                  _pcpWidget;
-    PCPSettings* _settingsWidget;
-    hdps::gui::DropWidget*       _dropWidget;
+    PCPSettings*                _settingsWidget;
+    hdps::gui::DropWidget*      _dropWidget;
 
 };
 

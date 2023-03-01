@@ -3,7 +3,7 @@
 #include <actions/WidgetAction.h>
 
 #include "ClampAction.h"
-//#include "DimensionSelectionAction.h"
+#include "DimensionSelectionAction.h"
 
 using namespace hdps;
 
@@ -37,10 +37,10 @@ public slots:
 public: // Action getters
 
     ClampAction& getClampAction() { return _clampAction; }
-//    DimensionSelectionAction& getDimensionSelectionAction() { return _dimensionSelectionAction; }
+    DimensionSelectionAction& getDimensionSelectionAction() { return _dimensionSelectionAction; }
 
 private:
     ParallelCoordinatesPlugin&  _pcpPlugin;
     ClampAction                 _clampAction;
-//    DimensionSelectionAction    _dimensionSelectionAction;
+    DimensionSelectionAction    _dimensionSelectionAction;
 };

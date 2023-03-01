@@ -10,8 +10,8 @@ using namespace hdps::gui;
 PCPSettings::PCPSettings(ParallelCoordinatesPlugin& parallelCoordinatesPlugin) :
     WidgetAction(&parallelCoordinatesPlugin),
     _pcpPlugin(parallelCoordinatesPlugin),
-    _clampAction(*this)
-    //    _dimensionSelectionAction(*this)
+    _clampAction(*this),
+    _dimensionSelectionAction(*this)
 {
 
 }
@@ -40,6 +40,6 @@ PCPSettings::Widget::Widget(QWidget* parent, PCPSettings* settingsAction) :
     layout->setSpacing(3);
 
     layout->addWidget(settingsAction->getClampAction().createCollapsedWidget(this));
-//    layout->addWidget(settingsAction->getDimensionSelectionAction().createCollapsedWidget(this));
+    layout->addWidget(settingsAction->getDimensionSelectionAction().createCollapsedWidget(this));
     layout->addStretch(1);
 }
