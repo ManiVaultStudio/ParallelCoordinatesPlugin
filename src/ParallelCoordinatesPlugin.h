@@ -3,7 +3,6 @@
 #include <ViewPlugin.h>
  
 #include <vector>
-#include <memory>
 
 #include <QString>
 #include <QStringList>
@@ -12,14 +11,20 @@ using namespace hdps::plugin;
 using namespace hdps::util;
 using namespace hdps::gui;
 
+namespace hdps {
+    namespace gui {
+        class DropWidget;
+    }
+}
+
 // =============================================================================
 // View
 // =============================================================================
 
 class Points;
 
-class ParlCoorSettings;
-class ParlCoorWidget;
+class PCPSettings;
+class PCPWidget;
 
 class ParallelCoordinatesPlugin : public ViewPlugin
 {
@@ -35,9 +40,7 @@ public:
      * Load one (or more datasets in the view)
      * @param datasets Dataset(s) to load
      */
-    void loadData(const QVector<hdps::Dataset<hdps::DatasetImpl>>& datasets) override;
-
-    void setData(QString newDatasetGuid);
+    void loadData(const hdps::Datasets& datasets) override;
 
     /**
      * Callback which is invoked when &Dataset<Points>::dataSelectionChanged is emitted
@@ -48,56 +51,47 @@ public:
     QString getCurrentDataSetName() const;
     QString getCurrentDataSetGuid() const;
 
+    void applyClamping();
+    void applyDimensionSelection();
+
 private:
     // Parses data to JSON and passes it to the web widget
     void passDataToJS(const std::vector<unsigned int>& pointIDsGlobal);
 
     // informs the core about a selection 
-    void publishSelection(std::vector<unsigned int> selectedIDs);
-
-    // Sets the html page in the main viewer widger
-    void initMainView();
+    void publishSelection(const std::vector<unsigned int>& selectedIDs);
 
     /** Updates the window title (includes the name of the loaded dataset) */
     void updateWindowTitle();
 
     void calculateMinMaxPerDim();
-
+    void calculateMinMaxClampPerDim();
 
 public slots:
     // sets window title and calls passDataToJS in another thread
     void onDataInput();
 
-    // update selected dimensions
-    void onApplySettings();
-
-    // calls initMainView
-    void onRefreshMainView();
-
-    void minDimClampChanged(int min);
-    void maxDimClampChanged(int max);
-    void calculateMinMaxClampPerDim();
-
 signals:
     void dataSetChanged();
 
 private:
-    hdps::Dataset<Points> _currentDataSet;
-    std::vector<unsigned int> _pointIDsGlobal;
+    hdps::Dataset<Points>       _currentDataSet;
+    std::vector<unsigned int>   _pointIDsGlobal;
 
-    QStringList _dimNames;
-    std::vector<bool> _selectedDimensions;
-    unsigned int _numDims;
-    unsigned int _numSelectedDims;
-    unsigned int _numPoints;
+    QStringList                 _dimNames;
+    std::vector<bool>           _selectedDimensions;
+    uint32_t                    _numDims;
+    uint32_t                    _numSelectedDims;
+    uint32_t                    _numPoints;
 
-    std::vector<float> _minMaxPerDim;    // [min_Ch0, max_Ch0, min_Ch1, max_Ch1, ...]
-    std::vector<float> _minMaxClampPerDim;    // [min_Ch0, max_Ch0, min_Ch1, max_Ch1, ...]
-    int _minClampPercent;
-    int _maxClampPercent;
+    std::vector<float>          _minMaxPerDim;         // [min_Ch0, max_Ch0, min_Ch1, max_Ch1, ...]
+    std::vector<float>          _minMaxClampPerDim;    // [min_Ch0, max_Ch0, min_Ch1, max_Ch1, ...]
+    int32_t                     _minClampPercent;
+    int32_t                     _maxClampPercent;
 
-    std::shared_ptr<ParlCoorWidget> _parCoordWidget;
-    std::shared_ptr<ParlCoorSettings> _settingsWidget;
+    PCPWidget*                  _pcpWidget;
+    PCPSettings*                _settingsWidget;
+    hdps::gui::DropWidget*      _dropWidget;
 
 };
 

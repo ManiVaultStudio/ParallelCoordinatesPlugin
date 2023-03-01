@@ -4,15 +4,14 @@ set(PCPLUGIN "ParallelCoordinatesPlugin")
 
 PROJECT(${PCPLUGIN})
 
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DWIN32 /EHsc /MP")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DWIN32 /EHsc /MP /permissive- /Zc:__cplusplus")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LTCG /NODEFAULTLIB:LIBCMT")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
 endif(MSVC)
@@ -21,26 +20,53 @@ endif(MSVC)
 file(TO_CMAKE_PATH $ENV{HDPS_INSTALL_DIR} INSTALL_DIR)
 find_package(Qt6 6.3.1 COMPONENTS Widgets WebEngineWidgets Concurrent REQUIRED)
 
+set(PLUGIN
+	src/ParallelCoordinatesPlugin.h
+	src/ParallelCoordinatesPlugin.cpp
+)
+
+set(ACTIONS
+	src/ParallelCoordinatesSettings.h
+	src/ParallelCoordinatesSettings.cpp
+	src/ClampAction.h
+	src/ClampAction.cpp
+	src/DimensionSelectionAction.h
+	src/DimensionSelectionAction.cpp
+)
+
+set(WIDGETS
+	src/ParallelCoordinatesWidget.h
+	src/ParallelCoordinatesWidget.cpp
+)
+
+set(WEB
+	res/parcoords/parcoords.html
+	res/parcoords/parcoords.tools.js
+	res/jslibs/d3.parcoords.css
+	res/jslibs/d3.parcoords.js
+	res/jslibs/d3.svg.multibrush.js
+	res/jslibs/d3.v3.min.js
+	res/jslibs/qwebchannel.js
+	res/jslibs/qwebchannel.tools.js
+	res/jslibs/styles.css
+)
+
+set(AUX
+	res/parcoords_resources.qrc
+	src/ParallelCoordinatesPlugin.json
+)
+
 qt6_add_resources(RESOURCE_FILES res/parcoords_resources.qrc)
 
-file(GLOB H src/*.h)
-file(GLOB CPP src/*.cpp)
-file(GLOB UIS src/*.ui)
-file(GLOB WEB res/jslibs/*.js res/jslibs/*.css res/parcoords/*.js res/parcoords/*.html)
-file(GLOB QRC src/*.qrc)
+set(SOURCES ${PLUGIN} ${ACTIONS} ${WIDGETS})
 
-set(SOURCES ${H} ${CPP})
-set(WEB ${WEB})
-set(AUX ${QRC})
-
-source_group(Plugin FILES ${SOURCES})
-source_group(UI FILES ${UIS})
+source_group(Plugin FILES ${PLUGIN})
+source_group(Actions FILES ${ACTIONS})
+source_group(Widget FILES ${WIDGETS})
 source_group(Web FILES ${WEB})
 source_group(Aux FILES ${AUX})
 
-QT6_WRAP_UI(UI_HEADERS ${UIS})
-
-add_library(${PCPLUGIN} SHARED ${SOURCES} ${UIS} ${WEB} ${AUX} ${WEB} ${RESOURCE_FILES})
+add_library(${PCPLUGIN} SHARED ${SOURCES} ${WEB} ${AUX} ${RESOURCE_FILES})
 
 target_include_directories(${PCPLUGIN} PRIVATE "${INSTALL_DIR}/$<CONFIGURATION>/include/")
 
@@ -50,6 +76,7 @@ target_compile_features(${PCPLUGIN} PRIVATE cxx_std_17)
 target_link_libraries(${PCPLUGIN} PRIVATE Qt6::Widgets)
 target_link_libraries(${PCPLUGIN} PRIVATE Qt6::WebEngineWidgets)
 target_link_libraries(${PCPLUGIN} PRIVATE Qt6::Concurrent)
+
 if(MSVC)
 	set(LIB_SUFFIX "${CMAKE_STATIC_LIBRARY_SUFFIX}")
 else()
@@ -60,9 +87,9 @@ target_link_libraries(${PCPLUGIN} PRIVATE "${INSTALL_DIR}/$<CONFIGURATION>/lib/$
 target_link_libraries(${PCPLUGIN} PRIVATE "${INSTALL_DIR}/$<CONFIGURATION>/lib/${CMAKE_SHARED_LIBRARY_PREFIX}PointData${LIB_SUFFIX}")
 
 install(TARGETS ${PCPLUGIN}
-   RUNTIME DESTINATION Plugins COMPONENT SHAREDLIB
-   LIBRARY DESTINATION lib COMPONENT LINKLIB
-   ARCHIVE DESTINATION lib COMPONENT LINKLIB
+	RUNTIME DESTINATION Plugins COMPONENT SHAREDLIB
+	LIBRARY DESTINATION lib COMPONENT LINKLIB
+	ARCHIVE DESTINATION lib COMPONENT LINKLIB
 )
 
 add_custom_command(TARGET ${PCPLUGIN} POST_BUILD

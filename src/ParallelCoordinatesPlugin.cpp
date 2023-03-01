@@ -8,6 +8,7 @@
 #include "PointData.h"
 
 #include <actions/PluginTriggerAction.h>
+#include <widgets/DropWidget.h>
 
 #include <QtCore>
 
@@ -18,7 +19,7 @@
 #include <QtConcurrent> 
 
 #include <numeric>      // iota, accumulate
-#include <algorithm>    // std::equal, clamp
+#include <algorithm>    // std::equal, clamp, count_if
 
 Q_PLUGIN_METADATA(IID "nl.tudelft.ParallelCoordinatesPlugin")
 
@@ -30,7 +31,7 @@ using namespace hdps::util;
 // =============================================================================
 
 ParallelCoordinatesPlugin::ParallelCoordinatesPlugin(const PluginFactory* factory) :
-    ViewPlugin(factory),  _currentDataSet(nullptr), _parCoordWidget(nullptr), _settingsWidget(nullptr),
+    ViewPlugin(factory),  _currentDataSet(nullptr), _pcpWidget(nullptr), _settingsWidget(nullptr), _dropWidget(nullptr),
     _minClampPercent(0), _maxClampPercent(100), _numDims(0), _numSelectedDims(0), _numPoints(0)
 { 
 }
@@ -41,21 +42,62 @@ ParallelCoordinatesPlugin::~ParallelCoordinatesPlugin()
 
 void ParallelCoordinatesPlugin::init()
 {
-    // General
+    getWidget().setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+
+    // set layout
     QVBoxLayout* layout = new QVBoxLayout();
+    
+    _settingsWidget = new PCPSettings(*this);
+    _pcpWidget      = new PCPWidget(this);
+    _dropWidget     = new DropWidget(_pcpWidget);
+
+    _pcpWidget->setPage(":parcoords/parcoords.html", "qrc:/parcoords/");     // set html contents of webpage
+
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
-    
+
+    layout->addWidget(_settingsWidget->createWidget(&getWidget()));
+    layout->addWidget(_pcpWidget, 1);
+
     getWidget().setLayout(layout);
 
-    // Main Widget view
-    _parCoordWidget = std::make_shared<ParlCoorWidget>(this);
-    initMainView();     // sets html page in _parCoordWidget
-    layout->addWidget(_parCoordWidget.get());
+    _dropWidget->setDropIndicatorWidget(new DropWidget::DropIndicatorWidget(&getWidget(), "No data loaded", "Drag an item from the data hierarchy and drop it here to visualize data..."));
 
-    // Plugin setting
-    _settingsWidget = std::make_shared<ParlCoorSettings>(this);
-    layout->addWidget(_settingsWidget.get());
+    _dropWidget->initialize([this](const QMimeData* mimeData) -> DropWidget::DropRegions {
+        DropWidget::DropRegions dropRegions;
+
+        // Gather information to generate appropriate drop regions
+        const auto mimeText = mimeData->text();
+        const auto tokens = mimeText.split("\n");
+
+        if (tokens.count() < 2)
+            return dropRegions;
+
+        const auto datasetName = tokens[0];
+        const auto datasetId = tokens[1];
+        const auto dataType = DataType(tokens[2]);
+        const auto dataTypes = DataTypes({ PointType });
+        const auto candidateDataset = _core->requestDataset(datasetId);
+
+        if (dataTypes.contains(dataType)) {
+
+            if (datasetId == getCurrentDataSetGuid()) {
+                dropRegions << new DropWidget::DropRegion(this, "Warning", "Data already loaded", "exclamation-circle", false);
+            }
+            else {
+                dropRegions << new DropWidget::DropRegion(this, "Points", QString("Visualize %1 as parallel coordinates").arg(datasetName), "map-marker-alt", true, [this, candidateDataset]() {
+                    loadData({ candidateDataset });
+                    _dropWidget->setShowDropIndicator(false);
+                    });
+
+            }
+        }
+        else {
+            dropRegions << new DropWidget::DropRegion(this, "Incompatible data", "This type of data is not supported", "exclamation-circle", false);
+        }
+
+        return dropRegions;
+        });
 
     // load data after drop action
     connect(this, &ParallelCoordinatesPlugin::dataSetChanged, this, &ParallelCoordinatesPlugin::onDataInput);
@@ -63,11 +105,8 @@ void ParallelCoordinatesPlugin::init()
     // update data when data set changed
     connect(&_currentDataSet, &Dataset<Points>::dataChanged, this, &ParallelCoordinatesPlugin::onDataInput);
 
-    // load data after right-click view 
-    connect(_parCoordWidget.get(), &ParlCoorWidget::webViewLoaded, this, &ParallelCoordinatesPlugin::onDataInput);
-
     // Pass selection from js to core
-    connect(_parCoordWidget.get(), &ParlCoorWidget::newSelectionToQt, this, &ParallelCoordinatesPlugin::publishSelection);
+    connect(_pcpWidget, &PCPWidget::newSelectionToQt, this, &ParallelCoordinatesPlugin::publishSelection);
 
     // Update the window title when the GUI name of the position dataset changes
     connect(&_currentDataSet, &Dataset<Points>::dataGuiNameChanged, this, &ParallelCoordinatesPlugin::updateWindowTitle);
@@ -78,7 +117,7 @@ void ParallelCoordinatesPlugin::init()
     updateWindowTitle();
 }
 
-void ParallelCoordinatesPlugin::loadData(const QVector<Dataset<DatasetImpl>>& datasets)
+void ParallelCoordinatesPlugin::loadData(const hdps::Datasets& datasets)
 {
     // Exit if there is nothing to load
     if (datasets.isEmpty())
@@ -86,13 +125,7 @@ void ParallelCoordinatesPlugin::loadData(const QVector<Dataset<DatasetImpl>>& da
 
     // Load the first dataset, changes to _currentDataSet are connected with onDataInput
     _currentDataSet = datasets.first();
-    _parCoordWidget->setDropWidgetShowDropIndicator(false);
-}
-
-
-void ParallelCoordinatesPlugin::setData(QString newDatasetGuid)
-{ 
-    _currentDataSet = _core->requestDataset<Points>(newDatasetGuid); 
+    _dropWidget->setShowDropIndicator(false);
     emit dataSetChanged();
 }
 
@@ -119,11 +152,8 @@ void ParallelCoordinatesPlugin::onDataSelectionChanged()
     const auto& selectionIndices = selectionSet->indices;
 
     // send them to js side
-    _parCoordWidget->passSelectionToJS(selectionIndices);
-    _parCoordWidget->disableBrushHighlight();
-
-    _settingsWidget->setNumSel(selectionSet->getNumPoints());
-
+    _pcpWidget->passSelectionToJS(selectionIndices);
+    _pcpWidget->disableBrushHighlight();
 }
 
 void ParallelCoordinatesPlugin::onDataInput()
@@ -170,33 +200,17 @@ void ParallelCoordinatesPlugin::onDataInput()
     // init the clamping valies
     calculateMinMaxClampPerDim();
 
-    _settingsWidget->setNumPoints(_numPoints);
-    _settingsWidget->setDimensionNames(_dimNames);
-    _settingsWidget->setNumDims(_dimNames.length());
-    _settingsWidget->setNumSel(0);
+    // setup dimensio selection widget
+    auto& dimensionSelectionWidget = _settingsWidget->getDimensionSelectionAction();
+    dimensionSelectionWidget.getDimensionsPickerAction().setPointsDataset(_currentDataSet);
+    dimensionSelectionWidget.setNumPoints(_numPoints);
+    dimensionSelectionWidget.setNumDims(_numSelectedDims);
+    dimensionSelectionWidget.setNumItems(_numPoints * _numSelectedDims);
 
     // parse data to JS in a different thread as to not block the UI
     QFuture<void> fvoid = QtConcurrent::run(&ParallelCoordinatesPlugin::passDataToJS, this, _pointIDsGlobal);
 
     updateWindowTitle();
-}
-
-void ParallelCoordinatesPlugin::initMainView() {
-    _parCoordWidget->setPage(":parcoords/parcoords.html", "qrc:/parcoords/");
-}
-
-void ParallelCoordinatesPlugin::onRefreshMainView() {
-    initMainView();
-}
-
-void ParallelCoordinatesPlugin::minDimClampChanged(int min)
-{
-    _minClampPercent = min;
-}
-
-void ParallelCoordinatesPlugin::maxDimClampChanged(int max)
-{
-    _maxClampPercent = max;
 }
 
 void ParallelCoordinatesPlugin::calculateMinMaxPerDim()
@@ -211,11 +225,11 @@ void ParallelCoordinatesPlugin::calculateMinMaxPerDim()
     });
 
     float valRange = 0;
-    int minIndex = 0;
-    int maxIndex = 0;
+    uint32_t minIndex = 0;
+    uint32_t maxIndex = 0;
     // for each dimension iterate over all values
     // remember data stucture (point1 d0, point1 d1,... point1 dn, point2 d0, point2 d1, ...)
-    for (unsigned int dimCount = 0; dimCount < _numDims; dimCount++) {
+    for (uint32_t dimCount = 0; dimCount < _numDims; dimCount++) {
         // init min and max
         minIndex = 2 * dimCount;
         maxIndex = 2 * dimCount + 1;
@@ -224,7 +238,7 @@ void ParallelCoordinatesPlugin::calculateMinMaxPerDim()
         _minMaxPerDim[minIndex] = currentVal;
         _minMaxPerDim[maxIndex] = currentVal;
 
-        for (unsigned int pointCount = 0; pointCount < _numPoints; pointCount++) {
+        for (uint32_t pointCount = 0; pointCount < _numPoints; pointCount++) {
             currentVal = attribute_data[pointCount * _numDims + dimCount];
             // min
             if (currentVal < _minMaxPerDim[minIndex])
@@ -246,18 +260,18 @@ void ParallelCoordinatesPlugin::calculateMinMaxClampPerDim()
     _minMaxClampPerDim.resize(2 * _numDims);
 
     float valRange = 0;
-    int minIndex = 0;
-    int maxIndex = 0;
+    uint32_t minIndex = 0;
+    uint32_t maxIndex = 0;
 
-    for (unsigned int dimCount = 0; dimCount < _numDims; dimCount++) {
+    for (uint32_t dimCount = 0; dimCount < _numDims; dimCount++) {
         // init min and max
         minIndex = 2 * dimCount;
         maxIndex = 2 * dimCount + 1;
 
         // set clamp values wrt to min and max in each dim and the user specified percentages
         valRange = _minMaxPerDim[maxIndex] - _minMaxPerDim[minIndex];
-        _minMaxClampPerDim[minIndex] = _minMaxPerDim[minIndex] + (float)_minClampPercent / 100.0 * valRange;
-        _minMaxClampPerDim[maxIndex] = _minMaxPerDim[maxIndex] - (1 - ((float)_maxClampPercent / 100.0)) * valRange;
+        _minMaxClampPerDim[minIndex] = _minMaxPerDim[minIndex] + static_cast<float>(_minClampPercent) / 100.0f * valRange;
+        _minMaxClampPerDim[maxIndex] = _minMaxPerDim[maxIndex] - (1 - (static_cast<float>(_maxClampPercent) / 100.0f)) * valRange;
     }
 }
 
@@ -265,7 +279,7 @@ void ParallelCoordinatesPlugin::passDataToJS(const std::vector<unsigned int>& po
 {
     // Qt has an internal maximum size for JSON files
     // For now, set an arbitrary, lower limit for points to display
-    // If you want to instepct more then 7 million elements - don't use parallel coordinates
+    // If you want to instepct more then 7 million elements - don't use this parallel coordinates plugin
     if (_numSelectedDims * _numPoints > 7000000)
     {
         qDebug() << "ParallelCoordinatesPlugin: Data set too large - select fewer dimensions";
@@ -284,7 +298,7 @@ void ParallelCoordinatesPlugin::passDataToJS(const std::vector<unsigned int>& po
         {
             dimension.clear();
             dimension["__pointID"] = pointId;
-            for (unsigned int dimId = 0; dimId < _numDims; dimId++)
+            for (uint32_t dimId = 0; dimId < _numDims; dimId++)
             {
                 if (_selectedDimensions[dimId] == false)
                     continue;
@@ -302,64 +316,65 @@ void ParallelCoordinatesPlugin::passDataToJS(const std::vector<unsigned int>& po
         }
     });
 
-    _parCoordWidget->passDataToJS(payload);
+    _pcpWidget->passDataToJS(payload);
 }
 
-void ParallelCoordinatesPlugin::onApplySettings() {
-    bool settingChanged = true;
+void ParallelCoordinatesPlugin::applyClamping() {
 
-    // current settings
-    std::vector<bool> newDimSelection = _settingsWidget->getSelectedDimensions();
-    unsigned int newNumSelectedDims = std::accumulate(newDimSelection.begin(), newDimSelection.end(), (unsigned int)(0));
+    int32_t newMinClamp = _settingsWidget->getClampAction().getMinClamp();
+    int32_t newMaxClamp = _settingsWidget->getClampAction().getMaxClamp();
 
-    int newMinClamp = _settingsWidget->getMinClamp();
-    int newMaxClamp = _settingsWidget->getMaxClamp();
+    // min and max clamp are the same
+    if ((newMinClamp == _minClampPercent) && (newMaxClamp == _maxClampPercent))
+    {
+        qDebug() << "ParallelCoordinatesPlugin: Same clamping values";
+        return;
+    }
 
-    // compare to saved settings
+    // Adjust clamping
+    _minClampPercent = newMinClamp;
+    _maxClampPercent = newMaxClamp;
+    calculateMinMaxClampPerDim();
+
+    // parse data to JS in a different thread as to not block the UI
+    QFuture<void> fvoid = QtConcurrent::run(&ParallelCoordinatesPlugin::passDataToJS, this, _pointIDsGlobal);
+}
+
+void ParallelCoordinatesPlugin::applyDimensionSelection() {
+
+    auto& dimensionSelectionWidget = _settingsWidget->getDimensionSelectionAction();
+    std::vector<bool> newDimSelection = dimensionSelectionWidget.getDimensionsPickerAction().getEnabledDimensions();
+    const auto newNumSelectedDims = std::count_if(newDimSelection.begin(), newDimSelection.end(), [](bool b) { return b; });
 
     // check if new dim selection is any different from the current one
     if (std::equal(_selectedDimensions.begin(), _selectedDimensions.end(), newDimSelection.begin()))
     {
         qDebug() << "ParallelCoordinatesPlugin: Same dimension selection";
-        settingChanged = false;
+        return;
+
     }
     // don't show less than two dimensions
     if (newNumSelectedDims < 2)
     {
         qDebug() << "ParallelCoordinatesPlugin: Select at least 2 dimensions";
-        settingChanged = false;
-    }
-
-    // min and max clamp are the same
-    if ((newMinClamp == _minClampPercent) && (newMaxClamp == _maxClampPercent) && !settingChanged)
-    {
-        qDebug() << "ParallelCoordinatesPlugin: Same clamping values";
-        settingChanged = false;
-    }
-    else
-    {
-        settingChanged = true;
-
-        // Adjust clamping
-        minDimClampChanged(newMinClamp);
-        maxDimClampChanged(newMaxClamp);
-        calculateMinMaxClampPerDim();
-    }
-
-    if (!settingChanged)
         return;
+    }
 
     _selectedDimensions = newDimSelection;
     _numSelectedDims = newNumSelectedDims;
+
+    // update info
+    dimensionSelectionWidget.setNumDims(_numSelectedDims);
+    dimensionSelectionWidget.setNumItems(_numPoints * _numSelectedDims);
 
     // parse data to JS in a different thread as to not block the UI
     QFuture<void> fvoid = QtConcurrent::run(&ParallelCoordinatesPlugin::passDataToJS, this, _pointIDsGlobal);
 
 }
 
-void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selectedIDs)
+void ParallelCoordinatesPlugin::publishSelection(const std::vector<unsigned int>& selectedIDs)
 {
-    _parCoordWidget->enableBrushHighlight();
+    _pcpWidget->enableBrushHighlight();
 
     // ask core for the selection set for the current data set
     auto selectionSet      = _currentDataSet->getSelection<Points>();
@@ -368,14 +383,14 @@ void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selec
     // no need to update the selection when nothing is updated
     if ((selectedIDs.size() == 0) & (selectionIndices.size() == 0))
     {
-        _parCoordWidget->disableBrushHighlight();   // this makes sure that the brush indicator will be removed when selection from other plugins come in
+        _pcpWidget->disableBrushHighlight();   // this makes sure that the brush indicator will be removed when selection from other plugins come in
         return;
     }
 
     // clear the selection and add the new points
     selectionIndices.clear();
     selectionIndices.reserve(_numPoints);
-    for (auto id : selectedIDs) {
+    for (const auto id : selectedIDs) {
         selectionIndices.push_back(id);
     }
 
@@ -384,9 +399,6 @@ void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selec
         events().notifyDatasetSelectionChanged(_currentDataSet->getSourceDataset<DatasetImpl>());
     else
         events().notifyDatasetSelectionChanged(_currentDataSet);
-
-    //
-    _settingsWidget->setNumSel(selectedIDs.size());
 
 }
 
@@ -399,15 +411,14 @@ void ParallelCoordinatesPlugin::updateWindowTitle()
 }
 
 
+// =============================================================================
+// Plugin Factory 
+// =============================================================================
+
 QIcon ParallelCoordinatesPluginFactory::getIcon(const QColor& color /*= Qt::black*/) const
 {
     return hdps::Application::getIconFont("FontAwesome").getIcon("chart-bar", color);
 }
-
-// =============================================================================
-// Factory DOES NOT NEED TO BE ALTERED
-// Merely responsible for generating new plugins when requested
-// =============================================================================
 
 ViewPlugin* ParallelCoordinatesPluginFactory::produce()
 {
@@ -417,10 +428,7 @@ ViewPlugin* ParallelCoordinatesPluginFactory::produce()
 hdps::DataTypes ParallelCoordinatesPluginFactory::supportedDataTypes() const
 {
     DataTypes supportedTypes;
-
-    // This example analysis plugin is compatible with points datasets
     supportedTypes.append(PointType);
-
     return supportedTypes;
 }
 
