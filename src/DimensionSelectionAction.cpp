@@ -8,7 +8,7 @@
 #include <QFileDialog>
 
 
-DimensionSelectionAction::DimensionSelectionAction(ParallelCoordinatesSettings& parallelCoordinatesSettings) :
+DimensionSelectionAction::DimensionSelectionAction(PCPSettings& parallelCoordinatesSettings) :
     WidgetAction(&parallelCoordinatesSettings),
     _parallelCoordinatesSettings(parallelCoordinatesSettings),
     _loadAction(this, "Load dimension selection"),
@@ -42,7 +42,7 @@ DimensionSelectionAction::DimensionSelectionAction(ParallelCoordinatesSettings& 
 
     // only show selected dimensions
     connect(&_loadAction, &TriggerAction::triggered, this, &DimensionSelectionAction::onLoadDims);
-    connect(&_applyAction, &TriggerAction::triggered, &_parallelCoordinatesSettings, &ParallelCoordinatesSettings::onApplyDimensionFiltering);
+    connect(&_applyAction, &TriggerAction::triggered, &_parallelCoordinatesSettings, &PCPSettings::onApplyDimensionFiltering);
 }
 
 void DimensionSelectionAction::setDimensionNames(QStringList dimNames) {

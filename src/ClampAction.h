@@ -6,7 +6,7 @@
 
 using namespace hdps::gui;
 
-class ParallelCoordinatesSettings;
+class PCPSettings;
 
 class ClampAction : public WidgetAction
 {
@@ -22,7 +22,7 @@ protected:
     };
 
 public:
-    ClampAction(ParallelCoordinatesSettings& ParallelCoordinatesSettings);
+    ClampAction(PCPSettings& PCPSettings);
 
     int32_t getMinClamp() { return _minClampAction.getValue(); };
     int32_t getMaxClamp() { return _maxClampAction.getValue(); };
@@ -38,7 +38,7 @@ public: // Action getters
     TriggerAction& getApplyAction() { return _applyAction; }
 
 protected:
-    ParallelCoordinatesSettings&     _parallelCoordinatesSettings;
+    PCPSettings&     _parallelCoordinatesSettings;
 
     IntegralAction     _minClampAction;
     IntegralAction     _maxClampAction;

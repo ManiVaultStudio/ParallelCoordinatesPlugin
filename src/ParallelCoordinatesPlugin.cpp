@@ -8,6 +8,7 @@
 #include "PointData.h"
 
 #include <actions/PluginTriggerAction.h>
+#include <widgets/DropWidget.h>
 
 #include <QtCore>
 
@@ -30,7 +31,7 @@ using namespace hdps::util;
 // =============================================================================
 
 ParallelCoordinatesPlugin::ParallelCoordinatesPlugin(const PluginFactory* factory) :
-    ViewPlugin(factory),  _currentDataSet(nullptr), _parCoordWidget(nullptr), _settingsWidget(nullptr),
+    ViewPlugin(factory),  _currentDataSet(nullptr), _pcpWidget(nullptr), _settingsWidget(nullptr), _dropWidget(nullptr),
     _minClampPercent(0), _maxClampPercent(100), _numDims(0), _numSelectedDims(0), _numPoints(0)
 { 
 }
@@ -46,18 +47,57 @@ void ParallelCoordinatesPlugin::init()
     // set layout
     QVBoxLayout* layout = new QVBoxLayout();
     
-    _settingsWidget = std::make_shared<ParallelCoordinatesSettings>(*this);
-    _parCoordWidget = std::make_shared<ParlCoorWidget>(this);
+    _settingsWidget = new PCPSettings(*this);
+    _pcpWidget      = new PCPWidget(this);
+    _dropWidget     = new DropWidget(_pcpWidget);
 
-    _parCoordWidget->setPage(":parcoords/parcoords.html", "qrc:/parcoords/");     // set html contents of webpage
+    _pcpWidget->setPage(":parcoords/parcoords.html", "qrc:/parcoords/");     // set html contents of webpage
 
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    layout->addWidget(_settingsWidget.get()->createWidget(&getWidget()));
-    layout->addWidget(_parCoordWidget.get(), 1);
+    layout->addWidget(_settingsWidget->createWidget(&getWidget()));
+    layout->addWidget(_pcpWidget, 1);
 
     getWidget().setLayout(layout);
+
+    _dropWidget->setDropIndicatorWidget(new DropWidget::DropIndicatorWidget(&getWidget(), "No data loaded", "Drag an item from the data hierarchy and drop it here to visualize data..."));
+
+    _dropWidget->initialize([this](const QMimeData* mimeData) -> DropWidget::DropRegions {
+        DropWidget::DropRegions dropRegions;
+
+        // Gather information to generate appropriate drop regions
+        const auto mimeText = mimeData->text();
+        const auto tokens = mimeText.split("\n");
+
+        if (tokens.count() < 2)
+            return dropRegions;
+
+        const auto datasetName = tokens[0];
+        const auto datasetId = tokens[1];
+        const auto dataType = DataType(tokens[2]);
+        const auto dataTypes = DataTypes({ PointType });
+        const auto candidateDataset = _core->requestDataset(datasetId);
+
+        if (dataTypes.contains(dataType)) {
+
+            if (datasetId == getCurrentDataSetGuid()) {
+                dropRegions << new DropWidget::DropRegion(this, "Warning", "Data already loaded", "exclamation-circle", false);
+            }
+            else {
+                dropRegions << new DropWidget::DropRegion(this, "Points", QString("Visualize %1 as parallel coordinates").arg(datasetName), "map-marker-alt", true, [this, candidateDataset]() {
+                    loadData({ candidateDataset });
+                    _dropWidget->setShowDropIndicator(false);
+                    });
+
+            }
+        }
+        else {
+            dropRegions << new DropWidget::DropRegion(this, "Incompatible data", "This type of data is not supported", "exclamation-circle", false);
+        }
+
+        return dropRegions;
+        });
 
     // load data after drop action
     connect(this, &ParallelCoordinatesPlugin::dataSetChanged, this, &ParallelCoordinatesPlugin::onDataInput);
@@ -65,11 +105,8 @@ void ParallelCoordinatesPlugin::init()
     // update data when data set changed
     connect(&_currentDataSet, &Dataset<Points>::dataChanged, this, &ParallelCoordinatesPlugin::onDataInput);
 
-    // load data after right-click view 
-    connect(_parCoordWidget.get(), &ParlCoorWidget::webViewLoaded, this, &ParallelCoordinatesPlugin::onDataInput);
-
     // Pass selection from js to core
-    connect(_parCoordWidget.get(), &ParlCoorWidget::newSelectionToQt, this, &ParallelCoordinatesPlugin::publishSelection);
+    connect(_pcpWidget, &PCPWidget::newSelectionToQt, this, &ParallelCoordinatesPlugin::publishSelection);
 
     // Update the window title when the GUI name of the position dataset changes
     connect(&_currentDataSet, &Dataset<Points>::dataGuiNameChanged, this, &ParallelCoordinatesPlugin::updateWindowTitle);
@@ -80,7 +117,7 @@ void ParallelCoordinatesPlugin::init()
     updateWindowTitle();
 }
 
-void ParallelCoordinatesPlugin::loadData(const QVector<Dataset<DatasetImpl>>& datasets)
+void ParallelCoordinatesPlugin::loadData(const hdps::Datasets& datasets)
 {
     // Exit if there is nothing to load
     if (datasets.isEmpty())
@@ -88,13 +125,7 @@ void ParallelCoordinatesPlugin::loadData(const QVector<Dataset<DatasetImpl>>& da
 
     // Load the first dataset, changes to _currentDataSet are connected with onDataInput
     _currentDataSet = datasets.first();
-    _parCoordWidget->setDropWidgetShowDropIndicator(false);
-}
-
-
-void ParallelCoordinatesPlugin::setData(QString newDatasetGuid)
-{ 
-    _currentDataSet = _core->requestDataset<Points>(newDatasetGuid); 
+    _dropWidget->setShowDropIndicator(false);
     emit dataSetChanged();
 }
 
@@ -121,8 +152,8 @@ void ParallelCoordinatesPlugin::onDataSelectionChanged()
     const auto& selectionIndices = selectionSet->indices;
 
     // send them to js side
-    _parCoordWidget->passSelectionToJS(selectionIndices);
-    _parCoordWidget->disableBrushHighlight();
+    _pcpWidget->passSelectionToJS(selectionIndices);
+    _pcpWidget->disableBrushHighlight();
 }
 
 void ParallelCoordinatesPlugin::onDataInput()
@@ -295,7 +326,7 @@ void ParallelCoordinatesPlugin::passDataToJS(const std::vector<unsigned int>& po
         }
     });
 
-    _parCoordWidget->passDataToJS(payload);
+    _pcpWidget->passDataToJS(payload);
 }
 
 void ParallelCoordinatesPlugin::applyClamping() {
@@ -349,7 +380,7 @@ void ParallelCoordinatesPlugin::applyDimensionSelection() {
 
 void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selectedIDs)
 {
-    _parCoordWidget->enableBrushHighlight();
+    _pcpWidget->enableBrushHighlight();
 
     // ask core for the selection set for the current data set
     auto selectionSet      = _currentDataSet->getSelection<Points>();
@@ -358,7 +389,7 @@ void ParallelCoordinatesPlugin::publishSelection(std::vector<unsigned int> selec
     // no need to update the selection when nothing is updated
     if ((selectedIDs.size() == 0) & (selectionIndices.size() == 0))
     {
-        _parCoordWidget->disableBrushHighlight();   // this makes sure that the brush indicator will be removed when selection from other plugins come in
+        _pcpWidget->disableBrushHighlight();   // this makes sure that the brush indicator will be removed when selection from other plugins come in
         return;
     }
 

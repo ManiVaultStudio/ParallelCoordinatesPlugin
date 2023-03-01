@@ -7,14 +7,9 @@
 #include <QJsonValue>
 
 class QResizeEvent;
-class ParlCoorWidget;
+class PCPWidget;
 class ParallelCoordinatesPlugin;
 
-namespace hdps {
-    namespace gui {
-        class DropWidget;
-    }
-}
 // =============================================================================
 // ParlCoorCommunicationObject
 // =============================================================================
@@ -23,7 +18,7 @@ class ParlCoorCommunicationObject : public hdps::gui::WebCommunicationObject
 {
     Q_OBJECT
 public:
-    ParlCoorCommunicationObject(ParlCoorWidget* parent);
+    ParlCoorCommunicationObject(PCPWidget* parent);
 
 signals:
     // Signals to JS side
@@ -32,7 +27,7 @@ signals:
     void qt_enableBrushHighlight();
     void qt_disableBrushHighlight();
 
-    // to make sure that the web view is loaded: js->notifyBridgeAvailable triggers ParlCoorWidget::initWebPage emits qt_triggerDataRequest which in turn lets the js side call askForDataFromQt back here 
+    // to make sure that the web view is loaded: js->notifyBridgeAvailable triggers PCPWidget::initWebPage emits qt_triggerDataRequest which in turn lets the js side call askForDataFromQt back here 
     void qt_triggerDataRequest();
 
     // Signal to Qt side
@@ -45,7 +40,7 @@ public slots:
     // Invoked from JS side //
     void js_passSelectionToQt(QVariantList data);
 
-    // to make sure that the web view is loaded: js->notifyBridgeAvailable triggers ParlCoorWidget::initWebPage emits qt_triggerDataRequest which in turn lets the js side call askForDataFromQt back here 
+    // to make sure that the web view is loaded: js->notifyBridgeAvailable triggers PCPWidget::initWebPage emits qt_triggerDataRequest which in turn lets the js side call askForDataFromQt back here 
     void js_askForDataFromQt();
 
     // invoked from Qt side //
@@ -54,19 +49,19 @@ public slots:
     void newSelectionToJS(const std::vector<unsigned int>& selectionIDs);
 
 private:
-    ParlCoorWidget* _parent;
+    PCPWidget* _parent;
 };
 
 
 // =============================================================================
-// ParlCoorWidget
+// PCPWidget
 // =============================================================================
 
-class ParlCoorWidget : public hdps::gui::WebWidget
+class PCPWidget : public hdps::gui::WebWidget
 {
     Q_OBJECT
 public:
-    ParlCoorWidget(ParallelCoordinatesPlugin* parentPlugin);
+    PCPWidget(ParallelCoordinatesPlugin* parentPlugin);
 
     void passDataToJS(QVariantList);
     void passSelectionToJS(const std::vector<unsigned int>& selectionIDs);
@@ -74,14 +69,11 @@ public:
     void enableBrushHighlight();
     void disableBrushHighlight();
 
-    void setDropWidgetShowDropIndicator(bool);
-
 protected:
     void resizeEvent(QResizeEvent * e) override;
 
 signals:
     void newSelectionToQt(std::vector<unsigned int> selectionIDs);
-    void webViewLoaded();
 
 private slots:
     /** Is invoked when the js side calls js_available of the WebCommunicationObject (ParlCoorCommunicationObject) 
@@ -91,6 +83,5 @@ private slots:
 private:
     ParlCoorCommunicationObject*    _communicationObject;
     ParallelCoordinatesPlugin*      _parentPlugin;
-    hdps::gui::DropWidget*          _dropWidget;
 
 };

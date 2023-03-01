@@ -7,7 +7,7 @@ using namespace hdps;
 using namespace hdps::gui;
 
 
-ParallelCoordinatesSettings::ParallelCoordinatesSettings(ParallelCoordinatesPlugin& parallelCoordinatesPlugin) :
+PCPSettings::PCPSettings(ParallelCoordinatesPlugin& parallelCoordinatesPlugin) :
     WidgetAction(&parallelCoordinatesPlugin),
     _parentPlugin(parallelCoordinatesPlugin),
     _clampAction(*this)
@@ -16,18 +16,18 @@ ParallelCoordinatesSettings::ParallelCoordinatesSettings(ParallelCoordinatesPlug
 
 }
 
-void ParallelCoordinatesSettings::onApplyClamping()
+void PCPSettings::onApplyClamping()
 {
     _parentPlugin.applyClamping();
 }
 
-void ParallelCoordinatesSettings::onApplyDimensionFiltering()
+void PCPSettings::onApplyDimensionFiltering()
 {
     _parentPlugin.applyDimensionSelection();
 }
 
 
-ParallelCoordinatesSettings::Widget::Widget(QWidget* parent, ParallelCoordinatesSettings* settingsAction) :
+PCPSettings::Widget::Widget(QWidget* parent, PCPSettings* settingsAction) :
     WidgetActionWidget(parent, settingsAction, State::Standard)
 {
     setAutoFillBackground(true);

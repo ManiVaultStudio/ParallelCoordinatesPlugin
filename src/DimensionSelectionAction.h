@@ -15,7 +15,7 @@
 using namespace hdps;
 using namespace hdps::gui;
 
-class ParallelCoordinatesSettings;
+class PCPSettings;
 
 class DimensionSelectionAction : public WidgetAction
 {
@@ -34,7 +34,7 @@ protected:
     };
 
 public:
-    DimensionSelectionAction(ParallelCoordinatesSettings& ParallelCoordinatesSettings);
+    DimensionSelectionAction(PCPSettings& PCPSettings);
 
     void setDimensionNames(QStringList dimNames);
     QStringList getSelectedDimensionNames();
@@ -61,7 +61,7 @@ private:
     bool tryToEnableDimensionByName(QString name);
 
 protected:
-    ParallelCoordinatesSettings& _parallelCoordinatesSettings;
+    PCPSettings& _parallelCoordinatesSettings;
 
     // For ComboBoxOfCheckBoxes, see http://programmingexamples.net/wiki/Qt/ModelView/ComboBoxOfCheckBoxes
     QStandardItemModel          _comboBoxLineModel;

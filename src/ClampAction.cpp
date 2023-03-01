@@ -12,7 +12,7 @@
 using namespace hdps;
 using namespace hdps::gui;
 
-ClampAction::ClampAction(ParallelCoordinatesSettings& parallelCoordinatesSettings) :
+ClampAction::ClampAction(PCPSettings& parallelCoordinatesSettings) :
     WidgetAction(&parallelCoordinatesSettings),
     _parallelCoordinatesSettings(parallelCoordinatesSettings),
     _minClampAction(this, "Range Min. (%): ", 0, 100, 0, 0),
@@ -29,7 +29,7 @@ ClampAction::ClampAction(ParallelCoordinatesSettings& parallelCoordinatesSetting
     connect(&_minClampAction, &IntegralAction::valueChanged, this, &ClampAction::adjustMaxClamp);
     connect(&_maxClampAction, &IntegralAction::valueChanged, this, &ClampAction::adjustMinClamp);
 
-    connect(&_applyAction, &TriggerAction::triggered, &_parallelCoordinatesSettings, &ParallelCoordinatesSettings::onApplyClamping);
+    connect(&_applyAction, &TriggerAction::triggered, &_parallelCoordinatesSettings, &PCPSettings::onApplyClamping);
 
 }
 

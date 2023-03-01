@@ -9,21 +9,21 @@ using namespace hdps;
 
 class ParallelCoordinatesPlugin;
 
-class ParallelCoordinatesSettings : public WidgetAction
+class PCPSettings : public WidgetAction
 {
 protected:
 
     class Widget : public hdps::gui::WidgetActionWidget {
     public:
-        Widget(QWidget* parent, ParallelCoordinatesSettings* settingsAction);
+        Widget(QWidget* parent, PCPSettings* settingsAction);
     };
 
     QWidget* getWidget(QWidget* parent, const std::int32_t& widgetFlags) override {
-        return new ParallelCoordinatesSettings::Widget(parent, this);
+        return new PCPSettings::Widget(parent, this);
     };
 
 public:
-    ParallelCoordinatesSettings(ParallelCoordinatesPlugin& parallelCoordinatesPlugin);
+    PCPSettings(ParallelCoordinatesPlugin& parallelCoordinatesPlugin);
 
 
 private slots:

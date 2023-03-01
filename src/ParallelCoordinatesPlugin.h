@@ -3,7 +3,6 @@
 #include <ViewPlugin.h>
  
 #include <vector>
-#include <memory>
 
 #include <QString>
 #include <QStringList>
@@ -12,14 +11,20 @@ using namespace hdps::plugin;
 using namespace hdps::util;
 using namespace hdps::gui;
 
+namespace hdps {
+    namespace gui {
+        class DropWidget;
+    }
+}
+
 // =============================================================================
 // View
 // =============================================================================
 
 class Points;
 
-class ParallelCoordinatesSettings;
-class ParlCoorWidget;
+class PCPSettings;
+class PCPWidget;
 
 class ParallelCoordinatesPlugin : public ViewPlugin
 {
@@ -35,9 +40,7 @@ public:
      * Load one (or more datasets in the view)
      * @param datasets Dataset(s) to load
      */
-    void loadData(const QVector<hdps::Dataset<hdps::DatasetImpl>>& datasets) override;
-
-    void setData(QString newDatasetGuid);
+    void loadData(const hdps::Datasets& datasets) override;
 
     /**
      * Callback which is invoked when &Dataset<Points>::dataSelectionChanged is emitted
@@ -90,8 +93,9 @@ private:
     int32_t _minClampPercent;
     int32_t _maxClampPercent;
 
-    std::shared_ptr<ParlCoorWidget>              _parCoordWidget;
-    std::shared_ptr<ParallelCoordinatesSettings> _settingsWidget;
+    PCPWidget*                  _pcpWidget;
+    PCPSettings* _settingsWidget;
+    hdps::gui::DropWidget*       _dropWidget;
 
 };
 
