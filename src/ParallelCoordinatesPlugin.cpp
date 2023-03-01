@@ -105,13 +105,10 @@ void ParallelCoordinatesPlugin::init()
     // update data when data set changed
     connect(&_currentDataSet, &Dataset<Points>::dataChanged, this, &ParallelCoordinatesPlugin::onDataInput);
 
-    // Pass selection from js to core
-    connect(_pcpWidget, &PCPWidget::newSelectionToQt, this, &ParallelCoordinatesPlugin::publishSelection);
-
     // Update the window title when the GUI name of the position dataset changes
     connect(&_currentDataSet, &Dataset<Points>::dataGuiNameChanged, this, &ParallelCoordinatesPlugin::updateWindowTitle);
 
-    // Update the selection
+    // Update the selection (coming from core) in PCP
     connect(&_currentDataSet, &Dataset<Points>::dataSelectionChanged, this, &ParallelCoordinatesPlugin::onDataSelectionChanged);
 
     updateWindowTitle();

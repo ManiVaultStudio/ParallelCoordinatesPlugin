@@ -30,13 +30,8 @@ void ParlCoorCommunicationObject::js_passSelectionToQt(QVariantList data){
     _selectedIDsFromjs.clear();
     std::for_each(data.begin(), data.end(), [this](const auto &dat) {_selectedIDsFromjs.push_back(dat.toUInt()); });
     // hand selction to core
-    emit newSelectionToQt(_selectedIDsFromjs);
+    emit newSelectionInPCP(_selectedIDsFromjs);
 }
-
-void ParlCoorCommunicationObject::js_askForDataFromQt() {
-    emit askForDataFromQt();
-}
-    
 
 void ParlCoorCommunicationObject::newSelectionToJS(const std::vector<unsigned int>& selectionIDs) {
     QVariantList selection;
@@ -64,7 +59,7 @@ void ParlCoorCommunicationObject::newSelectionToJS(const std::vector<unsigned in
 PCPWidget::PCPWidget(ParallelCoordinatesPlugin* pcpPlugin):
     _pcpPlugin(pcpPlugin)
 {
-    setAcceptDrops(true);
+    setAcceptDrops(true);   // drag & drop handled in ParallelCoordinatesPlugin.cpp
 
     Q_INIT_RESOURCE(parcoords_resources);
     _communicationObject = new ParlCoorCommunicationObject();
@@ -72,13 +67,12 @@ PCPWidget::PCPWidget(ParallelCoordinatesPlugin* pcpPlugin):
 
     layout()->setContentsMargins(0, 0, 0, 0);
 
-    getView()->resize(size());
+    resizeEvent(nullptr);
 
-    // re-emit the signal from the communication objection to the main plugin class where the selection is made public to the core
-    connect(_communicationObject, &ParlCoorCommunicationObject::newSelectionToQt, this, &PCPWidget::newSelectionToQt);
-
-    // re-emit the signal from the communication objection to the main plugin class: ask for new data after web view is loaded
-    connect(_communicationObject, &ParlCoorCommunicationObject::askForDataFromQt, _pcpPlugin, &ParallelCoordinatesPlugin::onDataInput);
+    // selection is made public to the core
+    connect(_communicationObject, &ParlCoorCommunicationObject::newSelectionInPCP, this, [this](const std::vector<unsigned int>& selectionIDs) {
+        _pcpPlugin->publishSelection(selectionIDs);
+    });
 
 }
 
@@ -89,7 +83,9 @@ void PCPWidget::resizeEvent(QResizeEvent * e) {
 void PCPWidget::initWebPage()
 {
     qDebug() << "PCPWidget: WebChannel bridge is available.";
-    emit _communicationObject->qt_triggerDataRequest();
+    
+    // call to data load, used when plugin is opened via right-clicking data set
+    _pcpPlugin->onDataInput();
 }
 
 void PCPWidget::passDataToJS(QVariantList data)
