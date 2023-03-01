@@ -2,11 +2,8 @@
 
 #include "widgets/WebWidget.h"
 
-#include <QWidget>
 #include <QVariantList>
-#include <QJsonValue>
 
-class QResizeEvent;
 class PCPWidget;
 class ParallelCoordinatesPlugin;
 
@@ -58,9 +55,6 @@ public:
 
     void enableBrushHighlight();
     void disableBrushHighlight();
-
-protected:
-    void resizeEvent(QResizeEvent * e) override;
 
 private slots:
     /** Is invoked when the js side calls js_available of the WebCommunicationObject (ParlCoorCommunicationObject) 

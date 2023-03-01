@@ -3,14 +3,6 @@
 
 #include <PointData.h>
 
-#include <string>
-#include <algorithm>
-#include <vector>
-#include <iterator>
-
-#include <QMimeData>
-#include <QResizeEvent>
-#include <QWebEngineView>
 #include <QDebug>
 
 using namespace hdps;
@@ -67,17 +59,11 @@ PCPWidget::PCPWidget(ParallelCoordinatesPlugin* pcpPlugin):
 
     layout()->setContentsMargins(0, 0, 0, 0);
 
-    resizeEvent(nullptr);
-
     // selection is made public to the core
     connect(_communicationObject, &ParlCoorCommunicationObject::newSelectionInPCP, this, [this](const std::vector<unsigned int>& selectionIDs) {
         _pcpPlugin->publishSelection(selectionIDs);
     });
 
-}
-
-void PCPWidget::resizeEvent(QResizeEvent * e) {
-    getView()->resize(size());
 }
 
 void PCPWidget::initWebPage()
