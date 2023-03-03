@@ -9,7 +9,6 @@
         <file>jslibs/d3.parcoords.css</file>
         <file>jslibs/d3.svg.multibrush.js</file>
         <file>jslibs/styles.css</file>
-        <file>jslibs/qwebchannel.js</file>
         <file>jslibs/qwebchannel.tools.js</file>
    </qresource>
 </RCC>
