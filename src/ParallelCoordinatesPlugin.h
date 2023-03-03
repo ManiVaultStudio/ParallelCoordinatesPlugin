@@ -93,8 +93,6 @@ private:
     PCPWidget*                  _pcpWidget;
     PCPSettings*                _settingsWidget;
     hdps::gui::DropWidget*      _dropWidget;
-
-    friend                      PCPWidget;
 };
 
 
