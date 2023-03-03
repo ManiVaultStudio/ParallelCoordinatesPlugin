@@ -26,8 +26,8 @@ set(PLUGIN
 )
 
 set(ACTIONS
-	src/ParallelCoordinatesSettings.h
-	src/ParallelCoordinatesSettings.cpp
+	src/SettingsAction.h
+	src/SettingsAction.cpp
 	src/ClampAction.h
 	src/ClampAction.cpp
 	src/DimensionSelectionAction.h

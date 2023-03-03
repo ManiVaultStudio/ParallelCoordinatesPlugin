@@ -45,7 +45,7 @@ public: // Action getters
 
 
 protected:
-    PCPSettings& _parallelCoordinatesSettings;
+    PCPSettings&                _settingsAction;
 
     DimensionsPickerAction      _dimensionAction;
     TriggerAction               _applyAction;

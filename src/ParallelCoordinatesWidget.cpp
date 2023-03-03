@@ -58,12 +58,6 @@ PCPWidget::PCPWidget(ParallelCoordinatesPlugin* pcpPlugin):
     init(_communicationObject);
 
     layout()->setContentsMargins(0, 0, 0, 0);
-
-    // selection is made public to the core
-    connect(_communicationObject, &ParlCoorCommunicationObject::newSelectionInPCP, this, [this](const std::vector<unsigned int>& selectionIDs) {
-        _pcpPlugin->publishSelection(selectionIDs);
-    });
-
 }
 
 void PCPWidget::initWebPage()

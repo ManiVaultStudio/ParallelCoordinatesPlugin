@@ -1,6 +1,6 @@
 #include "ParallelCoordinatesPlugin.h"
 #include "ParallelCoordinatesWidget.h"
-#include "ParallelCoordinatesSettings.h"
+#include "SettingsAction.h"
 
 #include "DataHierarchyItem.h"
 #include "event/Event.h"
@@ -110,6 +110,9 @@ void ParallelCoordinatesPlugin::init()
 
     // Update the selection (coming from core) in PCP
     connect(&_currentDataSet, &Dataset<Points>::dataSelectionChanged, this, &ParallelCoordinatesPlugin::onDataSelectionChanged);
+
+    // Update the selection (coming from PCP) in core
+    connect(&_pcpWidget->getCommunicationObject(), &ParlCoorCommunicationObject::newSelectionInPCP, this, &ParallelCoordinatesPlugin::publishSelection);
 
     updateWindowTitle();
 }

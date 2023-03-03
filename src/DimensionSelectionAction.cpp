@@ -1,5 +1,5 @@
 #include "DimensionSelectionAction.h"
-#include "ParallelCoordinatesSettings.h"
+#include "SettingsAction.h"
 
 #include <Application.h>
 
@@ -7,9 +7,9 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-DimensionSelectionAction::DimensionSelectionAction(PCPSettings& parallelCoordinatesSettings) :
-    WidgetAction(&parallelCoordinatesSettings),
-    _parallelCoordinatesSettings(parallelCoordinatesSettings),
+DimensionSelectionAction::DimensionSelectionAction(PCPSettings& settingsAction) :
+    WidgetAction(&settingsAction),
+    _settingsAction(settingsAction),
     _applyAction(this, "Apply"),
     _numPointsAction(this, "Number of points"),
     _numDimsAction(this, "Number of dimensions"),
@@ -34,7 +34,7 @@ DimensionSelectionAction::DimensionSelectionAction(PCPSettings& parallelCoordina
     _numItemsAction.setToolTip("#points * #dims must be smaller than 7,000,000");
 
     // only show selected dimensions
-    connect(&_applyAction, &TriggerAction::triggered, &_parallelCoordinatesSettings, &PCPSettings::onApplyDimensionFiltering);
+    connect(&_applyAction, &TriggerAction::triggered, &_settingsAction, &PCPSettings::onApplyDimensionFiltering);
 }
 
 void DimensionSelectionAction::setNumPoints(int32_t num) {

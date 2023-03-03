@@ -1,5 +1,5 @@
 #include "ClampAction.h"
-#include "ParallelCoordinatesSettings.h"
+#include "SettingsAction.h"
 
 #include <Application.h>
 
@@ -10,9 +10,9 @@
 using namespace hdps;
 using namespace hdps::gui;
 
-ClampAction::ClampAction(PCPSettings& parallelCoordinatesSettings) :
-    WidgetAction(&parallelCoordinatesSettings),
-    _parallelCoordinatesSettings(parallelCoordinatesSettings),
+ClampAction::ClampAction(PCPSettings& settingsAction) :
+    WidgetAction(&settingsAction),
+    _settingsAction(settingsAction),
     _minClampAction(this, "Range Min. (%): ", 0, 100, 0, 0),
     _maxClampAction(this, "Range Max. (%): ", 0, 100, 100, 100),
     _applyAction(this, "Apply")
@@ -27,7 +27,7 @@ ClampAction::ClampAction(PCPSettings& parallelCoordinatesSettings) :
     connect(&_minClampAction, &IntegralAction::valueChanged, this, &ClampAction::adjustMaxClamp);
     connect(&_maxClampAction, &IntegralAction::valueChanged, this, &ClampAction::adjustMinClamp);
 
-    connect(&_applyAction, &TriggerAction::triggered, &_parallelCoordinatesSettings, &PCPSettings::onApplyClamping);
+    connect(&_applyAction, &TriggerAction::triggered, &_settingsAction, &PCPSettings::onApplyClamping);
 
 }
 

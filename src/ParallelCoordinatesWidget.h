@@ -4,7 +4,6 @@
 
 #include <QVariantList>
 
-class PCPWidget;
 class ParallelCoordinatesPlugin;
 
 // =============================================================================
@@ -60,6 +59,10 @@ private slots:
     /** Is invoked when the js side calls js_available of the WebCommunicationObject (ParlCoorCommunicationObject) 
         js_available emits notifyJsBridgeIsAvailable, which is conencted to initWebPage in WebWidget.cpp*/
     void initWebPage() override;
+
+protected:
+    ParlCoorCommunicationObject& getCommunicationObject() { return *_communicationObject; };
+    friend ParallelCoordinatesPlugin;
 
 private:
     ParlCoorCommunicationObject*    _communicationObject;

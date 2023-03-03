@@ -1,4 +1,4 @@
-#include "ParallelCoordinatesSettings.h"
+#include "SettingsAction.h"
 
 #include "ParallelCoordinatesPlugin.h"
 

@@ -38,7 +38,7 @@ public: // Action getters
     TriggerAction& getApplyAction() { return _applyAction; }
 
 protected:
-    PCPSettings&     _parallelCoordinatesSettings;
+    PCPSettings&       _settingsAction;
 
     IntegralAction     _minClampAction;
     IntegralAction     _maxClampAction;
