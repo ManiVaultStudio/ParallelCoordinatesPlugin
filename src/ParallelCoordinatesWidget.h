@@ -47,7 +47,7 @@ class PCPWidget : public hdps::gui::WebWidget
 {
     Q_OBJECT
 public:
-    PCPWidget(ParallelCoordinatesPlugin* pcpPlugin);
+    PCPWidget(ParallelCoordinatesPlugin& pcpPlugin);
 
     void passDataToJS(QVariantList);
     void passSelectionToJS(const std::vector<unsigned int>& selectionIDs);
@@ -61,11 +61,10 @@ private slots:
     void initWebPage() override;
 
 protected:
-    ParlCoorCommunicationObject& getCommunicationObject() { return *_communicationObject; };
+    ParlCoorCommunicationObject& getCommunicationObject() { return _communicationObject; };
     friend ParallelCoordinatesPlugin;
 
 private:
-    ParlCoorCommunicationObject*    _communicationObject;
-    ParallelCoordinatesPlugin*      _pcpPlugin;
-
+    ParallelCoordinatesPlugin&      _pcpPlugin;
+    ParlCoorCommunicationObject     _communicationObject;
 };

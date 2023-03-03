@@ -48,14 +48,14 @@ void ParlCoorCommunicationObject::newSelectionToJS(const std::vector<unsigned in
 // PCPWidget
 // =============================================================================
 
-PCPWidget::PCPWidget(ParallelCoordinatesPlugin* pcpPlugin):
-    _pcpPlugin(pcpPlugin)
+PCPWidget::PCPWidget(ParallelCoordinatesPlugin& pcpPlugin):
+    _pcpPlugin(pcpPlugin),
+    _communicationObject()
 {
     setAcceptDrops(true);   // drag & drop handled in ParallelCoordinatesPlugin.cpp
 
     Q_INIT_RESOURCE(parcoords_resources);
-    _communicationObject = new ParlCoorCommunicationObject();
-    init(_communicationObject);
+    init(&_communicationObject);
 
     layout()->setContentsMargins(0, 0, 0, 0);
 }
@@ -65,25 +65,25 @@ void PCPWidget::initWebPage()
     qDebug() << "PCPWidget: WebChannel bridge is available.";
     
     // call to data load, used when plugin is opened via right-clicking data set
-    _pcpPlugin->onDataInput();
+    _pcpPlugin.onDataInput();
 }
 
 void PCPWidget::passDataToJS(QVariantList data)
 {
-    emit _communicationObject->qt_setDataInJS(data);
+    emit _communicationObject.qt_setDataInJS(data);
 }
 
 void PCPWidget::enableBrushHighlight()
 {
-    emit _communicationObject->qt_enableBrushHighlight();
+    emit _communicationObject.qt_enableBrushHighlight();
 }
 
 void PCPWidget::disableBrushHighlight()
 {
-    emit _communicationObject->qt_disableBrushHighlight();
+    emit _communicationObject.qt_disableBrushHighlight();
 }
 
 void PCPWidget::passSelectionToJS(const std::vector<unsigned int>& selectionIDs)
 {
-    _communicationObject->newSelectionToJS(selectionIDs);
+    _communicationObject.newSelectionToJS(selectionIDs);
 }

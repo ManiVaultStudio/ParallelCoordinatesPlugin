@@ -48,7 +48,7 @@ void ParallelCoordinatesPlugin::init()
     QVBoxLayout* layout = new QVBoxLayout();
     
     _settingsWidget = new PCPSettings(*this);
-    _pcpWidget      = new PCPWidget(this);
+    _pcpWidget      = new PCPWidget(*this);
     _dropWidget     = new DropWidget(_pcpWidget);
 
     _pcpWidget->setPage(":parcoords/parcoords.html", "qrc:/parcoords/");     // set html contents of webpage
