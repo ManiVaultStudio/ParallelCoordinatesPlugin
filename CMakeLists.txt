@@ -46,7 +46,6 @@ set(WEB
 	res/jslibs/d3.parcoords.js
 	res/jslibs/d3.svg.multibrush.js
 	res/jslibs/d3.v3.min.js
-	res/jslibs/qwebchannel.js
 	res/jslibs/qwebchannel.tools.js
 	res/jslibs/styles.css
 )
