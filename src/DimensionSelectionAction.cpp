@@ -57,6 +57,8 @@ DimensionSelectionAction::Widget::Widget(QWidget* parent, DimensionSelectionActi
     auto dimSelectionWidget = dimensionSelectionAction->getDimensionsPickerAction().createWidget(this);
     auto applyWidget = dimensionSelectionAction->getApplyAction().createWidget(this);
 
+    dimSelectionWidget->setFixedWidth(400);
+
     auto numPointsWidget = dimensionSelectionAction->getNumPointsAction().createWidget(this);
     auto numDimsWidget = dimensionSelectionAction->getNumDimsAction().createWidget(this);
     auto numItemsWidget = dimensionSelectionAction->getNumItemsAction().createWidget(this);
