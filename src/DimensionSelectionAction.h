@@ -5,7 +5,7 @@
 #include <actions/TriggerAction.h>
 #include <actions/IntegralAction.h>
 
-#include <DimensionsPickerAction.h>
+#include <PointData/DimensionsPickerAction.h>
 
 using namespace hdps;
 using namespace hdps::gui;
