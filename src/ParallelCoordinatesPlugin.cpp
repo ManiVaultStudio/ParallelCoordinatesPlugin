@@ -5,7 +5,7 @@
 #include "DataHierarchyItem.h"
 #include "event/Event.h"
 #include "Dataset.h"
-#include "PointData.h"
+#include "PointData/PointData.h"
 
 #include <actions/PluginTriggerAction.h>
 #include <widgets/DropWidget.h>

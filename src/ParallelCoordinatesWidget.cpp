@@ -1,7 +1,7 @@
 #include "ParallelCoordinatesWidget.h"
 #include "ParallelCoordinatesPlugin.h"
 
-#include <PointData.h>
+#include <PointData/PointData.h>
 
 #include <QDebug>
 
