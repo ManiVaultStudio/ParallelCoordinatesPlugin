@@ -11,10 +11,10 @@ using namespace hdps;
 using namespace hdps::gui;
 
 ClampAction::ClampAction(PCPSettings& settingsAction) :
-    WidgetAction(&settingsAction),
+    WidgetAction(&settingsAction, "Clamp"),
     _settingsAction(settingsAction),
-    _minClampAction(this, "Range Min. (%): ", 0, 100, 0, 0),
-    _maxClampAction(this, "Range Max. (%): ", 0, 100, 100, 100),
+    _minClampAction(this, "Range Min. (%): ", 0, 100, 0),
+    _maxClampAction(this, "Range Max. (%): ", 0, 100, 100),
     _applyAction(this, "Apply")
 {
     setText("Clamp");
@@ -54,5 +54,5 @@ ClampAction::Widget::Widget(QWidget* parent, ClampAction* clampAction) :
     layout->addWidget(maxClampWidget);
     layout->addWidget(applyWidget);
 
-    setPopupLayout(layout);
+    setLayout(layout);
 }

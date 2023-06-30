@@ -8,13 +8,13 @@
 #include <QVBoxLayout>
 
 DimensionSelectionAction::DimensionSelectionAction(PCPSettings& settingsAction) :
-    WidgetAction(&settingsAction),
+    WidgetAction(&settingsAction, "Dimension Selection"),
     _settingsAction(settingsAction),
     _applyAction(this, "Apply"),
     _numPointsAction(this, "Number of points"),
     _numDimsAction(this, "Number of dimensions"),
     _numItemsAction(this, "Number of total items"),
-    _dimensionAction(this)
+    _dimensionAction(this, "Dimension Picker")
 {
     setText("Dimension Selection");
     setIcon(Application::getIconFont("FontAwesome").getIcon("layer-group"));
@@ -23,9 +23,9 @@ DimensionSelectionAction::DimensionSelectionAction(PCPSettings& settingsAction) 
     _numDimsAction.setDefaultWidgetFlags(IntegralAction::LineEdit);
     _numItemsAction.setDefaultWidgetFlags(IntegralAction::LineEdit);
 
-    _numPointsAction.initialize(0, 7'000'000, 1, 1);
-    _numDimsAction.initialize(0, 7'000'000, 1, 1);
-    _numItemsAction.initialize(0, 7'000'000, 1, 1);
+    _numPointsAction.initialize(0, 7'000'000, 1);
+    _numDimsAction.initialize(0, 7'000'000, 1);
+    _numItemsAction.initialize(0, 7'000'000, 1);
 
     _numPointsAction.setEnabled(false);
     _numDimsAction.setEnabled(false);
@@ -50,7 +50,8 @@ void DimensionSelectionAction::setNumItems(int32_t num) {
 }
 
 DimensionSelectionAction::Widget::Widget(QWidget* parent, DimensionSelectionAction* dimensionSelectionAction) :
-    WidgetActionWidget(parent, dimensionSelectionAction)
+    WidgetActionWidget(parent, dimensionSelectionAction),
+    _groupsAction(this, "Dimension Selection")
 {
     auto layout = new QVBoxLayout();
 
@@ -74,5 +75,5 @@ DimensionSelectionAction::Widget::Widget(QWidget* parent, DimensionSelectionActi
     layout->addWidget(new QLabel("#Items (max 7,000,000):"));
     layout->addWidget(numItemsWidget);
 
-    setPopupLayout(layout);
+    setLayout(layout);
 }

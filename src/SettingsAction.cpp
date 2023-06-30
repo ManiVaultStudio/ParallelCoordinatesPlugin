@@ -8,7 +8,7 @@ using namespace hdps::gui;
 
 
 PCPSettings::PCPSettings(ParallelCoordinatesPlugin& parallelCoordinatesPlugin) :
-    WidgetAction(&parallelCoordinatesPlugin),
+    WidgetAction(&parallelCoordinatesPlugin, "Settings"),
     _pcpPlugin(parallelCoordinatesPlugin),
     _clampAction(*this),
     _dimensionSelectionAction(*this)

@@ -106,7 +106,7 @@ void ParallelCoordinatesPlugin::init()
     connect(&_currentDataSet, &Dataset<Points>::dataChanged, this, &ParallelCoordinatesPlugin::onDataInput);
 
     // Update the window title when the GUI name of the position dataset changes
-    connect(&_currentDataSet, &Dataset<Points>::dataGuiNameChanged, this, &ParallelCoordinatesPlugin::updateWindowTitle);
+//    connect(&_currentDataSet, &Dataset<Points>::dataSetGuiNameChanged, this, &ParallelCoordinatesPlugin::updateWindowTitle);
 
     // Update the selection (coming from core) in PCP
     connect(&_currentDataSet, &Dataset<Points>::dataSelectionChanged, this, &ParallelCoordinatesPlugin::onDataSelectionChanged);
@@ -132,7 +132,7 @@ void ParallelCoordinatesPlugin::loadData(const hdps::Datasets& datasets)
 QString ParallelCoordinatesPlugin::getCurrentDataSetName() const 
 { 
     if (_currentDataSet.isValid())
-        return _currentDataSet->getGuiName();
+        return _currentDataSet->text();
     else
         return QString{};
 }
@@ -140,7 +140,7 @@ QString ParallelCoordinatesPlugin::getCurrentDataSetName() const
 QString ParallelCoordinatesPlugin::getCurrentDataSetGuid() const 
 { 
     if (_currentDataSet.isValid())
-        return _currentDataSet->getGuid();
+        return _currentDataSet->getId();
     else
         return QString{};
 }
@@ -161,7 +161,7 @@ void ParallelCoordinatesPlugin::onDataInput()
     if (!_currentDataSet.isValid())
         return;
 
-    getWidget().setWindowTitle(_currentDataSet->getGuiName());
+    getWidget().setWindowTitle(_currentDataSet->text());
 
     // get data set from core
     // Get indices of selected points
@@ -396,9 +396,9 @@ void ParallelCoordinatesPlugin::publishSelection(const std::vector<unsigned int>
 
     // notify core about the selection change
     if (_currentDataSet->isDerivedData())
-        events().notifyDatasetSelectionChanged(_currentDataSet->getSourceDataset<DatasetImpl>());
+        events().notifyDatasetDataSelectionChanged(_currentDataSet->getSourceDataset<DatasetImpl>());
     else
-        events().notifyDatasetSelectionChanged(_currentDataSet);
+        events().notifyDatasetDataSelectionChanged(_currentDataSet);
 
 }
 
@@ -407,7 +407,7 @@ void ParallelCoordinatesPlugin::updateWindowTitle()
     if (!_currentDataSet.isValid())
         getWidget().setWindowTitle(getGuiName());
     else
-        getWidget().setWindowTitle(QString("%1: %2").arg(getGuiName(), _currentDataSet->getDataHierarchyItem().getFullPathName()));
+        getWidget().setWindowTitle(QString("%1: %2").arg(getGuiName(), _currentDataSet->getDataHierarchyItem().getLocation()));
 }
 
 
