@@ -9,6 +9,7 @@
 
 #include <actions/PluginTriggerAction.h>
 #include <widgets/DropWidget.h>
+#include <DatasetsMimeData.h>
 
 #include <QtCore>
 
@@ -66,26 +67,29 @@ void ParallelCoordinatesPlugin::init()
     _dropWidget->initialize([this](const QMimeData* mimeData) -> DropWidget::DropRegions {
         DropWidget::DropRegions dropRegions;
 
-        // Gather information to generate appropriate drop regions
-        const auto mimeText = mimeData->text();
-        const auto tokens = mimeText.split("\n");
+        const auto datasetsMimeData = dynamic_cast<const DatasetsMimeData*>(mimeData);
 
-        if (tokens.count() < 2)
+        if (datasetsMimeData == nullptr)
             return dropRegions;
 
-        const auto datasetName = tokens[0];
-        const auto datasetId = tokens[1];
-        const auto dataType = DataType(tokens[2]);
+        if (datasetsMimeData->getDatasets().count() > 1)
+            return dropRegions;
+
+        const auto dataset = datasetsMimeData->getDatasets().first();
+        const auto datasetGuiName = dataset->text();
+        const auto datasetId = dataset->getId();
+        const auto dataType = dataset->getDataType();
         const auto dataTypes = DataTypes({ PointType });
-        const auto candidateDataset = _core->requestDataset(datasetId);
 
         if (dataTypes.contains(dataType)) {
 
-            if (datasetId == getCurrentDataSetGuid()) {
+            const auto candidateDataset = _core->requestDataset(datasetId);
+
+            if (datasetId == getCurrentDataSetID()) {
                 dropRegions << new DropWidget::DropRegion(this, "Warning", "Data already loaded", "exclamation-circle", false);
             }
             else {
-                dropRegions << new DropWidget::DropRegion(this, "Points", QString("Visualize %1 as parallel coordinates").arg(datasetName), "map-marker-alt", true, [this, candidateDataset]() {
+                dropRegions << new DropWidget::DropRegion(this, "Points", QString("Visualize %1 as parallel coordinates").arg(datasetGuiName), "map-marker-alt", true, [this, candidateDataset]() {
                     loadData({ candidateDataset });
                     _dropWidget->setShowDropIndicator(false);
                     });
@@ -106,7 +110,7 @@ void ParallelCoordinatesPlugin::init()
     connect(&_currentDataSet, &Dataset<Points>::dataChanged, this, &ParallelCoordinatesPlugin::onDataInput);
 
     // Update the window title when the GUI name of the position dataset changes
-//    connect(&_currentDataSet, &Dataset<Points>::dataSetGuiNameChanged, this, &ParallelCoordinatesPlugin::updateWindowTitle);
+    connect(&_currentDataSet, &Dataset<Points>::guiNameChanged, this, &ParallelCoordinatesPlugin::updateWindowTitle);
 
     // Update the selection (coming from core) in PCP
     connect(&_currentDataSet, &Dataset<Points>::dataSelectionChanged, this, &ParallelCoordinatesPlugin::onDataSelectionChanged);
@@ -137,7 +141,7 @@ QString ParallelCoordinatesPlugin::getCurrentDataSetName() const
         return QString{};
 }
 
-QString ParallelCoordinatesPlugin::getCurrentDataSetGuid() const 
+QString ParallelCoordinatesPlugin::getCurrentDataSetID() const 
 { 
     if (_currentDataSet.isValid())
         return _currentDataSet->getId();
@@ -381,7 +385,7 @@ void ParallelCoordinatesPlugin::publishSelection(const std::vector<unsigned int>
     auto& selectionIndices  = selectionSet->indices;
 
     // no need to update the selection when nothing is updated
-    if ((selectedIDs.size() == 0) & (selectionIndices.size() == 0))
+    if ((selectedIDs.size() == 0) && (selectionIndices.size() == 0))
     {
         _pcpWidget->disableBrushHighlight();   // this makes sure that the brush indicator will be removed when selection from other plugins come in
         return;

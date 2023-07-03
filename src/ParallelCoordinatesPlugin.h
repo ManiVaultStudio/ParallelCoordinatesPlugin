@@ -49,7 +49,7 @@ public:
 
     hdps::CoreInterface* getCore() { return _core;  }
     QString getCurrentDataSetName() const;
-    QString getCurrentDataSetGuid() const;
+    QString getCurrentDataSetID() const;
 
     void applyClamping();
     void applyDimensionSelection();
