@@ -42,7 +42,7 @@ void ClampAction::adjustMinClamp(int32_t val) {
 }
 
 ClampAction::Widget::Widget(QWidget* parent, ClampAction* clampAction) :
-    WidgetActionWidget(parent, clampAction, State::Standard)
+    WidgetActionWidget(parent, clampAction)
 {
     auto layout = new QVBoxLayout();
 

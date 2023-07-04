@@ -28,7 +28,7 @@ void PCPSettings::onApplyDimensionFiltering()
 
 
 PCPSettings::Widget::Widget(QWidget* parent, PCPSettings* settingsAction) :
-    WidgetActionWidget(parent, settingsAction, State::Standard)
+    WidgetActionWidget(parent, settingsAction)
 {
     setAutoFillBackground(true);
 
