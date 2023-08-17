@@ -17,6 +17,7 @@ DimensionSelectionAction::DimensionSelectionAction(PCPSettings& settingsAction) 
     _dimensionAction(this, "Dimension Picker")
 {
     setText("Dimension Selection");
+    setSerializationName("Dimension Selection");
     setIcon(Application::getIconFont("FontAwesome").getIcon("layer-group"));
 
     _numPointsAction.setDefaultWidgetFlags(IntegralAction::LineEdit);
@@ -33,6 +34,12 @@ DimensionSelectionAction::DimensionSelectionAction(PCPSettings& settingsAction) 
 
     _numItemsAction.setToolTip("#points * #dims must be smaller than 7,000,000");
 
+    _dimensionAction.setSerializationName("DimensionAction");
+    _applyAction.setSerializationName("ApplyAction");
+    _numPointsAction.setSerializationName("NumPointsAction");
+    _numDimsAction.setSerializationName("NumDimsAction");
+    _numItemsAction.setSerializationName("NumItemsAction");
+
     // only show selected dimensions
     connect(&_applyAction, &TriggerAction::triggered, &_settingsAction, &PCPSettings::onApplyDimensionFiltering);
 }
@@ -47,6 +54,30 @@ void DimensionSelectionAction::setNumDims(int32_t num) {
 
 void DimensionSelectionAction::setNumItems(int32_t num) {
     _numItemsAction.setValue(num);
+}
+
+void DimensionSelectionAction::fromVariantMap(const QVariantMap& variantMap)
+{
+    WidgetAction::fromVariantMap(variantMap);
+
+    _dimensionAction.fromParentVariantMap(variantMap);
+    _applyAction.fromParentVariantMap(variantMap);
+    _numPointsAction.fromParentVariantMap(variantMap);
+    _numDimsAction.fromParentVariantMap(variantMap);
+    _numItemsAction.fromParentVariantMap(variantMap);
+}
+
+QVariantMap DimensionSelectionAction::toVariantMap() const
+{
+    QVariantMap variantMap = WidgetAction::toVariantMap();
+
+    _dimensionAction.insertIntoVariantMap(variantMap);
+    _applyAction.insertIntoVariantMap(variantMap);
+    _numPointsAction.insertIntoVariantMap(variantMap);
+    _numDimsAction.insertIntoVariantMap(variantMap);
+    _numItemsAction.insertIntoVariantMap(variantMap);
+
+    return variantMap;
 }
 
 DimensionSelectionAction::Widget::Widget(QWidget* parent, DimensionSelectionAction* dimensionSelectionAction) :

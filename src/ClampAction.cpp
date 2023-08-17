@@ -18,10 +18,15 @@ ClampAction::ClampAction(PCPSettings& settingsAction) :
     _applyAction(this, "Apply")
 {
     setText("Clamp");
+    setSerializationName("Clamp");
     setIcon(Application::getIconFont("FontAwesome").getIcon("ruler-horizontal"));
 
     _minClampAction.setDefaultWidgetFlags(IntegralAction::SpinBox | IntegralAction::Slider);
     _maxClampAction.setDefaultWidgetFlags(IntegralAction::SpinBox | IntegralAction::Slider);
+
+    _minClampAction.setSerializationName("MinClamp");
+    _maxClampAction.setSerializationName("MaxClamp");
+    _applyAction.setSerializationName("ApplyAction");
 
     // connect the two sliders
     connect(&_minClampAction, &IntegralAction::valueChanged, this, &ClampAction::adjustMaxClamp);
@@ -39,6 +44,26 @@ void ClampAction::adjustMaxClamp(int32_t val) {
 void ClampAction::adjustMinClamp(int32_t val) {
     if (val < _minClampAction.getValue())
         _minClampAction.setValue(val);
+}
+
+void ClampAction::fromVariantMap(const QVariantMap& variantMap)
+{
+    WidgetAction::fromVariantMap(variantMap);
+
+    _minClampAction.fromParentVariantMap(variantMap);
+    _maxClampAction.fromParentVariantMap(variantMap);
+    _applyAction.fromParentVariantMap(variantMap);
+}
+
+QVariantMap ClampAction::toVariantMap() const
+{
+    QVariantMap variantMap = WidgetAction::toVariantMap();
+
+    _minClampAction.insertIntoVariantMap(variantMap);
+    _maxClampAction.insertIntoVariantMap(variantMap);
+    _applyAction.insertIntoVariantMap(variantMap);
+
+    return variantMap;
 }
 
 ClampAction::Widget::Widget(QWidget* parent, ClampAction* clampAction) :

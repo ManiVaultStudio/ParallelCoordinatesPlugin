@@ -11,9 +11,15 @@ PCPSettings::PCPSettings(ParallelCoordinatesPlugin& parallelCoordinatesPlugin) :
     WidgetAction(&parallelCoordinatesPlugin, "Settings"),
     _pcpPlugin(parallelCoordinatesPlugin),
     _clampAction(*this),
-    _dimensionSelectionAction(*this)
+    _dimensionSelectionAction(*this),
+    _dataGUID(this, "DataGUIDAction")
 {
+    setText("Settings");
+    setSerializationName("Settings");
 
+    _clampAction.setSerializationName("ClampAction");
+    _dimensionSelectionAction.setSerializationName("DimensionSelectionAction");
+    _dataGUID.setSerializationName("DataGUIDAction");
 }
 
 void PCPSettings::onApplyClamping()
@@ -24,6 +30,32 @@ void PCPSettings::onApplyClamping()
 void PCPSettings::onApplyDimensionFiltering()
 {
     _pcpPlugin.applyDimensionSelection();
+}
+
+void PCPSettings::fromVariantMap(const QVariantMap& variantMap)
+{
+    WidgetAction::fromVariantMap(variantMap);
+
+    _clampAction.fromParentVariantMap(variantMap);
+    _dimensionSelectionAction.fromParentVariantMap(variantMap);
+    _dataGUID.fromParentVariantMap(variantMap);
+
+    //qDebug() << variantMap["DataGUIDAction"].toString();
+
+    //qDebug() << _dataGUID.text();
+}
+
+QVariantMap PCPSettings::toVariantMap() const
+{
+    QVariantMap variantMap = WidgetAction::toVariantMap();
+
+    _clampAction.insertIntoVariantMap(variantMap);
+    _dimensionSelectionAction.insertIntoVariantMap(variantMap);
+    _dataGUID.insertIntoVariantMap(variantMap);
+
+    //qDebug() << _dataGUID.text();
+
+    return variantMap;
 }
 
 
