@@ -75,6 +75,20 @@ public slots:
 signals:
     void dataSetChanged();
 
+public: // Serialization
+
+    /**
+     * Load plugin from variant map
+     * @param Variant map representation of the plugin
+     */
+    void fromVariantMap(const QVariantMap& variantMap) override;
+
+    /**
+     * Save plugin to variant map
+     * @return Variant map representation of the plugin
+     */
+    QVariantMap toVariantMap() const override;
+
 private:
     hdps::Dataset<Points>       _currentDataSet;
     std::vector<unsigned int>   _pointIDsGlobal;
