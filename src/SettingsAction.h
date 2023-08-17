@@ -5,6 +5,8 @@
 #include "ClampAction.h"
 #include "DimensionSelectionAction.h"
 
+#include <QLabel>
+
 using namespace hdps;
 
 class ParallelCoordinatesPlugin;
@@ -38,7 +40,8 @@ public: // Action getters
 
     ClampAction& getClampAction() { return _clampAction; }
     DimensionSelectionAction& getDimensionSelectionAction() { return _dimensionSelectionAction; }
-    StringAction& getDataGUID() { return _dataGUID; }
+    QLabel& getDataNameLabel() { return _dataName; }
+    StringAction& getDataGUIDAction() { return _dataGUID; }
 
 public: // Serialization
 
@@ -58,5 +61,6 @@ private:
     ParallelCoordinatesPlugin&  _pcpPlugin;
     ClampAction                 _clampAction;
     DimensionSelectionAction    _dimensionSelectionAction;
+    QLabel                      _dataName;
     StringAction                _dataGUID;      // internal for serialization
 };

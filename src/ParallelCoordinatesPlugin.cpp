@@ -167,7 +167,11 @@ void ParallelCoordinatesPlugin::onDataInput()
 
     getWidget().setWindowTitle(_currentDataSet->text());
 
-    _settingsWidget->getDataGUID().setText(_currentDataSet->getId());
+    // save data guid for serialization
+    _settingsWidget->getDataGUIDAction().setString(_currentDataSet->getId());
+
+    // display data name 
+    _settingsWidget->getDataNameLabel().setText(_currentDataSet->text());
 
     // get data set from core
     // Get indices of selected points
@@ -425,7 +429,8 @@ void ParallelCoordinatesPlugin::fromVariantMap(const QVariantMap& variantMap)
     _settingsWidget->fromVariantMap(variantMap["Settings"].toMap());
 
     // Load data set
-    _currentDataSet = hdps::data().getSet(_settingsWidget->getDataGUID().text());
+    _currentDataSet = hdps::data().getSet(_settingsWidget->getDataGUIDAction().getString());
+    _dropWidget->setShowDropIndicator(false);
 }
 
 QVariantMap ParallelCoordinatesPlugin::toVariantMap() const

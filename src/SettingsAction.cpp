@@ -12,7 +12,8 @@ PCPSettings::PCPSettings(ParallelCoordinatesPlugin& parallelCoordinatesPlugin) :
     _pcpPlugin(parallelCoordinatesPlugin),
     _clampAction(*this),
     _dimensionSelectionAction(*this),
-    _dataGUID(this, "DataGUIDAction")
+    _dataGUID(this, "DataGUIDAction"),
+    _dataName("")
 {
     setText("Settings");
     setSerializationName("Settings");
@@ -39,10 +40,6 @@ void PCPSettings::fromVariantMap(const QVariantMap& variantMap)
     _clampAction.fromParentVariantMap(variantMap);
     _dimensionSelectionAction.fromParentVariantMap(variantMap);
     _dataGUID.fromParentVariantMap(variantMap);
-
-    //qDebug() << variantMap["DataGUIDAction"].toString();
-
-    //qDebug() << _dataGUID.text();
 }
 
 QVariantMap PCPSettings::toVariantMap() const
@@ -52,8 +49,6 @@ QVariantMap PCPSettings::toVariantMap() const
     _clampAction.insertIntoVariantMap(variantMap);
     _dimensionSelectionAction.insertIntoVariantMap(variantMap);
     _dataGUID.insertIntoVariantMap(variantMap);
-
-    //qDebug() << _dataGUID.text();
 
     return variantMap;
 }
@@ -73,5 +68,6 @@ PCPSettings::Widget::Widget(QWidget* parent, PCPSettings* settingsAction) :
 
     layout->addWidget(settingsAction->getClampAction().createCollapsedWidget(this));
     layout->addWidget(settingsAction->getDimensionSelectionAction().createCollapsedWidget(this));
+    layout->addWidget(&(settingsAction->getDataNameLabel()));
     layout->addStretch(1);
 }
