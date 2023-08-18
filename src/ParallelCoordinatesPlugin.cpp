@@ -165,6 +165,9 @@ void ParallelCoordinatesPlugin::onDataInput()
     if (!_currentDataSet.isValid())
         return;
 
+    if (!_pcpWidget->isInit())
+        return;
+
     getWidget().setWindowTitle(_currentDataSet->text());
 
     // save data guid for serialization

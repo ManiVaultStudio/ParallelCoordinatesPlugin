@@ -50,7 +50,8 @@ void ParlCoorCommunicationObject::newSelectionToJS(const std::vector<unsigned in
 
 PCPWidget::PCPWidget(ParallelCoordinatesPlugin& pcpPlugin):
     _pcpPlugin(pcpPlugin),
-    _communicationObject()
+    _communicationObject(),
+    _isInit(false)
 {
     setAcceptDrops(true);   // drag & drop handled in ParallelCoordinatesPlugin.cpp
 
@@ -63,7 +64,8 @@ PCPWidget::PCPWidget(ParallelCoordinatesPlugin& pcpPlugin):
 void PCPWidget::initWebPage()
 {
     qDebug() << "PCPWidget: WebChannel bridge is available.";
-    
+    _isInit = true;
+
     // call to data load, used when plugin is opened via right-clicking data set
     _pcpPlugin.onDataInput();
 }

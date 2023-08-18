@@ -55,16 +55,16 @@ public:
     void enableBrushHighlight();
     void disableBrushHighlight();
 
+    ParlCoorCommunicationObject& getCommunicationObject() { return _communicationObject; };
+    bool isInit() { return _isInit; };
+
 private slots:
     /** Is invoked when the js side calls js_available of the WebCommunicationObject (ParlCoorCommunicationObject) 
         js_available emits notifyJsBridgeIsAvailable, which is conencted to initWebPage in WebWidget.cpp*/
     void initWebPage() override;
 
-protected:
-    ParlCoorCommunicationObject& getCommunicationObject() { return _communicationObject; };
-    friend ParallelCoordinatesPlugin;
-
 private:
     ParallelCoordinatesPlugin&      _pcpPlugin;
     ParlCoorCommunicationObject     _communicationObject;
+    bool                            _isInit;
 };
