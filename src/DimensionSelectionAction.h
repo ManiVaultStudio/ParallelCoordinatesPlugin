@@ -7,8 +7,8 @@
 
 #include <PointData/DimensionsPickerAction.h>
 
-using namespace hdps;
-using namespace hdps::gui;
+using namespace mv;
+using namespace mv::gui;
 
 class PCPSettings;
 
@@ -16,7 +16,7 @@ class DimensionSelectionAction : public WidgetAction
 {
 protected:
 
-    class Widget : public hdps::gui::WidgetActionWidget {
+    class Widget : public mv::gui::WidgetActionWidget {
     public:
         Widget(QWidget* parent, DimensionSelectionAction* layersAction);
 

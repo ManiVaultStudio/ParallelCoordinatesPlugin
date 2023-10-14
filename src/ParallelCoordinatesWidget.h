@@ -10,7 +10,7 @@ class ParallelCoordinatesPlugin;
 // ParlCoorCommunicationObject
 // =============================================================================
 
-class ParlCoorCommunicationObject : public hdps::gui::WebCommunicationObject
+class ParlCoorCommunicationObject : public mv::gui::WebCommunicationObject
 {
     Q_OBJECT
 public:
@@ -43,7 +43,7 @@ private:
 // PCPWidget
 // =============================================================================
 
-class PCPWidget : public hdps::gui::WebWidget
+class PCPWidget : public mv::gui::WebWidget
 {
     Q_OBJECT
 public:

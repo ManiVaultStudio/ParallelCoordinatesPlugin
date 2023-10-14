@@ -24,8 +24,8 @@
 
 Q_PLUGIN_METADATA(IID "nl.tudelft.ParallelCoordinatesPlugin")
 
-using namespace hdps;
-using namespace hdps::util;
+using namespace mv;
+using namespace mv::util;
 
 // =============================================================================
 // View
@@ -121,7 +121,7 @@ void ParallelCoordinatesPlugin::init()
     updateWindowTitle();
 }
 
-void ParallelCoordinatesPlugin::loadData(const hdps::Datasets& datasets)
+void ParallelCoordinatesPlugin::loadData(const mv::Datasets& datasets)
 {
     // Exit if there is nothing to load
     if (datasets.isEmpty())
@@ -432,7 +432,7 @@ void ParallelCoordinatesPlugin::fromVariantMap(const QVariantMap& variantMap)
     _settingsWidget->fromVariantMap(variantMap["Settings"].toMap());
 
     // Load data set
-    _currentDataSet = hdps::data().getSet(_settingsWidget->getDataGUIDAction().getString());
+    _currentDataSet = mv::data().getSet(_settingsWidget->getDataGUIDAction().getString());
     _dropWidget->setShowDropIndicator(false);
 }
 
@@ -451,7 +451,7 @@ QVariantMap ParallelCoordinatesPlugin::toVariantMap() const
 
 QIcon ParallelCoordinatesPluginFactory::getIcon(const QColor& color /*= Qt::black*/) const
 {
-    return hdps::Application::getIconFont("FontAwesome").getIcon("chart-bar", color);
+    return mv::Application::getIconFont("FontAwesome").getIcon("chart-bar", color);
 }
 
 ViewPlugin* ParallelCoordinatesPluginFactory::produce()
@@ -459,14 +459,14 @@ ViewPlugin* ParallelCoordinatesPluginFactory::produce()
     return new ParallelCoordinatesPlugin(this);
 }
 
-hdps::DataTypes ParallelCoordinatesPluginFactory::supportedDataTypes() const
+mv::DataTypes ParallelCoordinatesPluginFactory::supportedDataTypes() const
 {
     DataTypes supportedTypes;
     supportedTypes.append(PointType);
     return supportedTypes;
 }
 
-hdps::gui::PluginTriggerActions ParallelCoordinatesPluginFactory::getPluginTriggerActions(const hdps::Datasets& datasets) const
+mv::gui::PluginTriggerActions ParallelCoordinatesPluginFactory::getPluginTriggerActions(const mv::Datasets& datasets) const
 {
     PluginTriggerActions pluginTriggerActions;
 

@@ -7,8 +7,8 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-using namespace hdps;
-using namespace hdps::gui;
+using namespace mv;
+using namespace mv::gui;
 
 ClampAction::ClampAction(PCPSettings& settingsAction) :
     WidgetAction(&settingsAction, "Clamp"),

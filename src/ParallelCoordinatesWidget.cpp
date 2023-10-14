@@ -5,8 +5,8 @@
 
 #include <QDebug>
 
-using namespace hdps;
-using namespace hdps::gui;
+using namespace mv;
+using namespace mv::gui;
 
 // =============================================================================
 // ParlCoorCommunicationObject

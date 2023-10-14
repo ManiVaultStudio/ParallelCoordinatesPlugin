@@ -7,11 +7,11 @@
 #include <QString>
 #include <QStringList>
 
-using namespace hdps::plugin;
-using namespace hdps::util;
-using namespace hdps::gui;
+using namespace mv::plugin;
+using namespace mv::util;
+using namespace mv::gui;
 
-namespace hdps {
+namespace mv {
     namespace gui {
         class DropWidget;
     }
@@ -40,14 +40,14 @@ public:
      * Load one (or more datasets in the view)
      * @param datasets Dataset(s) to load
      */
-    void loadData(const hdps::Datasets& datasets) override;
+    void loadData(const mv::Datasets& datasets) override;
 
     /**
      * Callback which is invoked when &Dataset<Points>::dataSelectionChanged is emitted
      */
     void onDataSelectionChanged();
 
-    hdps::CoreInterface* getCore() { return _core;  }
+    mv::CoreInterface* getCore() { return _core;  }
     QString getCurrentDataSetName() const;
     QString getCurrentDataSetID() const;
 
@@ -90,7 +90,7 @@ public: // Serialization
     QVariantMap toVariantMap() const override;
 
 private:
-    hdps::Dataset<Points>       _currentDataSet;
+    mv::Dataset<Points>       _currentDataSet;
     std::vector<unsigned int>   _pointIDsGlobal;
 
     QStringList                 _dimNames;
@@ -106,7 +106,7 @@ private:
 
     PCPWidget*                  _pcpWidget;
     PCPSettings*                _settingsWidget;
-    hdps::gui::DropWidget*      _dropWidget;
+    mv::gui::DropWidget*      _dropWidget;
 };
 
 
@@ -116,7 +116,7 @@ private:
 
 class ParallelCoordinatesPluginFactory : public ViewPluginFactory
 {
-    Q_INTERFACES(hdps::plugin::ViewPluginFactory hdps::plugin::PluginFactory)
+    Q_INTERFACES(mv::plugin::ViewPluginFactory mv::plugin::PluginFactory)
     Q_OBJECT
     Q_PLUGIN_METADATA(IID   "nl.tudelft.ParallelCoordinatesPlugin"
                       FILE  "ParallelCoordinatesPlugin.json")
@@ -135,12 +135,12 @@ public:
     ViewPlugin* produce() override;
 
     /** Returns the data types that are supported by the example view plugin */
-    hdps::DataTypes supportedDataTypes() const override;
+    mv::DataTypes supportedDataTypes() const override;
 
     /**
      * Get plugin trigger actions given \p datasets
      * @param datasets Vector of input datasets
      * @return Vector of plugin trigger actions
      */
-    PluginTriggerActions getPluginTriggerActions(const hdps::Datasets& datasets) const override;
+    PluginTriggerActions getPluginTriggerActions(const mv::Datasets& datasets) const override;
 };

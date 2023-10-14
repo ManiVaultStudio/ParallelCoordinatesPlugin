@@ -7,7 +7,7 @@
 
 #include <QLabel>
 
-using namespace hdps;
+using namespace mv;
 
 class ParallelCoordinatesPlugin;
 
@@ -15,7 +15,7 @@ class PCPSettings : public WidgetAction
 {
 protected:
 
-    class Widget : public hdps::gui::WidgetActionWidget {
+    class Widget : public mv::gui::WidgetActionWidget {
     public:
         Widget(QWidget* parent, PCPSettings* settingsAction);
     };
