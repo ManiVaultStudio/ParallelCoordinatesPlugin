@@ -83,7 +83,7 @@ void ParallelCoordinatesPlugin::init()
 
         if (dataTypes.contains(dataType)) {
 
-            const auto candidateDataset = _core->requestDataset(datasetId);
+            const auto candidateDataset = mv::data().getDataset(datasetId);
 
             if (datasetId == getCurrentDataSetID()) {
                 dropRegions << new DropWidget::DropRegion(this, "Warning", "Data already loaded", "exclamation-circle", false);
@@ -432,7 +432,7 @@ void ParallelCoordinatesPlugin::fromVariantMap(const QVariantMap& variantMap)
     _settingsWidget->fromVariantMap(variantMap["Settings"].toMap());
 
     // Load data set
-    _currentDataSet = mv::data().getSet(_settingsWidget->getDataGUIDAction().getString());
+    _currentDataSet = mv::data().getDataset(_settingsWidget->getDataGUIDAction().getString());
     _dropWidget->setShowDropIndicator(false);
 }
 
