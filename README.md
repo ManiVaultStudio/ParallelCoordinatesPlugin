@@ -1,6 +1,6 @@
-# Parallel coordinates plugin [![Actions Status](https://github.com/hdps/ParallelCoordinatesPlugin/workflows/ParallelCoordinatesPlugin/badge.svg)](https://github.com/hdps/ParallelCoordinatesPlugin/actions)
+# Parallel coordinates plugin [![Actions Status](https://github.com/ManiVaultStudio/ParallelCoordinatesPlugin/workflows/ParallelCoordinatesPlugin/badge.svg)](https://github.com/ManiVaultStudio/ParallelCoordinatesPlugin/actions)
 
-A parallel coordinates plugin for the [hdps](https://github.com/hdps/core) based on the [d3.js](https://github.com/d3/d3) library [Parallel Coordinates](https://syntagmatic.github.io/parallel-coordinates/) from [here](https://github.com/syntagmatic/parallel-coordinates).
+A parallel coordinates plugin for the [ManiVault](https://github.com/ManiVaultStudio/core) visual analytics framework based on the [d3.js](https://github.com/d3/d3) library [Parallel Coordinates](https://syntagmatic.github.io/parallel-coordinates/) from [here](https://github.com/syntagmatic/parallel-coordinates).
 
 **Limitations**: limit of number of Dimensions * number of Points <= 7,000,000. Qt uses an internal json data representation to communicate between the c++ and js side, and this sets some data size limit for use here. This specific number is a bit arbitrary and does not correspond to the exact max Qt json size but it's pretty close. 
 
