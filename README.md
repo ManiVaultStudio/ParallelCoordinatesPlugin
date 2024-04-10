@@ -4,7 +4,7 @@ A parallel coordinates plugin for the [ManiVault](https://github.com/ManiVaultSt
 
 <p align="middle">
   <img src="https://github.com/ManiVaultStudio/ParallelCoordinatesPlugin/assets/58806453/82833616-d2e1-4907-a421-52e4a223cc2a" align="middle" width="65%" />
-  <img src="https://github.com/ManiVaultStudio/ParallelCoordinatesPlugin/assets/58806453/928e3acb-62bf-4c52-90cf-5e3ced77bf94" align="middle" width="30%" /> </br>
+  <img src="https://github.com/ManiVaultStudio/ParallelCoordinatesPlugin/assets/58806453/177bd5e1-96be-4b55-961f-f87c06cec443" align="middle" width="20%" /> </br>
   Parallel coordinates showing the  <a href="https://doi.org/10.24432/C5859H">Auto MPG</a> dataset with a manual selection in the "acceleration" dimension
 </p>
 
