@@ -8,6 +8,11 @@ A parallel coordinates plugin for the [ManiVault](https://github.com/ManiVaultSt
   Parallel coordinates showing the  <a href="https://doi.org/10.24432/C5859H">Auto MPG</a> dataset with a manual selection in the "acceleration" dimension
 </p>
 
+Clone the repo and all resources:
+```
+git clone https://github.com/ManiVaultStudio/ParallelCoordinatesPlugin.git
+```
+
 ## Interaction
 - Selecting ranges in each dimension
 - Selecting which dimensions to display
