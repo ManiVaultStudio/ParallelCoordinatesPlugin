@@ -84,27 +84,17 @@ DimensionSelectionAction::Widget::Widget(QWidget* parent, DimensionSelectionActi
     WidgetActionWidget(parent, dimensionSelectionAction),
     _groupsAction(this, "Dimension Selection")
 {
-    auto layout = new QVBoxLayout();
+    auto layout = new QGridLayout();
 
-    auto dimSelectionWidget = dimensionSelectionAction->getDimensionsPickerAction().createWidget(this);
-    auto applyWidget = dimensionSelectionAction->getApplyAction().createWidget(this);
+    layout->addWidget(dimensionSelectionAction->getDimensionsPickerAction().createWidget(this), 0, 0, 1, 2);
+    layout->addWidget(dimensionSelectionAction->getApplyAction().createWidget(this),            1, 0, 1, 2);
 
-    dimSelectionWidget->setFixedWidth(400);
-
-    auto numPointsWidget = dimensionSelectionAction->getNumPointsAction().createWidget(this);
-    auto numDimsWidget = dimensionSelectionAction->getNumDimsAction().createWidget(this);
-    auto numItemsWidget = dimensionSelectionAction->getNumItemsAction().createWidget(this);
-
-    layout->addWidget(new QLabel("Dimensions"));
-    layout->addWidget(dimSelectionWidget);
-    layout->addWidget(applyWidget);
-
-    layout->addWidget(new QLabel("#Points:"));
-    layout->addWidget(numPointsWidget);
-    layout->addWidget(new QLabel("#Dimensions:"));
-    layout->addWidget(numDimsWidget);
-    layout->addWidget(new QLabel("#Items (max 7,000,000):"));
-    layout->addWidget(numItemsWidget);
+    layout->addWidget(dimensionSelectionAction->getNumPointsAction().createLabelWidget(this),   2, 0);
+    layout->addWidget(dimensionSelectionAction->getNumPointsAction().createWidget(this),        2, 1);
+    layout->addWidget(dimensionSelectionAction->getNumDimsAction().createLabelWidget(this),     3, 0);
+    layout->addWidget(dimensionSelectionAction->getNumDimsAction().createWidget(this),          3, 1);
+    layout->addWidget(dimensionSelectionAction->getNumItemsAction().createLabelWidget(this),    4, 0);
+    layout->addWidget(dimensionSelectionAction->getNumItemsAction().createWidget(this),         4, 1);
 
     setLayout(layout);
 }

@@ -13,8 +13,8 @@ using namespace mv::gui;
 ClampAction::ClampAction(PCPSettings& settingsAction) :
     WidgetAction(&settingsAction, "Clamp"),
     _settingsAction(settingsAction),
-    _minClampAction(this, "Range Min. (%): ", 0, 100, 0),
-    _maxClampAction(this, "Range Max. (%): ", 0, 100, 100),
+    _minClampAction(this, "Range Min. (%)", 0, 100, 0),
+    _maxClampAction(this, "Range Max. (%)", 0, 100, 100),
     _applyAction(this, "Apply")
 {
     setText("Clamp");
