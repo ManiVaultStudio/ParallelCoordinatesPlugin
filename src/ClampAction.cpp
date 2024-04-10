@@ -13,8 +13,8 @@ using namespace mv::gui;
 ClampAction::ClampAction(PCPSettings& settingsAction) :
     WidgetAction(&settingsAction, "Clamp"),
     _settingsAction(settingsAction),
-    _minClampAction(this, "Range Min. (%): ", 0, 100, 0),
-    _maxClampAction(this, "Range Max. (%): ", 0, 100, 100),
+    _minClampAction(this, "Range Min. (%)", 0, 100, 0),
+    _maxClampAction(this, "Range Max. (%)", 0, 100, 100),
     _applyAction(this, "Apply")
 {
     setText("Clamp");
@@ -69,15 +69,13 @@ QVariantMap ClampAction::toVariantMap() const
 ClampAction::Widget::Widget(QWidget* parent, ClampAction* clampAction) :
     WidgetActionWidget(parent, clampAction)
 {
-    auto layout = new QVBoxLayout();
+    auto layout = new QGridLayout();
 
-    auto minClampWidget     = clampAction->getMinClampAction().createWidget(this);
-    auto maxClampWidget     = clampAction->getMaxClampAction().createWidget(this);
-    auto applyWidget        = clampAction->getApplyAction().createWidget(this);
-
-    layout->addWidget(minClampWidget);
-    layout->addWidget(maxClampWidget);
-    layout->addWidget(applyWidget);
+    layout->addWidget(clampAction->getMinClampAction().createLabelWidget(this), 0, 0);
+    layout->addWidget(clampAction->getMinClampAction().createWidget(this),      0, 1);
+    layout->addWidget(clampAction->getMaxClampAction().createLabelWidget(this), 1, 0);
+    layout->addWidget(clampAction->getMaxClampAction().createWidget(this),      1, 1);
+    layout->addWidget(clampAction->getApplyAction().createWidget(this),         2, 1);
 
     setLayout(layout);
 }
