@@ -1,9 +1,17 @@
 cmake_minimum_required(VERSION 3.17)
 
+option(MV_UNITY_BUILD "Combine target source files into batches for faster compilation" OFF)
+
+# -----------------------------------------------------------------------------
+# Project: Parallel Coordinates plugin
+# -----------------------------------------------------------------------------
 set(PCPLUGIN "ParallelCoordinatesPlugin")
 
 PROJECT(${PCPLUGIN})
 
+# -----------------------------------------------------------------------------
+# CMake Options
+# -----------------------------------------------------------------------------
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -16,6 +24,9 @@ if(MSVC)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
 endif(MSVC)
 
+# -----------------------------------------------------------------------------
+# Set install directory
+# -----------------------------------------------------------------------------
 # Check if the directory to the ManiVault installation has been provided
 if(NOT DEFINED MV_INSTALL_DIR)
     set(MV_INSTALL_DIR "" CACHE PATH "Directory where ManiVault is installed")
@@ -23,8 +34,14 @@ if(NOT DEFINED MV_INSTALL_DIR)
 endif()
 file(TO_CMAKE_PATH ${MV_INSTALL_DIR} MV_INSTALL_DIR)
 
-find_package(Qt6 6.3.1 COMPONENTS Widgets WebEngineWidgets Concurrent REQUIRED)
+# -----------------------------------------------------------------------------
+# Dependencies
+# -----------------------------------------------------------------------------
+find_package(Qt6 COMPONENTS Widgets WebEngineWidgets Concurrent REQUIRED)
 
+# -----------------------------------------------------------------------------
+# Source files
+# -----------------------------------------------------------------------------
 set(PLUGIN
 	src/ParallelCoordinatesPlugin.h
 	src/ParallelCoordinatesPlugin.cpp
@@ -70,13 +87,28 @@ source_group(Widget FILES ${WIDGETS})
 source_group(Web FILES ${WEB})
 source_group(Aux FILES ${AUX})
 
+# -----------------------------------------------------------------------------
+# CMake Target
+# -----------------------------------------------------------------------------
 add_library(${PCPLUGIN} SHARED ${SOURCES} ${WEB} ${AUX} ${RESOURCE_FILES})
 
+# -----------------------------------------------------------------------------
+# Target include directories
+# -----------------------------------------------------------------------------
 target_include_directories(${PCPLUGIN} PRIVATE "${MV_INSTALL_DIR}/$<CONFIGURATION>/include/")
 
-# Request C++17
+# -----------------------------------------------------------------------------
+# Target properties
+# -----------------------------------------------------------------------------
 target_compile_features(${PCPLUGIN} PRIVATE cxx_std_17)
 
+if(MV_UNITY_BUILD)
+    set_target_properties(${PCPLUGIN} PROPERTIES UNITY_BUILD ON)
+endif()
+
+# -----------------------------------------------------------------------------
+# Target library linking
+# -----------------------------------------------------------------------------
 # link qt libraries
 target_link_libraries(${PCPLUGIN} PRIVATE Qt6::Widgets)
 target_link_libraries(${PCPLUGIN} PRIVATE Qt6::WebEngineWidgets)
@@ -93,6 +125,9 @@ set(POINTDATA_LINK_LIBRARY "${PLUGIN_LINK_PATH}/${CMAKE_SHARED_LIBRARY_PREFIX}Po
 target_link_libraries(${PCPLUGIN} PRIVATE "${MV_LINK_LIBRARY}")
 target_link_libraries(${PCPLUGIN} PRIVATE "${POINTDATA_LINK_LIBRARY}")
 
+# -----------------------------------------------------------------------------
+# Target installation
+# -----------------------------------------------------------------------------
 install(TARGETS ${PCPLUGIN}
     RUNTIME DESTINATION Plugins COMPONENT PLUGINS # Windows .dll
     LIBRARY DESTINATION Plugins COMPONENT PLUGINS # Linux/Mac .so
@@ -105,6 +140,9 @@ add_custom_command(TARGET ${PCPLUGIN} POST_BUILD
 	--prefix ${MV_INSTALL_DIR}/$<CONFIGURATION>
 )
 
+# -----------------------------------------------------------------------------
+# Misc
+# -----------------------------------------------------------------------------
 # Automatically set the debug environment (command + working directory) for MSVC
 if(MSVC)
 	set_property(TARGET ${PCPLUGIN} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<IF:$<CONFIG:DEBUG>,${MV_INSTALL_DIR}/debug,${MV_INSTALL_DIR}/release>)
