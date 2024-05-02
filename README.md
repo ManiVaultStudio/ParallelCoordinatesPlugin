@@ -1,15 +1,26 @@
 # Parallel coordinates plugin [![Actions Status](https://github.com/ManiVaultStudio/ParallelCoordinatesPlugin/workflows/ParallelCoordinatesPlugin/badge.svg)](https://github.com/ManiVaultStudio/ParallelCoordinatesPlugin/actions)
 
-A parallel coordinates plugin for the [ManiVault](https://github.com/ManiVaultStudio/core) visual analytics framework based on the [d3.js](https://github.com/d3/d3) library [Parallel Coordinates](https://syntagmatic.github.io/parallel-coordinates/) from [here](https://github.com/syntagmatic/parallel-coordinates).
+A parallel coordinates plugin for the [ManiVault](https://github.com/ManiVaultStudio/core) visual analytics framework based on [syntagmatic's parallel coordinates](https://github.com/syntagmatic/parallel-coordinates) library written in [d3.js](https://github.com/d3/d3).
 
-**Limitations**: limit of number of Dimensions * number of Points <= 7,000,000. Qt uses an internal json data representation to communicate between the c++ and js side, and this sets some data size limit for use here. This specific number is a bit arbitrary and does not correspond to the exact max Qt json size but it's pretty close. 
+<p align="middle">
+  <img src="https://github.com/ManiVaultStudio/ParallelCoordinatesPlugin/assets/58806453/82833616-d2e1-4907-a421-52e4a223cc2a" align="middle" width="65%" />
+  <img src="https://github.com/ManiVaultStudio/ParallelCoordinatesPlugin/assets/58806453/177bd5e1-96be-4b55-961f-f87c06cec443" align="middle" width="20%" /> </br>
+  Parallel coordinates showing the  <a href="https://doi.org/10.24432/C5859H">Auto MPG</a> dataset with a manual selection in the "acceleration" dimension
+</p>
 
+Clone the repo and all resources:
+```
+git clone https://github.com/ManiVaultStudio/ParallelCoordinatesPlugin.git
+```
 
-## TODO
-Possible future features:
-- Add interaction controls:
-  - Make axis dragable (instead of brushing, since this does not work well at the same time when there are many axes)
-    - This could be expanded to an automatic axis reordering
-  - Several brush options
-- Option to not show all axis ticks but just the min and max values for each axis
-- Option to color lines based on values from one dimension
+## Interaction
+- Selecting ranges in each dimension
+- Selecting which dimensions to display
+- Clamping the shown value range
+
+This plugin does not implement all interactions provided by the underlying library. Have a look [at it's docs](https://syntagmatic.github.io/parallel-coordinates/) for a full set of features.
+
+## Limitations
+Qt uses an internal JSON data representation to communicate between the C++ (ManiVault) and JS side (this view plugin), and this introduces some data size limits. 
+The maximum number of elements (number of dimensions * number of data points) that the current implementation can handle is roughly the maximum size of a Qt JSON array. 
+You're on the safe side with fewer than 7,000,000 elements. 
