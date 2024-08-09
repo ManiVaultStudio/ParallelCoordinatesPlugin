@@ -6,7 +6,6 @@ option(MV_UNITY_BUILD "Combine target source files into batches for faster compi
 # Project: Parallel Coordinates plugin
 # -----------------------------------------------------------------------------
 set(PCPLUGIN "ParallelCoordinatesPlugin")
-
 PROJECT(${PCPLUGIN})
 
 # -----------------------------------------------------------------------------
@@ -14,8 +13,6 @@ PROJECT(${PCPLUGIN})
 # -----------------------------------------------------------------------------
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
 
 if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DWIN32 /EHsc /MP /permissive- /Zc:__cplusplus /W3")
