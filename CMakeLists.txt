@@ -84,7 +84,7 @@ add_library(${PCPLUGIN} SHARED ${SOURCES} ${WEB} ${AUX} ${RESOURCE_FILES})
 # -----------------------------------------------------------------------------
 # Target include directories
 # -----------------------------------------------------------------------------
-target_include_directories(${PCPLUGIN} PRIVATE "${ManiVault_INSTALL_DIR}")
+target_include_directories(${PCPLUGIN} PRIVATE "${ManiVault_INCLUDE_DIR}")
 
 # -----------------------------------------------------------------------------
 # Target properties
