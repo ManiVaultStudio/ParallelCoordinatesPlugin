@@ -121,6 +121,11 @@ add_custom_command(TARGET ${PCPLUGIN} POST_BUILD
 	--prefix ${ManiVault_INSTALL_DIR}/$<CONFIGURATION>
 )
 
+set_target_properties(${PCPLUGIN}
+    PROPERTIES
+    FOLDER AnalysisPlugins
+)
+
 # -----------------------------------------------------------------------------
 # Misc
 # -----------------------------------------------------------------------------
