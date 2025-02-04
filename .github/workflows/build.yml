@@ -37,7 +37,7 @@ jobs:
         if: ${{ github.event_name != 'pull_request'}}
         uses: actions/checkout@v4
         with:
-            submodules: recursiv
+            submodules: recursive
 
       - name: Checkout the source (pull_request version)
         if: ${{ github.event_name == 'pull_request'}}
