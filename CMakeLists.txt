@@ -123,7 +123,7 @@ add_custom_command(TARGET ${PCPLUGIN} POST_BUILD
 
 set_target_properties(${PCPLUGIN}
     PROPERTIES
-    FOLDER AnalysisPlugins
+    FOLDER ViewPlugins
 )
 
 # -----------------------------------------------------------------------------
