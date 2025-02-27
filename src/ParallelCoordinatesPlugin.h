@@ -124,13 +124,6 @@ class ParallelCoordinatesPluginFactory : public ViewPluginFactory
 public:
     ParallelCoordinatesPluginFactory(void) {}
     ~ParallelCoordinatesPluginFactory(void) override {}
-    
-    /**
-     * Get plugin icon
-     * @param color Icon color for flat (font) icons
-     * @return Icon
-     */
-    QIcon getIcon(const QColor& color = Qt::black) const override;
 
     ViewPlugin* produce() override;
 
