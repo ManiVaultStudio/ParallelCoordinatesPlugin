@@ -445,6 +445,10 @@ QVariantMap ParallelCoordinatesPlugin::toVariantMap() const
     return variantMap;
 }
 
+ParallelCoordinatesPluginFactory::ParallelCoordinatesPluginFactory()
+{
+    setIconByName("chart-bar");
+}
 
 ViewPlugin* ParallelCoordinatesPluginFactory::produce()
 {

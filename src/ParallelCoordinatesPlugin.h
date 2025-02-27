@@ -122,8 +122,9 @@ class ParallelCoordinatesPluginFactory : public ViewPluginFactory
                       FILE  "ParallelCoordinatesPlugin.json")
     
 public:
-    ParallelCoordinatesPluginFactory(void) {}
-    ~ParallelCoordinatesPluginFactory(void) override {}
+    ParallelCoordinatesPluginFactory();
+
+    ~ParallelCoordinatesPluginFactory() override {}
 
     ViewPlugin* produce() override;
 
