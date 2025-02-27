@@ -445,15 +445,6 @@ QVariantMap ParallelCoordinatesPlugin::toVariantMap() const
     return variantMap;
 }
 
-// =============================================================================
-// Plugin Factory 
-// =============================================================================
-
-QIcon ParallelCoordinatesPluginFactory::getIcon(const QColor& color /*= Qt::black*/) const
-{
-    return mv::Application::getIconFont("FontAwesome").getIcon("chart-bar", color);
-}
-
 ViewPlugin* ParallelCoordinatesPluginFactory::produce()
 {
     return new ParallelCoordinatesPlugin(this);
