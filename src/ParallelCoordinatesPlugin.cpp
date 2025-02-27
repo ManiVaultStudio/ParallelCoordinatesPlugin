@@ -445,6 +445,7 @@ QVariantMap ParallelCoordinatesPlugin::toVariantMap() const
     return variantMap;
 }
 
+
 ViewPlugin* ParallelCoordinatesPluginFactory::produce()
 {
     return new ParallelCoordinatesPlugin(this);
@@ -470,7 +471,7 @@ mv::gui::PluginTriggerActions ParallelCoordinatesPluginFactory::getPluginTrigger
     if (PluginFactory::areAllDatasetsOfTheSameType(datasets, PointType)) {
         if (numberOfDatasets >= 1) {
             if (datasets.first()->getDataType() == PointType) {
-                auto pluginTriggerAction = new PluginTriggerAction(const_cast<ParallelCoordinatesPluginFactory*>(this), this, "Parallel coordinates", "Load dataset in parallel coordinates viewer", getIcon(), [this, getInstance, datasets](PluginTriggerAction& pluginTriggerAction) -> void {
+                auto pluginTriggerAction = new PluginTriggerAction(const_cast<ParallelCoordinatesPluginFactory*>(this), this, "Parallel coordinates", "Load dataset in parallel coordinates viewer", icon(), [this, getInstance, datasets](PluginTriggerAction& pluginTriggerAction) -> void {
                     for (auto dataset : datasets)
                         getInstance()->loadData(Datasets({ dataset }));
                 });
