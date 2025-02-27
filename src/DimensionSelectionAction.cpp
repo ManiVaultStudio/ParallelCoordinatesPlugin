@@ -18,7 +18,7 @@ DimensionSelectionAction::DimensionSelectionAction(PCPSettings& settingsAction) 
 {
     setText("Dimension Selection");
     setSerializationName("Dimension Selection");
-    setIcon(Application::getIconFont("FontAwesome").getIcon("layer-group"));
+    setIconByName("layer-group");
 
     _numPointsAction.setDefaultWidgetFlags(IntegralAction::LineEdit);
     _numDimsAction.setDefaultWidgetFlags(IntegralAction::LineEdit);

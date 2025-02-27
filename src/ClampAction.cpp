@@ -19,7 +19,7 @@ ClampAction::ClampAction(PCPSettings& settingsAction) :
 {
     setText("Clamp");
     setSerializationName("Clamp");
-    setIcon(Application::getIconFont("FontAwesome").getIcon("ruler-horizontal"));
+    setIconByName("ruler-horizontal");
 
     _minClampAction.setDefaultWidgetFlags(IntegralAction::SpinBox | IntegralAction::Slider);
     _maxClampAction.setDefaultWidgetFlags(IntegralAction::SpinBox | IntegralAction::Slider);
