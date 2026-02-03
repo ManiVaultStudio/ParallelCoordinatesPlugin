@@ -1,5 +1,0 @@
-{
-    "name" : "Parallel Coordinates",
-    "version" : "0.1",
-    "dependencies" : ["Points"]
-}

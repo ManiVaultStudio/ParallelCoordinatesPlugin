@@ -6,7 +6,10 @@ option(MV_UNITY_BUILD "Combine target source files into batches for faster compi
 # Project: Parallel Coordinates plugin
 # -----------------------------------------------------------------------------
 set(PCPLUGIN "ParallelCoordinatesPlugin")
-PROJECT(${PCPLUGIN})
+PROJECT(${PCPLUGIN}
+        DESCRIPTION "Parallel coordinates view plugin for ManiVault"
+        LANGUAGES CXX
+)
 
 # -----------------------------------------------------------------------------
 # CMake Options
@@ -14,12 +17,12 @@ PROJECT(${PCPLUGIN})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
-if(MSVC)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DWIN32 /EHsc /MP /permissive- /Zc:__cplusplus /W3")
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
 	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /MD")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
-endif(MSVC)
+endif()
 
 # -----------------------------------------------------------------------------
 # Dependencies
@@ -63,7 +66,7 @@ set(WEB
 
 set(AUX
 	res/parcoords_resources.qrc
-	src/ParallelCoordinatesPlugin.json
+	PluginInfo.json
 )
 
 qt6_add_resources(RESOURCE_FILES res/parcoords_resources.qrc)
@@ -121,16 +124,13 @@ add_custom_command(TARGET ${PCPLUGIN} POST_BUILD
 	--prefix ${ManiVault_INSTALL_DIR}/$<CONFIGURATION>
 )
 
-set_target_properties(${PCPLUGIN}
-    PROPERTIES
-    FOLDER ViewPlugins
-)
+mv_handle_plugin_config(${PCPLUGIN})
 
 # -----------------------------------------------------------------------------
 # Misc
 # -----------------------------------------------------------------------------
 # Automatically set the debug environment (command + working directory) for MSVC
-if(MSVC)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     set_property(TARGET ${PCPLUGIN} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY $<IF:$<CONFIG:DEBUG>,${ManiVault_INSTALL_DIR}/Debug,$<IF:$<CONFIG:RELWITHDEBINFO>,${ManiVault_INSTALL_DIR}/RelWithDebInfo,${ManiVault_INSTALL_DIR}/Release>>)
     set_property(TARGET ${PCPLUGIN} PROPERTY VS_DEBUGGER_COMMAND $<IF:$<CONFIG:DEBUG>,"${ManiVault_INSTALL_DIR}/Debug/ManiVault Studio.exe",$<IF:$<CONFIG:RELWITHDEBINFO>,"${ManiVault_INSTALL_DIR}/RelWithDebInfo/ManiVault Studio.exe","${ManiVault_INSTALL_DIR}/Release/ManiVault Studio.exe">>)
 endif()
