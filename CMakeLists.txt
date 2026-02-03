@@ -63,7 +63,7 @@ set(WEB
 
 set(AUX
 	res/parcoords_resources.qrc
-	src/ParallelCoordinatesPlugin.json
+	PluginInfo.json
 )
 
 qt6_add_resources(RESOURCE_FILES res/parcoords_resources.qrc)
@@ -121,10 +121,7 @@ add_custom_command(TARGET ${PCPLUGIN} POST_BUILD
 	--prefix ${ManiVault_INSTALL_DIR}/$<CONFIGURATION>
 )
 
-set_target_properties(${PCPLUGIN}
-    PROPERTIES
-    FOLDER ViewPlugins
-)
+mv_handle_plugin_config(${PCPLUGIN})
 
 # -----------------------------------------------------------------------------
 # Misc
