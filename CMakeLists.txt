@@ -6,7 +6,10 @@ option(MV_UNITY_BUILD "Combine target source files into batches for faster compi
 # Project: Parallel Coordinates plugin
 # -----------------------------------------------------------------------------
 set(PCPLUGIN "ParallelCoordinatesPlugin")
-PROJECT(${PCPLUGIN})
+PROJECT(${PCPLUGIN}
+        DESCRIPTION "Parallel coordinates view plugin for ManiVault"
+        LANGUAGES CXX
+)
 
 # -----------------------------------------------------------------------------
 # CMake Options
