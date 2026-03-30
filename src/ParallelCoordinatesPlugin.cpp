@@ -323,7 +323,7 @@ void ParallelCoordinatesPlugin::passDataToJS(const std::vector<unsigned int>& po
                     dimName = QString::number(dimId);
 
                 // clamp data if necessary
-                dimension[dimName] = std::clamp((float)beginOfData[pointId * _numDims + dimId], _minMaxClampPerDim[2 * dimId], _minMaxClampPerDim[2 * dimId +1]);
+                dimension[dimName] = std::clamp((float)beginOfData[static_cast<std::uint64_t>(pointId) * _numDims + dimId], _minMaxClampPerDim[2 * dimId], _minMaxClampPerDim[2 * dimId +1]);
             }
             payload.append(dimension);
         }
