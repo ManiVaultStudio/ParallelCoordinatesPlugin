@@ -2,13 +2,14 @@
 #include "ParallelCoordinatesWidget.h"
 #include "SettingsAction.h"
 
-#include "DataHierarchyItem.h"
-#include "event/Event.h"
-#include "Dataset.h"
-#include "PointData/PointData.h"
-
 #include <actions/PluginTriggerAction.h>
+#include <DataHierarchyItem.h>
+#include <Dataset.h>
+#include <event/Event.h>
+#include <PointData/PointData.h>
 #include <widgets/DropWidget.h>
+#include <util/Serialization.h>
+
 #include <DatasetsMimeData.h>
 
 #include <QtCore>
@@ -210,10 +211,10 @@ void ParallelCoordinatesPlugin::onDataInput()
 
     // calc min and max per channel of source data
     calculateMinMaxPerDim();
-    // init the clamping valies
+    // init the clamping values
     calculateMinMaxClampPerDim();
 
-    // setup dimensio selection widget
+    // setup dimension selection widget
     auto& dimensionSelectionWidget = _settingsWidget->getDimensionSelectionAction();
     dimensionSelectionWidget.getDimensionsPickerAction().setPointsDataset(_currentDataSet);
     dimensionSelectionWidget.setNumPoints(_numPoints);
@@ -241,7 +242,7 @@ void ParallelCoordinatesPlugin::calculateMinMaxPerDim()
     uint32_t minIndex = 0;
     uint32_t maxIndex = 0;
     // for each dimension iterate over all values
-    // remember data stucture (point1 d0, point1 d1,... point1 dn, point2 d0, point2 d1, ...)
+    // remember data structure (point1 d0, point1 d1,... point1 dn, point2 d0, point2 d1, ...)
     for (uint32_t dimCount = 0; dimCount < _numDims; dimCount++) {
         // init min and max
         minIndex = 2 * dimCount;
@@ -334,8 +335,8 @@ void ParallelCoordinatesPlugin::passDataToJS(const std::vector<unsigned int>& po
 
 void ParallelCoordinatesPlugin::applyClamping() {
 
-    int32_t newMinClamp = _settingsWidget->getClampAction().getMinClamp();
-    int32_t newMaxClamp = _settingsWidget->getClampAction().getMaxClamp();
+    const int32_t newMinClamp = _settingsWidget->getClampAction().getMinClamp();
+    const int32_t newMaxClamp = _settingsWidget->getClampAction().getMaxClamp();
 
     // min and max clamp are the same
     if ((newMinClamp == _minClampPercent) && (newMaxClamp == _maxClampPercent))
@@ -447,7 +448,7 @@ QVariantMap ParallelCoordinatesPlugin::toVariantMap() const
 
 ParallelCoordinatesPluginFactory::ParallelCoordinatesPluginFactory()
 {
-    setIconByName("chart-bar");
+    WidgetAction::setIconByName("chart-bar");
 }
 
 ViewPlugin* ParallelCoordinatesPluginFactory::produce()
@@ -475,8 +476,8 @@ mv::gui::PluginTriggerActions ParallelCoordinatesPluginFactory::getPluginTrigger
     if (PluginFactory::areAllDatasetsOfTheSameType(datasets, PointType)) {
         if (numberOfDatasets >= 1) {
             if (datasets.first()->getDataType() == PointType) {
-                auto pluginTriggerAction = new PluginTriggerAction(const_cast<ParallelCoordinatesPluginFactory*>(this), this, "Parallel coordinates", "Load dataset in parallel coordinates viewer", icon(), [this, getInstance, datasets](PluginTriggerAction& pluginTriggerAction) -> void {
-                    for (auto dataset : datasets)
+                const auto pluginTriggerAction = new PluginTriggerAction(const_cast<ParallelCoordinatesPluginFactory*>(this), this, "Parallel coordinates", "Load dataset in parallel coordinates viewer", icon(), [this, getInstance, datasets](PluginTriggerAction& pluginTriggerAction) -> void {
+                    for (const auto& dataset : datasets)
                         getInstance()->loadData(Datasets({ dataset }));
                 });
 
